@@ -1,0 +1,23 @@
+# Maestro Web Automation Test Case for Desktop Chrome
+# Test: Open Google on Desktop Chrome
+# Description: Web browser test
+
+appId: web
+name: Open Google Test - Desktop Chrome
+
+---
+- launchApp:
+    clearState: true
+
+# Navigate to Google
+- runScript: |
+    window.location.href = 'https://www.google.com';
+
+# Wait for navigation
+- waitForAnimationToEnd
+
+# Verify page loaded
+- assertVisible: "Google"
+
+# Take screenshot
+- takeScreenshot: "google_homepage"

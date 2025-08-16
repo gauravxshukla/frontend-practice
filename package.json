@@ -1,0 +1,20 @@
+{
+  "name": "practicejs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "nodemon": "^3.1.10",
+    "puppeteer": "24.9.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "type": "module"
+}
