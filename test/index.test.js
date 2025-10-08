@@ -1,4 +1,4 @@
-const { add, subtract, multiply, divide } = require('./index');
+const { add, subtract, multiply, divide } = require('../index');
 
 describe('Math Operations', () => {
   describe('add', () => {

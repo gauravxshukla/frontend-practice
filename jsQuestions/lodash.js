@@ -1,17 +1,15 @@
 
 // deepClone, deepEqual, IntersectionBy, IntersectionWith, isEmpty
 
-
 export function flattenArray(inputArr) {
     let result = [];
-    const copyArr = [...inputArr];
+    let copy = [...inputArr];
 
-    while(copyArr.length){
-        let currentItem = copyArr.shift();
-
+    while(copy.length){
+        let currentItem = copy.shift();
         if(Array.isArray(currentItem)){
-            copyArr.unshift(...currentItem);
-        }
+            copy.unshift(...currentItem);
+        } 
         else{
             result.push(currentItem);
         }

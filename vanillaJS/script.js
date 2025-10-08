@@ -16,13 +16,11 @@
         4. Table of Contents
 */
 
-import { runAccordion } from './accordion.js';
-import { basicUI } from './basics.js';
-import { contactForm } from './contactForm.js';
-import { todoList } from './todoList.js';
+const $rootEl = document.getElementById('app');
+$rootEl.innerHTML ='<h1>Hello World!</h1>';
+$rootEl.innerHTML += '<p>Let\'s get started!</p>';
 
 
-todoList();
 
 
 

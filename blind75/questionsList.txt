@@ -2,4 +2,8 @@
 1. Balanced Brackets
 2. Maximum product in Contiguous array
 3. Target Sum
-4. 
+4. Linked List (Reverse, Cycle Detection, Combine Linked Lists)
+5. Buy and Sell Stock
+6. Sorting (Insertion, Selection, Bubble)
+7. Intervals (Insert Intervals, Merge Intervals)
+8. Trapping Water

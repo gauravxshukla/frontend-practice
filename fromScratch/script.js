@@ -45,43 +45,14 @@ import React from "./react.js";
 
 const $rootEl = document.getElementById('root');
 
-// Create a React element
-// const element = React.createElement(
-//   'div',
-//   { 
-//     className: 'app-container',
-//     style: 'padding: 20px; background-color: #f0f0f0; border-radius: 8px;'
-//   },
-//   React.createElement('h1', { style: 'color: #333;' }, 'Hello from Custom React!'),
-//   React.createElement('p', { style: 'color: #666;' }, 'This element was created using React.createElement()'),
-//   React.createElement('button', { 
-//     style: 'background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;',
-//     onclick: () => alert('Button clicked!')
-//   }, 'Click me!')
-// );
-
-
-// Render the element to the DOM
-// React.render(element, $rootEl);
-
-
-// Using createElement directly (what JSX compiles to)
-const app1 = React.createElement('div', { style: 'padding: 20px; font-family: Arial;' },
-  React.createElement('h1', { style: 'color: #2563eb;' }, 'JSX Support Added!'),
-  React.createElement('p', null, 'You can now write JSX-like code'),
-  React.createElement('button', 
-    { 
-      style: 'padding: 8px 16px; background: #10b981; color: white; border: none; border-radius: 4px;',
-      onclick: () => alert('JSX button works!')
-    }, 
-    'Try JSX'
-  )
+const app1 = React.createElement(
+  'h1',                      // Type
+  { style: 'color: red;' }, // Props
+  'Hi! React from Scratch' // Childrem
 );
 
 
 // Render the example
 $rootEl.innerHTML = '';
 React.render(app1, $rootEl);
-
-// ===== NEW CODE: React Class Component and Functions =====
 

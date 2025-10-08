@@ -2,18 +2,15 @@
 
 export function pairSum(numbers, target) {
   let hashMap = {};
-  let numbersLength = numbers.length;
-
-  for(let i = 0; i < numbersLength ; i++){
+  
+  for(let i=0;i<numbers.length;i++){
     if(hashMap.hasOwnProperty(target - numbers[i])){
-        return [hashMap[target-numbers[i]], i];
+      return [hashMap[target-numbers[i]], i];
     }
     else{
-        hashMap[numbers[i]] = i;
+      hashMap[numbers[i]] = i;
     }
   }
-
-  return [];
 };
 
 export function isBalancedBrackets(str) {
@@ -56,3 +53,20 @@ export function findDuplicates(numbers) {
   }
   return false;
 }
+
+export function maxProfit(prices) {
+    let minBuyPrice = Infinity;
+    let maxProfit = 0;
+
+    for(let i=0;i<prices.length; i++){
+      if(minBuyPrice > prices[i]){
+        minBuyPrice = prices[i];
+      }
+      else{
+        maxProfit = Math.max(maxProfit, prices[i] - minBuyPrice);
+      }
+    }
+
+    return maxProfit;
+}
+
