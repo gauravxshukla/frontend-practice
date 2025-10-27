@@ -89,3 +89,30 @@ export function throttle(func, wait) {
     };
 }
 
+export function mapAsync(iterable, callbackFn){
+  return new Promise((resolve, reject) => {
+    let len = iterable.length;
+    let array = new Array(len);
+
+    if (len === 0) {
+      resolve(array);
+    }
+
+    iterable.map(async (currentEl, index) => {
+      try {
+        if (Object.hasOwn(iterable, index)) {
+          array[index] = await callbackFn.call(this, currentEl);
+        }
+        if (index === len - 1) {
+          resolve(array);
+        }
+      } catch (e) {
+        reject(e);
+      }
+    });
+  });
+}
+
+export function promiseRace(){
+    return 'Promise.race';
+}

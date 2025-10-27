@@ -1,5 +1,22 @@
 import React, { useEffect, useState } from "react";
 
+/* 
+    Requirements - 
+    1. Fetch data from api and display title, price, image.
+    2. Do pagination with next and prev button and current page.
+    3. Add an option to set page size (Ex - 5, 10, 20 )
+
+
+    Components - 
+       Posts - 
+       postsList (useState)
+       async function getPosts (Append and add posts data)
+       useEffect (To run getPosts function on 1st render)
+       
+
+
+*/
+
 export default function FetchData(){
     const [postsData, setPostsData] = useState([]);
     

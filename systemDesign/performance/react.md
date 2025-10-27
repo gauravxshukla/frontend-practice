@@ -1,3 +1,5 @@
+Link - https://www.patterns.dev/react/
+
 ### useMemo
 
 - **What it does**: Caches the result of an expensive calculation between renders until its dependencies change.
