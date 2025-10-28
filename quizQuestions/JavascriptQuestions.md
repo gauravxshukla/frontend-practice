@@ -2,12 +2,15 @@
 
 ### 1. What is Hoisting
 Hoisting means JavaScript moves variable and function declarations to the top of their scope before code execution.
+
 **Edge case:** Only declarations are hoisted, not initializations; `let` and `const` are hoisted but stay in the Temporal Dead Zone until initialized.
 
 ---
 ### 2. Difference between Function Scope and Global Scope
 **Global scope:** Accessible from anywhere in the code.
+
 **Function scope:** Accessible only within the function it’s declared in.
+
 **Edge case:** Variables declared with `var` inside a function can shadow global variables with the same name.
 
 ---
