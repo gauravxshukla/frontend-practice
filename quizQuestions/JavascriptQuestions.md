@@ -16,24 +16,31 @@ Hoisting means JavaScript moves variable and function declarations to the top of
 ---
 ### 3. Difference between Shallow Copy and Deep Copy
 A shallow copy creates a new object but only copies references of nested objects — not the actual nested data.
+
 A deep copy recursively copies all levels of the object, ensuring that every nested structure is fully cloned.
 
 ---
 ### 4. What is the Difference Between call, apply, and bind
 **.call:** Calls function with a given `this` and arguments individually.
+
 **.apply:** Same as call, but arguments are in an array.
+
 **.bind:** Returns a new function with bound `this`.
+
 **Edge case:** `.bind()` doesn’t immediately invoke the function — it must be called later.
 
 ---
 ### 5. Difference between slice and splice method for array
 **slice:** Returns a new array (doesn’t modify the original).
+
 **splice:** Changes the original array (add/remove items).
+
 **Edge case:** `splice` returns the deleted elements, not the modified array.
 
 ---
 ### 6. What is a Currying Function? Explain with an Example
 Currying converts a multi-argument function into a series of single-argument functions.
+
 ```javascript
 function add(a) {
   return function (b) {
@@ -42,17 +49,21 @@ function add(a) {
 }
 console.log(add(5)(10)); // 15
 ```
+
 **Edge case:** If any argument is missing, the returned function must handle it gracefully or throw an error.
 
 ---
 ### 7. What is a Pure Function? Benefits of Pure Function
 A pure function returns the same output for the same input and has no side effects.
+
 **Benefits:** Easier to test, debug, and cache.
+
 **Edge case:** If a function modifies external variables or DOM, it’s not pure even if output seems predictable.
 
 ---
 ### 8. What is Closure? Explain with an Example
 A closure gives access to an outer function’s scope from an inner function even after the outer function has executed.
+
 ```javascript
 function outer() {
   let count = 0;
@@ -65,30 +76,37 @@ const counter = outer();
 console.log(counter()); // 1
 console.log(counter()); // 2
 ```
+
 **Edge case:** Closures can cause memory leaks if large objects remain referenced unintentionally.
 
 ---
 ### 9. What is the Temporal Dead Zone
 It’s the phase between variable declaration and initialization where `let` and `const` can’t be accessed.
+
 **Edge case:** Accessing variables before initialization throws a ReferenceError, not undefined.
 
 ---
 ### 10. What is an IIFE (Immediately Invoked Function Expression)
 IIFE runs immediately after it’s defined.
+
 ```javascript
 (function () {
   console.log("IIFE runs immediately!");
 })();
 ```
+
 **Edge case:** Must be wrapped in parentheses to avoid syntax errors.
 
 ---
 ### 11. What is a Callback Function? Explain Callback Hell
-A callback function is a function passed into another function as an argument. Callback Hell is an anti-pattern with multiple nested callbacks which makes code hard to read and debug.
+A callback function is a function passed into another function as an argument. 
+
+Callback Hell is an anti-pattern with multiple nested callbacks which makes code hard to read and debug.
 
 ---
 ### 12. Explain Throttle and Debounce
 **Debouncing:** Executes a function only after a certain time since the last call.
+
 ```javascript
 function debounce(fn, delay) {
   let timer;
@@ -98,6 +116,7 @@ function debounce(fn, delay) {
   };
 }
 ```
+
 **Throttling:** Ensures a function executes at most once in a specific interval.
 ```javascript
 function throttle(fn, limit) {
@@ -124,13 +143,17 @@ function throttle(fn, limit) {
 ---
 ### 14. Explain difference between undefined, null and NaN
 - **undefined:** A variable declared but not assigned.
+
 - **null:** Explicitly assigned value representing “no value”.
+
 - **NaN:** Result of invalid mathematical operations.
+
 **Edge case:** `typeof null` returns `"object"` (a historical bug).
 
 ---
 ### 15. What is a Promise? Explain different states of a promise
 A Promise represents the eventual completion (or failure) of an asynchronous operation.
+
 States: **pending**, **fulfilled**, **rejected**.
 
 ---
@@ -165,8 +188,11 @@ fetchData()
 ---
 ### 20. Phases of Execution Context
 1. **Creation Phase:** Memory allocation, hoisting.
+
 2. **Execution Phase:** Code runs line by line.
+
 **Global Execution Context:** Created first.
+
 **Function Execution Context:** Created whenever a function runs.
 
 ---
@@ -183,7 +209,9 @@ console.log(sum(1, 2, 3));
 ---
 ### 22. Difference between forEach and Map function
 - **forEach:** Iterates but returns nothing.
+
 - **map:** Returns a new array.
+
 **Edge case:** `forEach` can’t be chained; `map` can.
 
 ---
