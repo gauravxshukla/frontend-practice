@@ -280,3 +280,105 @@ const Card = ({ children }) => <div className="card">{children}</div>;
 <Card><Profile /></Card>;
 ```
 ---
+
+### 27) Explain what State Management library would you prefer and why? (Redux, Zustand, Context)
+
+- **Context + useReducer**
+  - Built-in, zero-deps, great for small-to-medium scoped state (theme, auth).
+  - Avoids extra runtime; but can cause re-renders if provider value changes frequently.
+  - Use when app needs simple global state without complex middleware.
+
+- **Redux (Redux Toolkit)**
+  - Predictable single source of truth, time-travel debugging, middleware ecosystem (thunk/saga/rtk-query).
+  - Good for large apps with complex state interactions, strict data flow, and teams needing clear patterns.
+  - Use `createSlice`, `RTK Query` for data fetching to reduce boilerplate.
+  - Downsides: boilerplate (mitigated by RTK), potential verbosity.
+
+- **Zustand**
+  - Lightweight, minimal API, selective subscriptions (no unnecessary re-renders).
+  - Great for performance-critical apps and local/global hybrid state.
+  - Simple migration path and small bundle size compared to Redux.
+  - Use when you need fine-grained updates without boilerplate.
+
+- **Decision factors**:
+  - Data complexity, team familiarity, need for middleware/time travel, performance constraints, bundle size.
+- **Example recommendation**:
+  - Small app: Context + useReducer; Medium-large: Zustand; Very large enterprise with complex flows: Redux Toolkit + RTK Query.
+
+---
+
+### 28) How does React Fiber differ from the older reconciliation algorithm?
+
+- **Fiber** is a reimplementation of the reconciliation algorithm with **incremental rendering** and **prioritization**.
+- Key differences:
+  - **Incremental work**: breaks rendering work into units of work (fibers) so rendering can be paused/resumed.
+  - **Prioritization & scheduling**: supports different priorities (user input, animation, low-priority updates).
+  - **Ability to yield**: React can yield to higher priority tasks and resume work later — improves responsiveness.
+  - **Better error recovery** and **suspense** support since work can be split.
+- Internally, Fiber represents each element as a linked tree of fiber nodes with pointers (`child`, `sibling`, `return`) enabling DFS traversal and diffing in chunks.
+- Result: smoother UI, reduced jank, and foundation for concurrent features.
+
+---
+
+### 29) What are concurrent features in React 18, and how do they work internally?
+
+- **Concurrent features** enable React to prepare multiple versions of the UI and interrupt work for higher-priority updates.
+- Notable features:
+  - **Automatic batching**: batches multiple state updates across event handlers/promises to reduce re-renders.
+  - **startTransition**: mark low-priority updates that can be interrupted to keep UI responsive.
+  - **useDeferredValue**: defer a value to avoid blocking urgent updates.
+  - **Suspense for data fetching + streaming SSR**: allows showing placeholders while async data is being fetched.
+- **Internals**:
+  - Built on Fiber scheduler — updates tagged with priorities; work is scheduled and can be paused/resumed.
+  - `startTransition` marks updates with lower priority in the scheduler.
+  - React maintains multiple "lanes" (priority lanes) to classify and manage concurrent updates.
+- **Practical guidance**:
+  - Use `startTransition` for navigation, filtering, or large list updates.
+  - Use Suspense + server components/streaming SSR to improve TTFB and perceived performance.
+
+---
+
+### 30) How does React decide whether to re-render a component?
+
+- **Props/state changes**: React re-renders when parent re-renders or state/props change; reconciliation compares previous and next element trees.
+- **Pure components & memoization**:
+  - `React.memo` performs shallow prop comparison to skip re-render when props unchanged.
+  - `useMemo`, `useCallback` help avoid recreating objects/functions that would trigger prop equality changes.
+- **Key heuristics**:
+  - If element type differs, React unmounts old subtree and mounts new one.
+  - For same element type, React compares props and updates DOM based on diffed Virtual DOM.
+- **Avoiding unnecessary renders**:
+  - Keep props stable (avoid creating inline objects/arrays/functions in render).
+  - Use selective state co-location to minimize affected components.
+  - Use selectors in state libs (e.g., Zustand/RTK) to subscribe to slices of state.
+- **Example**:
+  ```js
+  const Item = React.memo(({ item }) => <div>{item.name}</div>);
+  ```
+
+---
+
+### 31) How do you handle large lists efficiently in React beyond virtualization (Windowing + React 18 streaming)?
+
+- **Virtualization (Windowing)**:
+  - Libraries: `react-window`, `react-virtualized`.
+  - Render only visible subset of items to reduce DOM nodes and memory.
+- **Chunked rendering / incremental hydration**:
+  - Use `startTransition` to render large updates as low-priority work so UI stays responsive.
+  - Render items in batches (e.g., `requestIdleCallback` or `setTimeout` chunks) to avoid blocking main thread.
+- **Progressive hydration & streaming**:
+  - Server-side stream HTML to client (React 18 streaming SSR) so user sees initial content sooner.
+  - Hydrate interactive regions progressively instead of full-page blocking hydration.
+- **Windowing + virtualization optimizations**:
+  - Use item measurement caching, sticky headers, and overscan tuning.
+  - Avoid expensive item renders: memoize row components, use `shouldComponentUpdate` or `React.memo`.
+- **Data handling**:
+  - Use pagination or cursor-based loading; fetch in background with `useDeferredValue`.
+  - Use Suspense for data fetching so placeholders render while data arrives.
+- **Native-like techniques**:
+  - Offload heavy computations to Web Workers.
+  - Use `IntersectionObserver` to lazy-load images/content within list items.
+- **Example pattern**:
+  - Virtualize visible rows, prefetch next page in background, and use `startTransition` to insert new rows without jank.
+
+---

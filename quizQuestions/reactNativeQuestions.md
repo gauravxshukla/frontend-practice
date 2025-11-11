@@ -773,12 +773,106 @@ This approach **improves startup, reduces app size, optimizes OTA**, and keeps t
 
 ### 6) How does JS thread and Main thread communicate while making a UI and executing business logic?
 
----
-### 9) How do you measure App performance?
-### 10)  What tools do you use for performance monitoring ?
-### 11) How do you log and monitor error in production? (JS Error, native error) How do you handle them without crashing the app?
-### 12) How do you manage CI/CD ? How did you implement OTA?
+- React Native uses a **multi-threaded architecture**:
+  - **JS thread** → runs JavaScript (business logic, React rendering).
+  - **Main/UI thread** → handles layout, gestures, animations, and native views.
+  - **Bridge** → mediates async, batched message passing between JS & Native (serialized JSON).
 
+- Communication:
+  - JS thread sends UI commands (e.g., `createView`, `setProps`) via the bridge.
+  - Native sends events (e.g., `onPress`, scroll updates) back to JS.
+  - Data is **serialized** and passed asynchronously — avoiding UI blockage.
+
+- **Performance Issue**:
+  - Heavy JS-Native communication (large JSON, image data) causes frame drops (Bridge bottleneck).
+
+- **New Architecture (Fabric + JSI + TurboModules)**:
+  - Eliminates bridge; uses **JSI (JavaScript Interface)** for **synchronous, memory-shared calls**.
+  - **Fabric** renders UI using concurrent React, ensuring smoother 60 FPS rendering.
+  - **TurboModules** allow direct C++ access to native modules.
+
+---
+
+### 9) How do you measure App performance?
+
+- **Startup Time (Cold/Warm start)** → Measure via native logs (`adb shell am start -W`) and `AppStart` events.
+- **FPS (Frame Rate)** → Use `PerformanceMonitor` in dev menu or Flipper performance plugin.
+- **JS Thread Frame Drops** → Detect long tasks (>16ms) using `InteractionManager` or profiling tools.
+- **Memory Usage** → Profile via Xcode Instruments or Android Studio Profiler.
+- **Bridge Performance** → Track message queue length between JS ↔ Native.
+
+**Key Metrics**:
+- TTI (Time To Interactive)
+- JS frame rate (60 FPS target)
+- Memory footprint and GC frequency
+- Bundle load time
+
+---
+
+### 10) What tools do you use for performance monitoring?
+
+- **Flipper** → Inspect layout, network requests, logs, and performance (official RN tool).
+- **React Native Performance Monitor** → Measures FPS, memory, JS frame drops.
+- **New Relic / Datadog / Firebase Performance Monitoring** → Production-level telemetry.
+- **Hermes profiling** → For JS bytecode performance with `--profile` flag.
+- **Sentry Performance** → Tracks slow transactions and bridge delays.
+- **Android Studio Profiler & Xcode Instruments** → For native CPU/memory traces.
+
+---
+
+### 11) How do you log and monitor errors in production? (JS Error, native error) How do you handle them without crashing the app?
+
+- **JS Errors**:
+  - Use **Error Boundaries** in React to catch render-time errors.
+  - Use **Sentry**, **Bugsnag**, or **New Relic** to log and aggregate JS errors.
+  - Example:
+    ```js
+    class ErrorBoundary extends React.Component {
+      componentDidCatch(error, info) {
+        Sentry.captureException(error);
+      }
+      render() { return this.props.children; }
+    }
+    ```
+
+- **Native Errors (Java/Swift)**:
+  - Integrate native crash reporters like **Firebase Crashlytics** or **Sentry Native SDK**.
+  - Wrap native module calls in `try-catch` and return safe fallbacks to JS.
+
+- **Handling Without Crash**:
+  - Use a **global error handler** (`ErrorUtils.setGlobalHandler`) for JS.
+  - Gracefully degrade the UI or show retry screens for known failures.
+  - Avoid unhandled promise rejections — use `.catch()` in async flows.
+
+---
+
+### 12) How do you manage CI/CD? How did you implement OTA?
+
+- **CI/CD Setup**:
+  - Tools: **Fastlane**, **GitHub Actions**, **Bitrise**, or **CircleCI**.
+  - Automate build, signing, testing, and deployment for both Android & iOS.
+  - Steps:
+    1. Lint & run Jest/Detox tests.
+    2. Increment version via Fastlane.
+    3. Build `.aab` / `.ipa` with credentials.
+    4. Upload to Play Store/TestFlight.
+
+- **OTA (Over-The-Air Updates)**:
+  - Implemented via **Microsoft CodePush (App Center)**.
+  - Pushes JS & asset updates without app store re-release.
+  - Rollback available if crashes detected post-deploy.
+  - Example:
+    ```js
+    import codePush from "react-native-code-push";
+    const App = () => <MainApp />;
+    export default codePush({ checkFrequency: codePush.CheckFrequency.ON_APP_START })(App);
+    ```
+
+- **Security Practices**:
+  - Sign OTA bundles.
+  - Ensure native versions stay compatible with JS updates.
+
+---
 ---
 
 ### 13) How to debug React Native applications?
@@ -794,4 +888,252 @@ This approach **improves startup, reduces app size, optimizes OTA**, and keeps t
 - **Profiling:** Use Flipper plugins, Android Profiler, Xcode Instruments.  
 - **Hot Reload / Fast Refresh:** Speeds up iteration for JS code changes.
 
+### 14) What is Deep Linking? How to implement one?
 
+- **Deep linking** lets users open specific screens within the app from URLs.  
+- Types:
+  - **Custom URL scheme** (`myapp://profile/123`)
+  - **Universal Links (iOS)** / **App Links (Android)** → HTTPS URLs that open the app if installed.
+- **Implementation**:
+  - Add schemes in `Info.plist` (iOS) & `AndroidManifest.xml` (Android).
+  - Use `Linking` API or React Navigation’s linking config.
+  - Example:
+    ```js
+    const linking = {
+      prefixes: ["myapp://", "https://myapp.com"],
+      config: { screens: { Profile: "profile/:id" } }
+    };
+    ```
+
+---
+
+### 15) What will be your choice of persistent Storage in React Native and why?
+
+- **AsyncStorage (via @react-native-async-storage/async-storage)** for key-value pairs.
+- **MMKV** (by Tencent) → faster, C++ based, used in production apps for performance-critical caching.
+- **SQLite / WatermelonDB / Realm** → for complex relational data or offline sync.
+- **Choice depends on**: data volume, read/write frequency, offline support needs.
+- Example: use MMKV for auth/session, SQLite for cached API data.
+
+---
+
+### 16) How would you implement retry logic for failed requests?
+
+- Wrap API call in retry logic using **exponential backoff**.
+- Use libraries like **axios-retry** or implement custom retry.
+- Example:
+  ```js
+  async function fetchWithRetry(url, retries = 3, delay = 1000) {
+    try {
+      return await fetch(url);
+    } catch (err) {
+      if (retries > 0) {
+        await new Promise(res => setTimeout(res, delay));
+        return fetchWithRetry(url, retries - 1, delay * 2);
+      }
+      throw err;
+    }
+  }
+  ```
+- Helps handle intermittent network failures.
+
+---
+
+### 17) How would you implement real-time validation?
+
+- Use controlled inputs with onChange validation.
+- Validate against regex or schema (e.g., **Yup** with **Formik**).
+- Use debounce to avoid excessive validation calls.
+- Example:
+  ```js
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+
+  const validateEmail = val => setError(/@/.test(val) ? "" : "Invalid email");
+  ```
+
+---
+
+### 18) How would you implement form persistence?
+
+- Save form data in **AsyncStorage/MMKV** on change or blur.
+- On mount, load saved state into the form.
+- Example:
+  ```js
+  useEffect(() => {
+    AsyncStorage.setItem("draft", JSON.stringify(formData));
+  }, [formData]);
+  ```
+- Useful for long or multi-step forms that users may exit midway.
+
+---
+
+### 19) How would you implement proper keyboard handling?
+
+- Use **KeyboardAvoidingView** or **react-native-keyboard-aware-scroll-view**.
+- Dismiss keyboard on tap outside using `TouchableWithoutFeedback` + `Keyboard.dismiss()`.
+- Adjust `behavior` prop based on platform (`padding` for iOS, `height` for Android).
+- Example:
+  ```js
+  <KeyboardAvoidingView behavior="padding">
+    <ScrollView>...</ScrollView>
+  </KeyboardAvoidingView>
+  ```
+
+---
+
+### 20) How do you handle push-notification deep linking and navigation stack flows when the app is closed vs backgrounded?
+
+- Use **react-native-push-notification** or **Firebase Cloud Messaging (FCM)**.
+- On tap → handle via notification listener (foreground/background/cold start).
+- When app is closed:
+  - Use `getInitialNotification()` to read payload and navigate.
+- Example:
+  ```js
+  messaging().onNotificationOpenedApp(remoteMessage =>
+    navigateTo(remoteMessage.data.screen)
+  );
+  messaging().getInitialNotification().then(remoteMessage => ...);
+  ```
+- Maintain a **navigationRef** to handle navigation outside components.
+
+---
+
+### 21) How do you handle background tasks or headless JS in React Native (e.g., background fetch, notifications)?
+
+- **Headless JS** → runs JS tasks even when app closed (Android).
+- Used for background sync, location tracking, or silent push handling.
+- Use **react-native-background-fetch** or native modules.
+- Example:
+  ```js
+  AppRegistry.registerHeadlessTask('BackgroundFetch', () => fetchTask);
+  ```
+- iOS requires **Background Modes** enabled and scheduled background tasks.
+
+---
+
+### 22) How do you debug React Native apps for iOS and Android: what tools and strategies?
+
+- **React Native Debugger** (integrates Redux + Network + Console).
+- **Flipper** → native-level inspection for network, layout, async storage.
+- **Chrome DevTools** → for inspecting JS thread logs.
+- Use **adb logcat** (Android) & **Xcode logs** (iOS) for native crashes.
+- Profiling:
+  - `react-devtools` profiler.
+  - Hermes profiling with `--profile` flag for JS performance.
+
+---
+
+### 23) How do you reduce initial load time (cold start) of a React Native app?
+
+- Enable **Hermes engine** → smaller bytecode, faster load.
+- **Preload critical assets** (images, fonts) using `Asset.loadAsync()`.
+- **Lazy load screens** via dynamic imports.
+- **Reduce bridge traffic** during startup.
+- Use **code push** for incremental JS updates, avoiding full reinstall.
+
+---
+
+### 24) How do you secure user data in a React Native app: safe storage (Keychain/Keystore), encrypting local data, secure communication?
+
+- Use **react-native-keychain** or **EncryptedStorage** for tokens & secrets.
+- **MMKV encryption** for cached values.
+- **HTTPS + certificate pinning** for secure communication.
+- Avoid storing sensitive data in AsyncStorage.
+- Enable **SSL pinning** using **react-native-ssl-pinning** with `fetch` or Axios.
+
+---
+
+### 25) Explain how bridging large data batches (e.g., images, large JSON) affects performance, and how to mitigate it.
+
+- Bridge between JS ↔ Native has **serialization cost**.
+- Large payloads block JS thread → frame drops, jank.
+- Mitigation:
+  - Process large data natively (C++, Java/Kotlin, Swift).
+  - Use **TurboModules** or **JSI** for direct memory sharing (no serialization).
+  - Stream data in chunks.
+
+---
+
+### 26) How do you handle app versioning, code-push (e.g., via Microsoft CodePush), and rollback in React Native?
+
+- Use **Microsoft App Center CodePush** for OTA JS bundle updates.
+- Maintain **version mapping** between native + JS versions.
+- Rollback via CodePush dashboard on crash detection.
+- For app store updates: update native modules separately.
+- Example:
+  ```js
+  codePush.sync({ installMode: codePush.InstallMode.IMMEDIATE });
+  ```
+
+---
+
+### 27) How do you instrument and monitor mobile app performance for React Native (crash reporting, in-app analytics)?
+
+- Crash reporting:
+  - **Sentry**, **New Relic**, **Datadog**, **Firebase Crashlytics**.
+- Performance metrics:
+  - Measure JS frame rate, memory, and bridge usage.
+  - Log slow renders using React Profiler.
+- Analytics:
+  - **Firebase Analytics**, **Amplitude**, or **Segment**.
+
+---
+
+### 28) Explain memory leaks in React Native apps: how they arise (timers, subscriptions, listeners) and how to detect/fix them?
+
+- Common causes:
+  - Unremoved event listeners, intervals, or setTimeouts.
+  - Unmounted components holding state references.
+- Detection:
+  - **Xcode Instruments** (Leaks tab), **Android Studio Profiler**, **Flipper memory plugin**.
+- Fix:
+  - Cleanup listeners in `useEffect` return.
+  - Use `useRef` for stable references.
+  - Avoid retaining closures over large objects.
+
+---
+
+### 29) How do you handle deep linking and universal links in React Native?
+
+- **Deep linking** → open app via `myapp://path`.
+- **Universal/App Links** → open via HTTPS when app installed.
+- Configure via:
+  - iOS: Associated Domains (`applinks:myapp.com`).
+  - Android: `<intent-filter>` with `autoVerify=true`.
+- Use React Navigation linking config to parse routes.
+
+---
+
+### 30) How do you manage offline support and synchronization (local caching, network detection) in React Native apps?
+
+- Cache responses using **AsyncStorage/MMKV**.
+- Detect connectivity with **NetInfo**.
+- Queue offline actions (e.g., POST requests) → replay when online.
+- Example:
+  ```js
+  if (!isConnected) queue.push(action);
+  else sendToServer(action);
+  ```
+- Use **Redux Offline** or **react-query** with persistence.
+
+---
+
+### 31) How do you optimize Android app startup time (cold start vs warm start, launching activity, splash screen)?
+
+- Minimize work in `MainActivity.onCreate()`.
+- Use **Hermes**, **ProGuard/R8**, and smaller native deps.
+- Preload JS bundle with `AppRegistry.preloadBundle()`.
+- Use **react-native-bootsplash** for faster splash rendering.
+
+---
+
+### 32) How do you minimize APK/Bundle size (resources shrinking, code splitting, ProGuard/R8)?
+
+- Enable **ProGuard/R8** → minify & shrink unused code.
+- Use **Android App Bundles (AAB)** → device-specific delivery.
+- Remove unused native modules.
+- Compress assets & use WebP images.
+- Hermes reduces JS bundle size by compiling to bytecode.
+
+---
