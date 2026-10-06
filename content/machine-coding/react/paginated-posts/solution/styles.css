@@ -1,0 +1,21 @@
+body {
+  font-family: system-ui, sans-serif;
+  padding: 16px;
+}
+
+.post {
+  border-bottom: 1px solid #eee;
+  padding: 8px 0;
+}
+
+.post h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+
+.pagination {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 12px;
+}

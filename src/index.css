@@ -1,0 +1,139 @@
+/* Design tokens. `data-theme` is always set to the resolved theme (see src/lib/theme.ts). */
+:root {
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-lg: 10px;
+
+  --sidebar-width: 272px;
+  --rail-width: 56px;
+  --header-height: 52px;
+
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --duration: 180ms;
+}
+
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --surface-1: #fafafa;
+  --surface-2: #f4f4f5;
+  --surface-3: #e9e9ec;
+  --border: #e4e4e7;
+  --border-strong: #d4d4d8;
+  --text: #18181b;
+  --text-muted: #63636e;
+  --text-faint: #8f8f99;
+  --accent: #5b5bd6;
+  --accent-hover: #4a4ac4;
+  --accent-soft: #eeeefc;
+  --accent-text: #4343b8;
+  --on-accent: #ffffff;
+  --easy: #18794e;
+  --easy-soft: #e9f6ef;
+  --medium: #a35200;
+  --medium-soft: #fdf1e2;
+  --hard: #cd2b31;
+  --hard-soft: #fdecec;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px rgb(0 0 0 / 0.08), 0 4px 12px rgb(0 0 0 / 0.04);
+  --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.14);
+  --focus: 0 0 0 2px var(--bg), 0 0 0 4px #8d8dec;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #111113;
+  --surface-1: #18181b;
+  --surface-2: #1f1f23;
+  --surface-3: #2a2a30;
+  --border: #27272c;
+  --border-strong: #3a3a42;
+  --text: #ececef;
+  --text-muted: #a0a0ab;
+  --text-faint: #6f6f7a;
+  --accent: #7c7cf0;
+  --accent-hover: #9191f5;
+  --accent-soft: #23234a;
+  --accent-text: #b1b1fb;
+  --on-accent: #111113;
+  --easy: #3dd68c;
+  --easy-soft: #11291e;
+  --medium: #ffb224;
+  --medium-soft: #2e2210;
+  --hard: #ff6369;
+  --hard-soft: #3a1618;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow: 0 1px 3px rgb(0 0 0 / 0.5), 0 4px 12px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.5);
+  --focus: 0 0 0 2px var(--bg), 0 0 0 4px #6262d8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: var(--accent-text);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+  border-radius: var(--radius-sm);
+}
+
+code,
+pre,
+kbd {
+  font-family: var(--mono);
+  font-size: 0.86em;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
+}

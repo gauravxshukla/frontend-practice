@@ -1,6 +1,0 @@
-Job board
-Grid Lights
-Progress Bars I, II, III, IV
-Like Button
-Stop Watch
-Traffic Lights

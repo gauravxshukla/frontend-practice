@@ -1,0 +1,10 @@
+body {
+  font-family: sans-serif;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 320px;
+}

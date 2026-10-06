@@ -1,20 +1,32 @@
 {
-  "name": "practicejs",
+  "name": "frontend-practice",
+  "private": true,
   "version": "1.0.0",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "start": "nodemon index.js",
-    "dev": "nodemon index.js",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "new": "node scripts/new-question.mjs",
+    "validate": "node scripts/validate-content.mjs",
+    "test:solutions": "vitest run",
+    "verify": "npm run validate && npm run test:solutions"
   },
   "dependencies": {
-    "nodemon": "^3.1.10",
-    "puppeteer": "24.9.0"
+    "@codesandbox/sandpack-react": "^2.20.0",
+    "lucide-react": "^1.52.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-markdown": "^10.1.0",
+    "react-router": "^7.18.4",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
-    "jest": "^29.7.0"
-  },
-  "type": "module"
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.3",
+    "vitest": "^5.0.3"
+  }
 }
