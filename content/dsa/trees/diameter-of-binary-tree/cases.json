@@ -1,0 +1,18 @@
+{
+  "fn": "diameterOfBinaryTree",
+  "kind": "function",
+  "params": [{"name":"root","type":"TreeNode"}],
+  "returns": "number",
+  "compare": "exact",
+  "cases": [
+    {"input":[[1,2,3,4,5]],"expected":3},
+    {"input":[[1,2]],"expected":1},
+    {"input":[[1]],"expected":0,"hidden":true},
+    {"input":[[1,2,null,3,4,5,null,null,6,7,null,null,8]],"expected":6,"hidden":true},
+    {"input":[[1,2,null,3,null,4,null,5,null,6]],"expected":5,"hidden":true},
+    {"input":[[4,-7,-3,null,null,-9,-3,9,-7,-4,null,6,null,-6,-6,null,null,0,6,5,null,9,null,null,-1,-4,null,null,null,-2]],"expected":8,"hidden":true},
+    {"input":[[1,2,3,4,5,6,7]],"expected":4,"hidden":true},
+    {"input":[[31,27,-50,16,36,82,-96,38,75,-66,59,100,-83,-55,null,8,null,-78,64,-43,42,-44,46,null,-81,-53,null,null,null,30,null,-25,-49,-24,-74,-51,-62,48,-59,7,95,22,null,null,null,null,null,-36,62,-17,61,4,null,33,-10,null,null,null,null,-38,null,-69,18,84,-13,-2,null,-16,null,15,null,-66,-20,null,null,44,46,null,-99,null,null,-4,null,-44,-77,94,66,null,40,-76,54,-16,51,null,14,-60,-51,-14,null,23,20,null,null,null,-39,57,null,null,null,null,-29,null,-4,15,-81,null,null,null,-31,null,-63,35,61,null,-29,null,-43,34,null,-17,64,39,null,16,null,null,null,82,42,55,96,null,55,null,-60,null,null,41,null,null,null,-83,null,null,null,34,null,null,null,60,-7,18,null,-55,null,-92,null,54,null,23,-98,40,-50,null,null,null,null,null,60,null,-13,null,null,null,14,null,null,null,null,null,null,35,-73,null,null,null,25,null,null,-19,null,null,-50,60,null,null,null,null,35,31,30,null,-9,null,null,null,null,-95,null,null,null,null,34,-39,-46,null,null,null,null,null,28,null,null,-18,-57,null,77,37,-36,-92,59,5,null,null,null,12,-88,-43,null,null,null,-39,87,null,null,-41,null,18,46,null,null,null,null,85,18,0,null,53,null,null,null,null,null,null,null,41,null,-36,null,null,null,null,null,null,null,40,-70,null,null,null,null,null,null,null,null,null,null,null,-53]],"expected":25,"hidden":true},
+    {"input":[[-5,-68,35,-1,-46,37,-48,41,-64,-62,76,1,34,-73,-70,31,-6,null,33,35,null,null,-38,44,97,null,null,30,-10,40,-19,-14,65,58,null,null,100,null,-77,null,null,-100,69,-44,67,null,-3,-32,59,null,null,null,56,-92,26,null,null,43,-4,null,91,null,null,-83,17,56,69,30,null,-1,30,null,-3,71,-17,null,-27,14,null,-17,null,null,null,null,-98,94,null,84,null,null,-82,-25,59,-1,null,-81,-57,-79,-94,-7,73,-29,-90,93,-40,null,null,null,null,49,null,-99,-15,-21,null,null,null,null,null,null,-41,96,-6,null,null,-74,null,null,null,null,-42,null,null,null,null,-18,-1,-55,97,-24,66,-91,-48,-12,-4,-5,86,-24,-95,null,null,null,null,null,13,null,-27,null,null,67,null,null,null,-56,-39,null,null,64,null,null,-41,-30,73,55,-48,-84,null,null,6,null,28,-79,93,-89,null,-73,-94,null,16,null,-84,-77,77,null,null,22,null,null,null,null,null,-73,9,-88,70,null,null,-16,null,55,94,null,null,63,5,null,null,-69,null,null,null,null,null,-6,88,34,43,-85,84,null,69,49,null,null,null,null,-57,null,null,-38,null,null,null,null,-15,81,-31,null,null,-53,-18,null,null,null,null,46,null,null,null,53,null,null,null,76,-48,null,57,-76,null,-12,null,-18,null,-4,-21,null,null,null,null,44,null,-96,null,null,null,-29,null,null,null,null,null,null,null,null,null,null,null,-55,null,2,null,74,null,-4,null,-74,null,-87,-14,12,null,null,null,null,null,null,45,null,null,66,null,null,null,null,null,null,null,57,null,-37,null,64,56,-49,-75,null,-36,null,31,27,47,-95,-63,-69,-97,-89,null,78,null,-99,33,null,null,-45,null,null,null,28,null,null,null,-55,null,null,68,-22,79,null,-26,null,null,null,99,null,-95,null,null,19,null,null,45,null,null,null,null,null,null,null,null,null,null,-68,null,null,null,null,null,null,53]],"expected":28,"hidden":true}
+  ]
+}

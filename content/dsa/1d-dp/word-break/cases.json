@@ -1,0 +1,30 @@
+{
+  "fn": "wordBreak",
+  "kind": "function",
+  "params": [
+    {
+      "name": "s",
+      "type": "string"
+    },
+    {
+      "name": "wordDict",
+      "type": "string[]"
+    }
+  ],
+  "returns": "boolean",
+  "compare": "exact",
+  "cases": [
+    {"input":["leetcode",["leet","code"]],"expected":true},
+    {"input":["applepenapple",["apple","pen"]],"expected":true},
+    {"input":["catsandog",["cats","dog","sand","and","cat"]],"expected":false},
+    {"input":["a",["a"]],"expected":true,"hidden":true},
+    {"input":["a",["b"]],"expected":false,"hidden":true},
+    {"input":["aaaaaaa",["aaaa","aaa"]],"expected":true,"hidden":true},
+    {"input":["goalspecial",["go","goal","goals","special"]],"expected":true,"hidden":true},
+    {"input":["cars",["car","ca","rs"]],"expected":true,"hidden":true},
+    {"input":["aaaaaaaaaaaaaaaaaaab",["a","aa","aaa","aaaa"]],"expected":false,"hidden":true},
+    {"input":["bb",["a","b","bbb","bbbb"]],"expected":true,"hidden":true},
+    {"input":["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab",["a","aa","aaa","aaaa","aaaaa","aaaaaa","aaaaaaa","aaaaaaaa","aaaaaaaaa","aaaaaaaaaa"]],"expected":false,"hidden":true},
+    {"input":["pineappleapplepenpineapplepenpenapplepineappleappleapplepenpenpenpineappleappleappleapplepenpineapplepenpineapplepenapplepenapplepenpineapplepineapplepenapplepinepineapplepineapplepineapplepenpineapplepineapplepenapplepenpinepineappleapple",["pine","apple","pen","applepen","pineapple"]],"expected":true,"hidden":true}
+  ]
+}

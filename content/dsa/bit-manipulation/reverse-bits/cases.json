@@ -1,0 +1,89 @@
+{
+  "fn": "reverseBits",
+  "kind": "function",
+  "params": [
+    {
+      "name": "n",
+      "type": "number"
+    }
+  ],
+  "returns": "number",
+  "compare": "exact",
+  "cases": [
+    {
+      "input": [
+        43261596
+      ],
+      "expected": 964176192
+    },
+    {
+      "input": [
+        4294967293
+      ],
+      "expected": 3221225471
+    },
+    {
+      "input": [
+        0
+      ],
+      "expected": 0,
+      "hidden": true
+    },
+    {
+      "input": [
+        1
+      ],
+      "expected": 2147483648,
+      "hidden": true
+    },
+    {
+      "input": [
+        2147483648
+      ],
+      "expected": 1,
+      "hidden": true
+    },
+    {
+      "input": [
+        4294967295
+      ],
+      "expected": 4294967295,
+      "hidden": true
+    },
+    {
+      "input": [
+        2863311530
+      ],
+      "expected": 1431655765,
+      "hidden": true
+    },
+    {
+      "input": [
+        255
+      ],
+      "expected": 4278190080,
+      "hidden": true
+    },
+    {
+      "input": [
+        1260014201
+      ],
+      "expected": 2656196818,
+      "hidden": true
+    },
+    {
+      "input": [
+        710943530
+      ],
+      "expected": 1422132820,
+      "hidden": true
+    },
+    {
+      "input": [
+        1180885494
+      ],
+      "expected": 1871136354,
+      "hidden": true
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "fn": "checkInclusion",
+  "kind": "function",
+  "params": [
+    {
+      "name": "s1",
+      "type": "string"
+    },
+    {
+      "name": "s2",
+      "type": "string"
+    }
+  ],
+  "returns": "boolean",
+  "compare": "exact",
+  "cases": [
+    {
+      "input": ["abc", "lecabee"],
+      "expected": true
+    },
+    {
+      "input": ["abc", "lecaabee"],
+      "expected": false
+    },
+    {
+      "input": ["a", "a"],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": ["ab", "a"],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": ["adc", "dcda"],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": ["hello", "ooolleoooleh"],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": ["aab", "baa"],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": ["xyz", "xyyz"],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": ["ab", "eidboaoo"],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": ["a", "bbbbb"],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": ["qrstuv", "cfgdfcfgdadccbbbdbceggeedaaedfceeaagffbagfedbfgbbfafagafdgaeafaadcgdcgabbgacdebagagcaafbabggbbfbcbbffcbbcgebedgbdgefbgfdacaadaccdfgbfegfbfebfgbgdabdeggcagbdgdbfbgcgcbfcaeefbbbefcbfaeagdcdbdfbbgdabbcbcageabbcdegcddacfcaegcbbcdfbgeecfcgfgffebcddbaecbffvutsrq"],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": ["aabbc", "dbaabbbbbadddaaddaabbbabbdaddddababdaadbadadbbbdabaabbabddbddbddbaadddaabddbbbaaadbdabaadabdbddbdaddaadaaddabadbdabaddadaaabddadbdabaabdbbdabaadaababddbbbdddabaaadbdabaddbabdddbaddadbbbaabddaaddbbadbaadaaaaadaadbabdadbdddbdbddddabbbaababbbbadabadbdddbabaabadadddbbaaadaabadbaadbdbbddbbdaaadbbbabbdada"],
+      "expected": false,
+      "hidden": true
+    }
+  ]
+}

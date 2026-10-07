@@ -1,0 +1,66 @@
+{
+  "fn": "isAnagram",
+  "kind": "function",
+  "params": [
+    {
+      "name": "s",
+      "type": "string"
+    },
+    {
+      "name": "t",
+      "type": "string"
+    }
+  ],
+  "returns": "boolean",
+  "compare": "exact",
+  "cases": [
+    {
+      "input": ["anagram", "nagaram"],
+      "expected": true
+    },
+    {
+      "input": ["rat", "car"],
+      "expected": false
+    },
+    {
+      "input": ["a", "a"],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": ["ab", "a"],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": ["aacc", "ccac"],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": ["abc", "cbaa"],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": ["aabb", "abab"],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": ["x", "y"],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": ["dbdeddaededbdacbbdeeacdbbbeecceaabbcecdbceebcedacadbdbbccecabadabbcbecceddacccdbcebcedaddbedbdecacdecdaeabcebebeccabdedecebabcdddcdedacbdcbdbbbbacedceebccaebadbaaaadddbbcebaebebbcebdbebcdcddbadaaccbdd", "ddbccaadabddcdcbebdbecbbebeabecbbdddaaaabdabeaccbeecdecabbbbdbcdbcadedcdddcbabecededbaccebebecbaeadcedcacedbdebddadecbecbdcccaddeccebcbbadabaceccbbdbdacadecbeecbdcecbbaaecceebbbdcaeedbbcadbdedeaddedbd"],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": ["cbcccbeedcebacbeeacbaebededcdebdcdcaedadbedecebabedbbedddaeedbaabbccabdeaabdcdcaecddbaccdcaeddbadeccedcdccddbbaaecbaaeeceddeeddadbdcecadaaeccaecdeddbbdaaecedbaaccdabbaaabeaceaddcaaadedbcbdabbbccaaeace", "bcccbeedcebacbeeacbaebededcdebdcdcaedadbedecebabedbbedddaeedbaabbccabdeaabdcdcaecddbaccdcaeddbadeccedcdccddbbaaecbaaeeceddeeddadbdcecadaaeccaecdeddbbdaaecedbaaccdabbaaabeaceaddcaaadedbcbdabbbccaaeacea"],
+      "expected": false,
+      "hidden": true
+    }
+  ]
+}

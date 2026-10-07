@@ -5,6 +5,7 @@ import CatalogPage from '../features/catalog/CatalogPage';
 import QuizIndex from '../features/quiz/QuizIndex';
 import QuizDeckPage from '../features/quiz/QuizDeckPage';
 import NotesPage from '../features/notes/NotesPage';
+import TopicPage from '../features/topic/TopicPage';
 import { usePersistentState } from '../lib/usePersistentState';
 import Sidebar from './Sidebar';
 import './layout.css';
@@ -88,6 +89,7 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <CatalogPage /> },
+      { path: 'topics/*', element: <TopicPage /> },
       { path: 'q/*', element: <QuestionPage /> },
       { path: 'quiz', element: <QuizIndex /> },
       { path: 'quiz/:deck', element: <QuizDeckPage /> },

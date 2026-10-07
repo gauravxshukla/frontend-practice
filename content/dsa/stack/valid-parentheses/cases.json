@@ -1,0 +1,87 @@
+{
+  "fn": "isValid",
+  "kind": "function",
+  "params": [
+    {
+      "name": "s",
+      "type": "string"
+    }
+  ],
+  "returns": "boolean",
+  "cases": [
+    {
+      "input": [
+        "()"
+      ],
+      "expected": true
+    },
+    {
+      "input": [
+        "()[]{}"
+      ],
+      "expected": true
+    },
+    {
+      "input": [
+        "(]"
+      ],
+      "expected": false
+    },
+    {
+      "input": [
+        ""
+      ],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": [
+        "([)]"
+      ],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [
+        "{[]}"
+      ],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": [
+        "(("
+      ],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [
+        "))"
+      ],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [
+        "())"
+      ],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [
+        "{[()()]}"
+      ],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": [
+        "]"
+      ],
+      "expected": false,
+      "hidden": true
+    }
+  ]
+}

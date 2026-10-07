@@ -1,0 +1,31 @@
+{
+  "fn": "leastInterval",
+  "kind": "function",
+  "params": [
+    {
+      "name": "tasks",
+      "type": "string[]"
+    },
+    {
+      "name": "n",
+      "type": "number"
+    }
+  ],
+  "returns": "number",
+  "compare": "exact",
+  "cases": [
+    {"input":[["A","A","A","B","B","B"],2],"expected":8},
+    {"input":[["A","C","A","B","D","B"],1],"expected":6},
+    {"input":[["A","A","A","B","B","B"],3],"expected":10},
+    {"input":[["A"],0],"expected":1,"hidden":true},
+    {"input":[["A"],100],"expected":1,"hidden":true},
+    {"input":[["A","A","A","A"],0],"expected":4,"hidden":true},
+    {"input":[["A","A","A","A"],3],"expected":13,"hidden":true},
+    {"input":[["A","A","A","A","A","A","B","C","D","E","F","G"],2],"expected":16,"hidden":true},
+    {"input":[["A","B","C","D","E","A","B","C","D","E"],4],"expected":10,"hidden":true},
+    {"input":[["A","A","A","B","B","B","C","C","C"],2],"expected":9,"hidden":true},
+    {"input":[["A","A","B","B"],5],"expected":8,"hidden":true},
+    {"input":[["F","C","C","A","B","G","A","A","B","B","F","A","F","E","C","C","A","A","G","E","C","G","C","A","E","F","D","C","F","B","C","C","C","A","G","A","F","G","B","C","A","F","B","C","E","D","E","F","A","E","E","A","B","B","D","C","C","B","C","E","G","F","C","C","B","E","E","C","G","C","F","B","D","D","E","F","G","B","B","E","F","C","D","B","F","G","F","E","D","G","A","B","G","A","E","F","B","G","B","D","G","F","B","F","D","E","G","B","B","E","B","G","F","A","B","G","C","E","D","D","G","D","F","E","F","E","B","A","B","B","A","D","G","G","B","G","F","G","B","B","B","A","G","C","B","B","A","C","E","C","G","G","G","B","D","B","A","D","F","A","G","D","B","E","F","A","G","G","B","E","D","A","F","F","B","C","C","F","F","F","G","F","B","C","E","G","D","C","D","A","C","B","B","D","E","A","C","A","C","A"],7],"expected":305,"hidden":true},
+    {"input":[["F","C","C","A","B","G","A","A","B","B","F","A","F","E","C","C","A","A","G","E","C","G","C","A","E","F","D","C","F","B","C","C","C","A","G","A","F","G","B","C","A","F","B","C","E","D","E","F","A","E","E","A","B","B","D","C","C","B","C","E","G","F","C","C","B","E","E","C","G","C","F","B","D","D","E","F","G","B","B","E","F","C","D","B","F","G","F","E","D","G","A","B","G","A","E","F","B","G","B","D","G","F","B","F","D","E","G","B","B","E","B","G","F","A","B","G","C","E","D","D","G","D","F","E","F","E","B","A","B","B","A","D","G","G","B","G","F","G","B","B","B","A","G","C","B","B","A","C","E","C","G","G","G","B","D","B","A","D","F","A","G","D","B","E","F","A","G","G","B","E","D","A","F","F","B","C","C","F","F","F","G","F","B","C","E","G","D","C","D","A","C","B","B","D","E","A","C","A","C","A"],1],"expected":200,"hidden":true}
+  ]
+}

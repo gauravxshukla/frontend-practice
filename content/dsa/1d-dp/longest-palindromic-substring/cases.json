@@ -1,0 +1,24 @@
+{
+  "fn": "longestPalindrome",
+  "kind": "function",
+  "params": [
+    {
+      "name": "s",
+      "type": "string"
+    }
+  ],
+  "returns": "string",
+  "compare": "checker",
+  "cases": [
+    {"input":["babad"],"expected":"bab"},
+    {"input":["cbbd"],"expected":"bb"},
+    {"input":["a"],"expected":"a","hidden":true},
+    {"input":["ac"],"expected":"a","hidden":true},
+    {"input":["aaaa"],"expected":"aaaa","hidden":true},
+    {"input":["forgeeksskeegfor"],"expected":"geeksskeeg","hidden":true},
+    {"input":["abacdfgdcaba"],"expected":"aba","hidden":true},
+    {"input":["xyzzyxabcbaq"],"expected":"xyzzyx","hidden":true},
+    {"input":["abababababbaabbbaabbbbaabbbbababbaababaaaabbbabaaaabbaabaaaa"],"expected":"bbbaabbbbaabbb","hidden":true},
+    {"input":["aaaaaabcaabcaabcacababcacabbcaabaccabaabbcaccaaababbaabbcabcccbabbabaabaabbbabbbacaacbbaabcacbaaaabaccacbccbaccacbabccbccbaaaaccbcbbbacbaababaaaaacbaaabaaaabbcbaaacbaaaacbbccaabacabccaaaabaacbbbbbcacbracecarannakayakyzxyzxxxxzyzzxzxxyxyxxzzyzxxxyzyyyyyzzyyzyyyyxyxzzzyxxxxzzxxyxyzyzzzzzzxzzyzzyzz"],"expected":"aabaccabaa","hidden":true}
+  ]
+}

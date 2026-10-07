@@ -1,0 +1,70 @@
+{
+  "fn": "minWindow",
+  "kind": "function",
+  "params": [
+    {
+      "name": "s",
+      "type": "string"
+    },
+    {
+      "name": "t",
+      "type": "string"
+    }
+  ],
+  "returns": "string",
+  "compare": "exact",
+  "cases": [
+    {
+      "input": ["OUZODYXAZV", "XYZ"],
+      "expected": "YXAZ"
+    },
+    {
+      "input": ["xyz", "xyz"],
+      "expected": "xyz"
+    },
+    {
+      "input": ["x", "xy"],
+      "expected": ""
+    },
+    {
+      "input": ["a", "a"],
+      "expected": "a",
+      "hidden": true
+    },
+    {
+      "input": ["a", "b"],
+      "expected": "",
+      "hidden": true
+    },
+    {
+      "input": ["aa", "aa"],
+      "expected": "aa",
+      "hidden": true
+    },
+    {
+      "input": ["ab", "A"],
+      "expected": "",
+      "hidden": true
+    },
+    {
+      "input": ["bba", "ab"],
+      "expected": "ba",
+      "hidden": true
+    },
+    {
+      "input": ["aaflslflsldkalskaaa", "aaa"],
+      "expected": "aaa",
+      "hidden": true
+    },
+    {
+      "input": ["cabwefgewcwaefgcf", "cae"],
+      "expected": "cwae",
+      "hidden": true
+    },
+    {
+      "input": ["cghdfdhagfccfaaaedgfgcagahdbegeahhgfdfcedbfebhgagbacfgachghbbeeaedhedbhgeacchcfcegfccghedffefehfdfbbbfacededbgbgdfdhafhedcehghcbhgbebffdgdecfhaeceddagXYZZgbhdbhaacgaebaddhaebchchbbbgahcceffbcfadedghhaagbehgdbebhhcffbeaabcdgccbcehfdffgcbeahcafbechbccfagfe", "ZYZX"],
+      "expected": "XYZZ",
+      "hidden": true
+    }
+  ]
+}

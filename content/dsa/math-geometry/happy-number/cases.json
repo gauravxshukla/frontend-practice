@@ -1,0 +1,89 @@
+{
+  "fn": "isHappy",
+  "kind": "function",
+  "params": [
+    {
+      "name": "n",
+      "type": "number"
+    }
+  ],
+  "returns": "boolean",
+  "compare": "exact",
+  "cases": [
+    {
+      "input": [
+        19
+      ],
+      "expected": true
+    },
+    {
+      "input": [
+        2
+      ],
+      "expected": false
+    },
+    {
+      "input": [
+        1
+      ],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": [
+        7
+      ],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": [
+        4
+      ],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [
+        10
+      ],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": [
+        100
+      ],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": [
+        116
+      ],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [
+        1111111
+      ],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": [
+        2147483647
+      ],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [
+        3
+      ],
+      "expected": false,
+      "hidden": true
+    }
+  ]
+}

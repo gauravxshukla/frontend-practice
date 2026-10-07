@@ -3,6 +3,8 @@ export interface Note {
   slug: string;
   title: string;
   section: string;
+  /** Folder path of the section, e.g. `system-design/performance`; the sidebar links to it. */
+  sectionId: string;
   content: string;
 }
 
@@ -37,6 +39,7 @@ export const notes: Note[] = Object.entries(files)
       slug,
       title: label(parts[parts.length - 1]),
       section: parts.length > 1 ? parts.slice(0, -1).map(label).join(' › ') : 'General',
+      sectionId: parts.length > 1 ? parts.slice(0, -1).join('/') : 'general',
       content,
     };
   })
@@ -44,4 +47,19 @@ export const notes: Note[] = Object.entries(files)
 
 export function getNote(slug: string) {
   return notes.find((n) => n.slug === slug);
+}
+
+export interface NoteSection {
+  id: string;
+  label: string;
+  notes: Note[];
+}
+
+export const noteSections: NoteSection[] = [...new Set(notes.map((n) => n.sectionId))].map((id) => {
+  const items = notes.filter((n) => n.sectionId === id);
+  return { id, label: items[0].section, notes: items };
+});
+
+export function getNoteSection(id: string) {
+  return noteSections.find((s) => s.id === id);
 }

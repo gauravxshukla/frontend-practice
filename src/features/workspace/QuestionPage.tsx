@@ -9,7 +9,8 @@ import {
   type RefObject,
 } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { ArrowLeft, ArrowRight, ChevronRight, Clock, Eye, Lightbulb, RotateCcw, Undo2 } from 'lucide-react';
+import { SandpackCodeViewer, SandpackProvider } from '@codesandbox/sandpack-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, ChevronRight, Clock, Eye, Lock, RotateCcw, Undo2 } from 'lucide-react';
 import { DifficultyBadge, Tag } from '../../components/Badges';
 import Markdown from '../../components/Markdown';
 import {
@@ -17,16 +18,24 @@ import {
   getNeighbours,
   getQuestion,
   loadQuestionFiles,
+  loadRunnerAssets,
+  loadSolutionSource,
   type FileMap,
+  type Question,
+  type RunnerAssets,
 } from '../../lib/content/catalog';
 import { clearDraft, loadDraft } from '../../lib/drafts';
+import { useProgress } from '../../lib/progress';
+import { useTheme } from '../../lib/theme';
 import { usePersistentState } from '../../lib/usePersistentState';
+import CodeWorkspace from './CodeWorkspace';
 import Workspace from './Workspace';
+import { sandpackThemes } from './sandpackThemes';
 
-type View = 'attempt' | 'solution';
-
-const MIN_PROMPT = 280;
+const MIN_PROMPT = 300;
 const MAX_PROMPT_RATIO = 0.6;
+
+type LeftTab = 'description' | 'notes' | 'solution';
 
 function WorkspaceSkeleton() {
   return (
@@ -41,7 +50,7 @@ function WorkspaceSkeleton() {
 
 /** Draggable (and keyboard-adjustable) divider between prompt and workspace. */
 function useResizablePrompt(containerRef: RefObject<HTMLDivElement | null>) {
-  const [width, setWidth] = usePersistentState('fp:promptWidth', 400);
+  const [width, setWidth] = usePersistentState('fp:promptWidth', 440);
 
   const clamp = useCallback(
     (px: number) => {
@@ -74,41 +83,86 @@ function useResizablePrompt(containerRef: RefObject<HTMLDivElement | null>) {
   return { width, onPointerDown, onKeyDown };
 }
 
+function SolutionCode({ question }: { question: Question }) {
+  const { resolved } = useTheme();
+  const [code, setCode] = useState<string | null>(null);
+  useEffect(() => {
+    loadSolutionSource(question).then((src) => setCode(src ?? ''));
+  }, [question]);
+
+  if (code === null) return <WorkspaceSkeleton />;
+  return (
+    <SandpackProvider files={{ '/solution.js': code }} theme={sandpackThemes[resolved]} options={{ activeFile: '/solution.js' }}>
+      <div className="solution-viewer">
+        <SandpackCodeViewer showLineNumbers wrapContent />
+      </div>
+    </SandpackProvider>
+  );
+}
+
+function LockedPanel({ onReveal, what }: { onReveal: () => void; what: string }) {
+  return (
+    <div className="locked-panel">
+      <Lock size={20} aria-hidden />
+      <h3>{what} are hidden while you practise</h3>
+      <p className="muted">Give it a real attempt first. They unlock automatically once your submission is accepted.</p>
+      <button type="button" className="btn" onClick={onReveal}>
+        <Eye size={14} aria-hidden /> Reveal anyway
+      </button>
+    </div>
+  );
+}
+
 export default function QuestionPage() {
   const slug = useParams()['*'] ?? '';
   const question = getQuestion(slug);
   const navigate = useNavigate();
+  const progress = useProgress();
   const bodyRef = useRef<HTMLDivElement>(null);
   const divider = useResizablePrompt(bodyRef);
 
-  const [view, setView] = useState<View>('attempt');
+  const isCode = question?.type === 'js' || question?.type === 'dsa';
+  const solved = question ? progress[question.slug] === 'solved' : false;
+
+  const [leftTab, setLeftTab] = useState<LeftTab>('description');
+  const [revealed, setRevealed] = useState(false);
+  // Code questions
+  const [assets, setAssets] = useState<RunnerAssets | null>(null);
+  // Machine-coding questions
+  const [uiView, setUiView] = useState<'attempt' | 'solution'>('attempt');
   const [starter, setStarter] = useState<FileMap | null>(null);
-  const [solution, setSolution] = useState<FileMap | null>(null);
-  // Bumping this remounts the sandbox, which is how Reset discards edits.
+  const [solutionFiles, setSolutionFiles] = useState<FileMap | null>(null);
   const [resetKey, setResetKey] = useState(0);
 
   useEffect(() => {
     if (!question) return;
     let cancelled = false;
-    setView('attempt');
+    setLeftTab('description');
+    setRevealed(false);
+    setAssets(null);
+    setUiView('attempt');
     setStarter(null);
-    setSolution(null);
-    loadQuestionFiles(question, 'starter').then((files) => {
-      if (!cancelled) setStarter({ ...files, ...(loadDraft(question.slug) ?? {}) });
-    });
+    setSolutionFiles(null);
+    if (question.type === 'js' || question.type === 'dsa') {
+      loadRunnerAssets(question).then((a) => !cancelled && setAssets(a));
+    } else {
+      loadQuestionFiles(question, 'starter').then((files) => {
+        if (!cancelled) setStarter({ ...files, ...(loadDraft(question.slug) ?? {}) });
+      });
+    }
     return () => {
       cancelled = true;
     };
   }, [question]);
 
   useEffect(() => {
-    if (view !== 'solution' || solution || !question) return;
-    loadQuestionFiles(question, 'solution').then(setSolution);
-  }, [view, solution, question]);
+    if (uiView !== 'solution' || solutionFiles || !question) return;
+    loadQuestionFiles(question, 'solution').then(setSolutionFiles);
+  }, [uiView, solutionFiles, question]);
 
   const { prev, next } = question ? getNeighbours(question) : {};
 
-  // Alt+←/→ moves between questions in the same group.
+  // Alt+←/→ moves between questions in the same topic.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (!e.altKey) return;
@@ -118,6 +172,8 @@ export default function QuestionPage() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [prev, next, navigate]);
+
+  const onAccepted = useCallback(() => setRevealed(true), []);
 
   if (!question) {
     return (
@@ -132,7 +188,12 @@ export default function QuestionPage() {
     );
   }
 
-  const reset = () => {
+  const unlocked = revealed || solved;
+  const reveal = () => {
+    if (window.confirm('Reveal the reference solution and notes?')) setRevealed(true);
+  };
+
+  const resetUi = () => {
     if (!window.confirm('Discard your code and restore the starter?')) return;
     clearDraft(question.slug);
     loadQuestionFiles(question, 'starter').then((files) => {
@@ -144,26 +205,35 @@ export default function QuestionPage() {
   const backToAttempt = () => {
     // The attempt sandbox unmounted while the solution was shown; remount it from the latest draft.
     setStarter((prevFiles) => (prevFiles ? { ...prevFiles, ...(loadDraft(question.slug) ?? {}) } : prevFiles));
-    setView('attempt');
+    setUiView('attempt');
   };
 
-  const crumbs = breadcrumbOf(question);
+  const tabs: { id: LeftTab; label: string }[] = [
+    { id: 'description', label: 'Description' },
+    ...(question.notes ? [{ id: 'notes' as const, label: 'Notes' }] : []),
+    ...(isCode && question.hasSolution ? [{ id: 'solution' as const, label: 'Solution' }] : []),
+  ];
 
   return (
     <div className="question-page">
       <header className="question-header">
         <div className="question-heading">
           <nav className="breadcrumb" aria-label="Breadcrumb">
-            {crumbs.map((c, i) => (
-              <span key={c} className="breadcrumb-item">
+            {breadcrumbOf(question).map((g, i, all) => (
+              <span key={g.id} className="breadcrumb-item">
                 {i > 0 && <ChevronRight size={12} aria-hidden />}
-                {c}
+                {i === all.length - 1 ? <Link to={`/topics/${g.id}`}>{g.label}</Link> : g.label}
               </span>
             ))}
           </nav>
           <div className="question-title-row">
             <h1>{question.title}</h1>
             <DifficultyBadge difficulty={question.difficulty} />
+            {solved && (
+              <span className="solved-pill">
+                <CheckCircle2 size={13} aria-hidden /> Solved
+              </span>
+            )}
             {question.estimatedMinutes ? (
               <span className="meta">
                 <Clock size={13} aria-hidden /> {question.estimatedMinutes} min
@@ -195,47 +265,67 @@ export default function QuestionPage() {
               <ArrowRight size={15} />
             </button>
           </div>
-          {view === 'attempt' ? (
-            <>
-              <button type="button" className="btn" onClick={reset}>
-                <RotateCcw size={14} aria-hidden /> Reset
+          {!isCode &&
+            (uiView === 'attempt' ? (
+              <>
+                <button type="button" className="btn" onClick={resetUi}>
+                  <RotateCcw size={14} aria-hidden /> Reset
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => {
+                    setRevealed(true);
+                    setUiView('solution');
+                  }}
+                  disabled={!question.hasSolution}
+                  title={question.hasSolution ? undefined : 'No reference solution has been written yet'}
+                >
+                  <Eye size={14} aria-hidden /> {question.hasSolution ? 'Reveal solution' : 'No solution yet'}
+                </button>
+              </>
+            ) : (
+              <button type="button" className="btn btn-primary" onClick={backToAttempt}>
+                <Undo2 size={14} aria-hidden /> Back to my code
               </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => setView('solution')}
-                disabled={!question.hasSolution}
-                title={question.hasSolution ? undefined : 'No reference solution has been written yet'}
-              >
-                <Eye size={14} aria-hidden /> {question.hasSolution ? 'Reveal solution' : 'No solution yet'}
-              </button>
-            </>
-          ) : (
-            <button type="button" className="btn btn-primary" onClick={backToAttempt}>
-              <Undo2 size={14} aria-hidden /> Back to my code
-            </button>
-          )}
+            ))}
         </div>
       </header>
 
       <div className="question-body" ref={bodyRef} style={{ '--prompt-width': `${divider.width}px` } as CSSProperties}>
         <section className="prompt-panel" aria-label="Problem">
-          {question.tags.length > 0 && (
-            <div className="tag-list">
-              {question.tags.map((tag) => (
-                <Tag key={tag}>{tag}</Tag>
-              ))}
-            </div>
-          )}
-          <Markdown>{question.prompt}</Markdown>
-          {view === 'solution' && question.notes && (
-            <aside className="callout">
-              <h2 className="callout-title">
-                <Lightbulb size={15} aria-hidden /> Notes
-              </h2>
-              <Markdown>{question.notes}</Markdown>
-            </aside>
-          )}
+          <div className="panel-tabs" role="tablist">
+            {tabs.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                role="tab"
+                aria-selected={leftTab === t.id}
+                onClick={() => setLeftTab(t.id)}
+              >
+                {t.label}
+                {t.id !== 'description' && !unlocked && <Lock size={11} aria-label="locked" />}
+              </button>
+            ))}
+          </div>
+          <div className="panel-scroll">
+            {leftTab === 'description' && (
+              <>
+                {question.tags.length > 0 && (
+                  <div className="tag-list">
+                    {question.tags.map((tag) => (
+                      <Tag key={tag}>{tag}</Tag>
+                    ))}
+                  </div>
+                )}
+                <Markdown>{question.prompt}</Markdown>
+              </>
+            )}
+            {leftTab === 'notes' &&
+              (unlocked ? <Markdown>{question.notes}</Markdown> : <LockedPanel what="Notes" onReveal={reveal} />)}
+            {leftTab === 'solution' &&
+              (unlocked ? <SolutionCode question={question} /> : <LockedPanel what="Solutions" onReveal={reveal} />)}
+          </div>
         </section>
 
         <div
@@ -249,20 +339,30 @@ export default function QuestionPage() {
           onKeyDown={divider.onKeyDown}
         />
 
-        <section className="workspace-panel" aria-label={view === 'solution' ? 'Reference solution' : 'Your code'}>
-          {view === 'solution' && <p className="solution-banner">Reference solution · read-only</p>}
-          {view === 'attempt' &&
-            (starter ? (
-              <Workspace key={`${question.slug}:${resetKey}`} question={question} files={starter} draftSlug={question.slug} />
+        <section className="workspace-panel" aria-label="Workspace">
+          {isCode ? (
+            assets ? (
+              <CodeWorkspace question={question} assets={assets} onAccepted={onAccepted} />
             ) : (
               <WorkspaceSkeleton />
-            ))}
-          {view === 'solution' &&
-            (solution ? (
-              <Workspace key={`${question.slug}:solution`} question={question} files={solution} readOnly />
-            ) : (
-              <WorkspaceSkeleton />
-            ))}
+            )
+          ) : (
+            <>
+              {uiView === 'solution' && <p className="solution-banner">Reference solution · read-only</p>}
+              {uiView === 'attempt' &&
+                (starter ? (
+                  <Workspace key={`${question.slug}:${resetKey}`} question={question} files={starter} draftSlug={question.slug} />
+                ) : (
+                  <WorkspaceSkeleton />
+                ))}
+              {uiView === 'solution' &&
+                (solutionFiles ? (
+                  <Workspace key={`${question.slug}:solution`} question={question} files={solutionFiles} readOnly />
+                ) : (
+                  <WorkspaceSkeleton />
+                ))}
+            </>
+          )}
         </section>
       </div>
     </div>

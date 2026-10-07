@@ -1,0 +1,76 @@
+{
+  "fn": "isPalindrome",
+  "kind": "function",
+  "params": [
+    {
+      "name": "s",
+      "type": "string"
+    }
+  ],
+  "returns": "boolean",
+  "compare": "exact",
+  "cases": [
+    {
+      "input": ["Was it a car or a cat I saw?"],
+      "expected": true
+    },
+    {
+      "input": ["tab a cat"],
+      "expected": false
+    },
+    {
+      "input": [" "],
+      "expected": true
+    },
+    {
+      "input": [""],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": ["a."],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": ["0P"],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [".,!?"],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": ["No lemon, no melon"],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": ["ab_a"],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": ["1b1"],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": ["Aa"],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": ["race a car"],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [",9XccY0.a0,0acaZ,9b XZc,a,.ba,bca99YX0bZ9Y,9b ,.abY90,,9Y9ZZ X 09c,,c009Y0b0a0 Y XXbZbZcca,bcbc0bZ,Zbbcc,a Z ab0YZY .,ZXXZ,. YZY0ba Z a,ccbbZ,Zb0cbcb,accZbZbXX Y 0a0b0Y900c,,c90 X ZZ9Y9,,09Yba., b9,Y9Zb0XY99acb,ab.,a,cZX b9,Zaca0,0a.0YccX9,"],
+      "expected": true,
+      "hidden": true
+    }
+  ]
+}

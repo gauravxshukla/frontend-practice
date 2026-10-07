@@ -1,0 +1,139 @@
+{
+  "fn": "groupAnagrams",
+  "kind": "function",
+  "params": [
+    {
+      "name": "strs",
+      "type": "string[]"
+    }
+  ],
+  "returns": "string[][]",
+  "compare": "unordered-deep",
+  "cases": [
+    {
+      "input": [
+        ["eat", "tea", "tan", "ate", "nat", "bat"]
+      ],
+      "expected": [
+        ["eat", "tea", "ate"],
+        ["tan", "nat"],
+        ["bat"]
+      ]
+    },
+    {
+      "input": [
+        [""]
+      ],
+      "expected": [
+        [""]
+      ]
+    },
+    {
+      "input": [
+        ["a"]
+      ],
+      "expected": [
+        ["a"]
+      ]
+    },
+    {
+      "input": [
+        ["", ""]
+      ],
+      "expected": [
+        ["", ""]
+      ],
+      "hidden": true
+    },
+    {
+      "input": [
+        ["abc", "bca", "cab", "xyz"]
+      ],
+      "expected": [
+        ["abc", "bca", "cab"],
+        ["xyz"]
+      ],
+      "hidden": true
+    },
+    {
+      "input": [
+        ["ab", "ba", "abb", "bab", "bba", "a"]
+      ],
+      "expected": [
+        ["ab", "ba"],
+        ["abb", "bab", "bba"],
+        ["a"]
+      ],
+      "hidden": true
+    },
+    {
+      "input": [
+        ["aa", "a", "aa"]
+      ],
+      "expected": [
+        ["aa", "aa"],
+        ["a"]
+      ],
+      "hidden": true
+    },
+    {
+      "input": [
+        ["listen", "silent", "enlist", "google", "gooegl", "cat", "act", "tac"]
+      ],
+      "expected": [
+        ["listen", "silent", "enlist"],
+        ["google", "gooegl"],
+        ["cat", "act", "tac"]
+      ],
+      "hidden": true
+    },
+    {
+      "input": [
+        ["ddddddddddb", "bbbbbbbbbbc"]
+      ],
+      "expected": [
+        ["ddddddddddb"],
+        ["bbbbbbbbbbc"]
+      ],
+      "hidden": true
+    },
+    {
+      "input": [
+        ["aaac", "bcaa", "bb", "bb", "abc", "cbba", "abc", "bc", "bbbc", "ccc", "b", "aba", "aaac", "a", "acac", "ab", "b", "bcb", "cca", "aba", "ac", "ccb", "bac", "a", "ba", "bb", "baca", "abb", "a", "cb", "bcac", "ba", "caba", "bba", "ac", "a", "ccb", "acab", "abbc", "aca", "bcca", "ccaa", "a", "cb", "aab", "bbb", "ac", "aac", "bcaa", "cc", "acbb", "ccac", "b", "cbba", "bcca", "cc", "bbc", "cbac", "bba", "cca", "caab", "bab", "ba", "cac", "abcc", "abbb", "ca", "accb", "bccb", "a", "a", "acbb", "cb", "abba", "c", "cbc", "ccbc", "cca", "b", "ab", "a", "acab", "ab", "aab", "bc", "aab", "baa", "bc", "b", "bbab", "c", "a", "c", "a", "abc", "c", "abba", "bcc", "a", "ca", "ccb", "cba", "aaa", "ac", "a", "a", "bcc", "ca", "c", "a", "c", "aaaa", "babb", "bcbb", "ab", "ac", "abcb", "ca", "bba", "caa"]
+      ],
+      "expected": [
+        ["aaac", "aaac"],
+        ["bcaa", "baca", "caba", "acab", "bcaa", "caab", "acab"],
+        ["bb", "bb", "bb"],
+        ["abc", "abc", "bac", "abc", "cba"],
+        ["cbba", "abbc", "acbb", "cbba", "acbb", "abcb"],
+        ["bc", "cb", "cb", "cb", "bc", "bc"],
+        ["bbbc", "bcbb"],
+        ["ccc"],
+        ["b", "b", "b", "b", "b"],
+        ["aba", "aba", "aab", "aab", "aab", "baa"],
+        ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"],
+        ["acac", "ccaa"],
+        ["ab", "ba", "ba", "ba", "ab", "ab", "ab"],
+        ["bcb", "bbc"],
+        ["cca", "cca", "cac", "cca"],
+        ["ac", "ac", "ac", "ca", "ca", "ac", "ca", "ac", "ca"],
+        ["ccb", "ccb", "cbc", "bcc", "ccb", "bcc"],
+        ["abb", "bba", "bba", "bab", "bba"],
+        ["bcac", "bcca", "bcca", "cbac", "abcc", "accb"],
+        ["aca", "aac", "caa"],
+        ["bbb"],
+        ["cc", "cc"],
+        ["ccac"],
+        ["abbb", "bbab", "babb"],
+        ["bccb"],
+        ["abba", "abba"],
+        ["c", "c", "c", "c", "c", "c"],
+        ["ccbc"],
+        ["aaa"],
+        ["aaaa"]
+      ],
+      "hidden": true
+    }
+  ]
+}

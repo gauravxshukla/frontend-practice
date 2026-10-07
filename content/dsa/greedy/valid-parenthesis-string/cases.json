@@ -1,0 +1,123 @@
+{
+  "fn": "checkValidString",
+  "kind": "function",
+  "params": [
+    {
+      "name": "s",
+      "type": "string"
+    }
+  ],
+  "returns": "boolean",
+  "compare": "exact",
+  "cases": [
+    {
+      "input": [
+        "()"
+      ],
+      "expected": true
+    },
+    {
+      "input": [
+        "(*)"
+      ],
+      "expected": true
+    },
+    {
+      "input": [
+        "(*))"
+      ],
+      "expected": true
+    },
+    {
+      "input": [
+        "*"
+      ],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": [
+        ")"
+      ],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [
+        "("
+      ],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [
+        "*)"
+      ],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": [
+        ")*"
+      ],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [
+        "(*"
+      ],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": [
+        "*("
+      ],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [
+        "((*)"
+      ],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": [
+        "(((*)"
+      ],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [
+        "(*()*))((*"
+      ],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [
+        "((((()(()()()*()(((((*)()*(**(())))))(())()())(((())())())))))))(((((())*)))()))(()((*()*(*)))(*)()"
+      ],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": [
+        "(*)("
+      ],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [
+        "((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((************************************************************))))))))))))))))))))))))))))))"
+      ],
+      "expected": true,
+      "hidden": true
+    }
+  ]
+}

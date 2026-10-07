@@ -1,0 +1,24 @@
+{
+  "fn": "countSubstrings",
+  "kind": "function",
+  "params": [
+    {
+      "name": "s",
+      "type": "string"
+    }
+  ],
+  "returns": "number",
+  "compare": "exact",
+  "cases": [
+    {"input":["abc"],"expected":3},
+    {"input":["aaa"],"expected":6},
+    {"input":["z"],"expected":1,"hidden":true},
+    {"input":["ab"],"expected":2,"hidden":true},
+    {"input":["aa"],"expected":3,"hidden":true},
+    {"input":["abba"],"expected":6,"hidden":true},
+    {"input":["racecar"],"expected":10,"hidden":true},
+    {"input":["babbbbababbbbbaaabaaabaababaaabbbbbaaabb"],"expected":115,"hidden":true},
+    {"input":["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],"expected":7260,"hidden":true},
+    {"input":["caabbaccccccccaccaccbaccacbbacabbbbcacacbaccabcbbbaaabbbbccccacabcbcbabbbcaaaabaaabbccbcccacacacaaabccaccbcababbcacbaaabcaababaabacabcbcbbcbbaccbacaacababcbccaccccaacbbbacbccccbaccaabbabaabbbcbaaabbcacacababacaaabbababbabbbacabababaccbbcbabcbcbabbcbccbccbabcababaccbacabcaaccabababacccabacaacbccccaac"],"expected":639,"hidden":true}
+  ]
+}

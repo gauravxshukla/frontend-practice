@@ -1,0 +1,83 @@
+{
+  "fn": "encode / decode",
+  "kind": "codec",
+  "methods": ["encode", "decode"],
+  "params": [
+    {
+      "name": "strs",
+      "type": "string[]"
+    }
+  ],
+  "returns": "string[]",
+  "compare": "exact",
+  "cases": [
+    {
+      "input": [
+        ["neet", "code", "love", "you"]
+      ],
+      "expected": ["neet", "code", "love", "you"]
+    },
+    {
+      "input": [
+        ["we", "say", ":", "yes"]
+      ],
+      "expected": ["we", "say", ":", "yes"]
+    },
+    {
+      "input": [
+        []
+      ],
+      "expected": [],
+      "hidden": true
+    },
+    {
+      "input": [
+        [""]
+      ],
+      "expected": [""],
+      "hidden": true
+    },
+    {
+      "input": [
+        ["", "", ""]
+      ],
+      "expected": ["", "", ""],
+      "hidden": true
+    },
+    {
+      "input": [
+        ["#", "##", "3#abc", "4#"]
+      ],
+      "expected": ["#", "##", "3#abc", "4#"],
+      "hidden": true
+    },
+    {
+      "input": [
+        ["12", "1#2", " ", "\n\t"]
+      ],
+      "expected": ["12", "1#2", " ", "\n\t"],
+      "hidden": true
+    },
+    {
+      "input": [
+        ["héllo", "wörld", "日本語", "emoji 🙂"]
+      ],
+      "expected": ["héllo", "wörld", "日本語", "emoji 🙂"],
+      "hidden": true
+    },
+    {
+      "input": [
+        ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "b"]
+      ],
+      "expected": ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "b"],
+      "hidden": true
+    },
+    {
+      "input": [
+        ["", "11a a#ab", ";/#/a", ",#,/", "", "bbb#", ";#;;;", "#/1", "; ,#", "a", "/#/", "a 1,, a", "b1/", " ##11;,1", "b1b", ";a ;;#;", "/#a#;ba", "b#; ", "#a #;;/", "aaaa", "1", "b/a ;,", "ab1;/", "##a  #", "b#11/ab ", "/a;,", "/a", "b;a/", "#1 a;#//", ";b1 /#,", ",1b1a", ";/#,bb ", ",,1,baaa", "b baa/,", ";", "a,ba/a/", "a;a", "ba;,", " 111 a", "1", "ab1", "b1/b", "a,;b,#,", "a", "; ;,1b", ";", "/a;1#;;", ";//##;", " ", "1", "#/a/", " 1", "", "1 1a1", "/;", "b", "1;#a,a", ";", "1", "/a,aa /1", "b;b", "/,#1a/b", "a//,11 ", ";//#1/a", "/", " // 1#", ",,,#,/,1", "b;", ";", "/a/,#", "a#;/#,1", "a#", "", "##/", ",,a ;#1", "", "/ #,;;", "// 1 1 ", " /", "1#,1;", ",/#aab#", "/#", "/", "1b#;#", " #,1;", "", "#/a/1#", "b,", " ;", ";#1", "b,1abb", ",b1", "#aa;#;,", ",b", "1##/ba", "ab", ",1#a;1b", "a,#b,#", "", ";a # 1"]
+      ],
+      "expected": ["", "11a a#ab", ";/#/a", ",#,/", "", "bbb#", ";#;;;", "#/1", "; ,#", "a", "/#/", "a 1,, a", "b1/", " ##11;,1", "b1b", ";a ;;#;", "/#a#;ba", "b#; ", "#a #;;/", "aaaa", "1", "b/a ;,", "ab1;/", "##a  #", "b#11/ab ", "/a;,", "/a", "b;a/", "#1 a;#//", ";b1 /#,", ",1b1a", ";/#,bb ", ",,1,baaa", "b baa/,", ";", "a,ba/a/", "a;a", "ba;,", " 111 a", "1", "ab1", "b1/b", "a,;b,#,", "a", "; ;,1b", ";", "/a;1#;;", ";//##;", " ", "1", "#/a/", " 1", "", "1 1a1", "/;", "b", "1;#a,a", ";", "1", "/a,aa /1", "b;b", "/,#1a/b", "a//,11 ", ";//#1/a", "/", " // 1#", ",,,#,/,1", "b;", ";", "/a/,#", "a#;/#,1", "a#", "", "##/", ",,a ;#1", "", "/ #,;;", "// 1 1 ", " /", "1#,1;", ",/#aab#", "/#", "/", "1b#;#", " #,1;", "", "#/a/1#", "b,", " ;", ";#1", "b,1abb", ",b1", "#aa;#;,", ",b", "1##/ba", "ab", ",1#a;1b", "a,#b,#", "", ";a # 1"],
+      "hidden": true
+    }
+  ]
+}

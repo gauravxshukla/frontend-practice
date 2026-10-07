@@ -1,0 +1,103 @@
+{
+  "fn": "containsDuplicate",
+  "kind": "function",
+  "params": [
+    {
+      "name": "nums",
+      "type": "number[]"
+    }
+  ],
+  "returns": "boolean",
+  "cases": [
+    {
+      "input": [
+        [
+          1,
+          2,
+          3,
+          1
+        ]
+      ],
+      "expected": true
+    },
+    {
+      "input": [
+        [
+          1,
+          2,
+          3,
+          4
+        ]
+      ],
+      "expected": false
+    },
+    {
+      "input": [
+        []
+      ],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          7
+        ]
+      ],
+      "expected": false,
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          1,
+          1,
+          1,
+          3,
+          3,
+          4,
+          3,
+          2,
+          4,
+          2
+        ]
+      ],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          -1,
+          -1
+        ]
+      ],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          0,
+          0
+        ]
+      ],
+      "expected": true,
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          5,
+          4,
+          3,
+          2,
+          1,
+          5
+        ]
+      ],
+      "expected": true,
+      "hidden": true
+    }
+  ]
+}

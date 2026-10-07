@@ -1,9 +1,10 @@
-import { useEffect, useMemo, type CSSProperties, type ReactNode, type RefObject } from 'react';
-import { Link, NavLink, useLocation } from 'react-router';
+import { useEffect, type CSSProperties, type ReactNode, type RefObject } from 'react';
+import { Link, useLocation } from 'react-router';
 import {
   Atom,
   Binary,
   Braces,
+  CheckCircle2,
   ChevronRight,
   Code2,
   FileCode,
@@ -19,14 +20,10 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
-import {
-  countQuestions,
-  questionTree,
-  type Question,
-  type QuestionGroup,
-} from '../lib/content/catalog';
-import { notes, type Note } from '../lib/content/notes';
+import { getQuestion, questionsIn, questionTree, type QuestionGroup } from '../lib/content/catalog';
+import { noteSections, notes } from '../lib/content/notes';
 import { quizDecks } from '../lib/content/quiz';
+import { useProgress } from '../lib/progress';
 import { useTheme, type ThemeMode } from '../lib/theme';
 import { usePersistentState } from '../lib/usePersistentState';
 import { Kbd } from '../components/Kbd';
@@ -63,38 +60,40 @@ interface SidebarProps {
   filterRef: RefObject<HTMLInputElement | null>;
 }
 
-/** Group ids that must be open for the current route to be visible. */
-function openIdsForPath(pathname: string): string[] {
+/**
+ * Where the current route sits in the tree: which topic leaf is active and which
+ * groups must be open to show it. Questions resolve to their topic.
+ */
+function locate(pathname: string): { activeLeaf?: string; open: string[] } {
+  const topicOpen = (groupId: string) => {
+    const parent = groupId.includes('/') ? [`questions/${groupId.split('/')[0]}`] : [];
+    return { activeLeaf: `topic:${groupId}`, open: ['questions', ...parent] };
+  };
   if (pathname.startsWith('/q/')) {
-    const slug = pathname.slice(3);
-    if (slug.startsWith('machine-coding/')) {
-      const type = slug.split('/')[1];
-      return ['questions', 'questions/machine-coding', `questions/machine-coding/${type}`];
-    }
-    return ['questions', `questions/${slug.split('/')[0]}`];
+    const q = getQuestion(pathname.slice(3));
+    return q ? topicOpen(q.groupId) : { open: ['questions'] };
   }
-  if (pathname.startsWith('/quiz')) return ['quiz'];
+  if (pathname.startsWith('/topics/')) return topicOpen(pathname.slice(8));
+  if (pathname.startsWith('/quiz/')) return { activeLeaf: `quiz:${pathname.slice(6)}`, open: ['quiz'] };
   if (pathname.startsWith('/notes/')) {
-    const note = notes.find((n) => pathname === `/notes/${n.slug}`);
-    return note ? ['notes', `notes/${note.section}`] : ['notes'];
+    const rest = pathname.slice(7);
+    const sectionId = notes.find((n) => n.slug === rest)?.sectionId ?? rest;
+    return { activeLeaf: `notes:${sectionId}`, open: ['notes'] };
   }
-  return [];
+  return { open: [] };
 }
 
-function matches(term: string, ...fields: string[]) {
-  return fields.some((f) => f.toLowerCase().includes(term));
-}
+const matches = (term: string, ...fields: string[]) => fields.some((f) => f.toLowerCase().includes(term));
 
-function filterGroup(group: QuestionGroup, term: string): QuestionGroup | null {
-  const questions = group.questions.filter((q) => matches(term, q.title, ...q.tags));
-  const children = group.children.map((c) => filterGroup(c, term)).filter(Boolean) as QuestionGroup[];
-  return questions.length || children.length ? { ...group, questions, children } : null;
+/** A topic stays visible while filtering if its name or any of its questions match. */
+function topicMatches(group: QuestionGroup, term: string) {
+  return matches(term, group.label) || questionsIn(group).some((q) => matches(term, q.title, ...q.tags));
 }
 
 interface GroupProps {
   id: string;
   label: string;
-  count: number;
+  meta?: ReactNode;
   depth: number;
   open: boolean;
   onToggle: (id: string) => void;
@@ -102,7 +101,7 @@ interface GroupProps {
   children: ReactNode;
 }
 
-function AccordionGroup({ id, label, count, depth, open, onToggle, icon: Icon, children }: GroupProps) {
+function AccordionGroup({ id, label, meta, depth, open, onToggle, icon: Icon, children }: GroupProps) {
   const panelId = `nav-${id.replace(/\W/g, '-')}`;
   return (
     <div className={`nav-group${depth === 0 ? ' is-root' : ''}`} style={{ '--depth': depth } as CSSProperties}>
@@ -116,7 +115,7 @@ function AccordionGroup({ id, label, count, depth, open, onToggle, icon: Icon, c
         <ChevronRight className="nav-chevron" size={14} aria-hidden />
         {Icon && <Icon className="nav-icon" size={15} aria-hidden />}
         <span className="nav-label">{label}</span>
-        <span className="nav-count">{count}</span>
+        {meta}
       </button>
       <div id={panelId} className={`nav-group-panel${open ? ' open' : ''}`} role="group" inert={!open}>
         <div className="nav-group-inner">{children}</div>
@@ -125,23 +124,40 @@ function AccordionGroup({ id, label, count, depth, open, onToggle, icon: Icon, c
   );
 }
 
-function NavItem({ to, children, title }: { to: string; children: ReactNode; title?: string }) {
+function TopicLink({
+  to,
+  label,
+  active,
+  icon: Icon,
+  meta,
+}: {
+  to: string;
+  label: string;
+  active: boolean;
+  icon?: LucideIcon;
+  meta?: ReactNode;
+}) {
   return (
-    <NavLink to={to} className="nav-item" title={title} end>
-      {children}
-    </NavLink>
+    <Link to={to} className={`nav-item${active ? ' active' : ''}`} aria-current={active ? 'page' : undefined} title={label}>
+      {Icon ? <Icon className="nav-icon" size={15} aria-hidden /> : <span className="nav-bullet" aria-hidden />}
+      <span className="nav-item-label">{label}</span>
+      {meta}
+    </Link>
   );
 }
 
-function QuestionItem({ q }: { q: Question }) {
+function Progress({ solved, total }: { solved: number; total: number }) {
+  if (total && solved === total) {
+    return (
+      <span className="nav-count complete" title="All solved">
+        <CheckCircle2 size={13} aria-label="all solved" />
+      </span>
+    );
+  }
   return (
-    <NavItem to={`/q/${q.slug}`} title={q.title}>
-      <span
-        className={`difficulty-dot dot-${q.difficulty}${q.hasSolution ? '' : ' hollow'}`}
-        aria-label={`${q.difficulty}${q.hasSolution ? '' : ', no solution yet'}`}
-      />
-      <span className="nav-item-label">{q.title}</span>
-    </NavItem>
+    <span className="nav-count" title={`${solved} of ${total} solved`}>
+      {solved ? `${solved}/${total}` : total}
+    </span>
   );
 }
 
@@ -157,11 +173,13 @@ export default function Sidebar({
 }: SidebarProps) {
   const { pathname } = useLocation();
   const { mode, setMode } = useTheme();
+  const progress = useProgress();
   const [openIds, setOpenIds] = usePersistentState<string[]>('fp:sidebar:open', ['questions']);
+  const location = locate(pathname);
 
   // Reveal wherever the current route lives in the tree.
   useEffect(() => {
-    const needed = openIdsForPath(pathname);
+    const needed = locate(pathname).open;
     setOpenIds((prev) => (needed.every((id) => prev.includes(id)) ? prev : [...new Set([...prev, ...needed])]));
   }, [pathname, setOpenIds]);
 
@@ -171,31 +189,26 @@ export default function Sidebar({
   const toggle = (id: string) =>
     setOpenIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
-  const tree = useMemo(
-    () => (filtering ? (questionTree.map((g) => filterGroup(g, term)).filter(Boolean) as QuestionGroup[]) : questionTree),
-    [filtering, term],
-  );
-  const decks = filtering ? quizDecks.filter((d) => matches(term, d.title)) : quizDecks;
-  const visibleNotes = filtering ? notes.filter((n) => matches(term, n.title, n.section)) : notes;
-  const noteSections = [...new Set(visibleNotes.map((n) => n.section))];
-  const totalQuestions = tree.reduce((n, g) => n + countQuestions(g), 0);
+  const solvedIn = (group: QuestionGroup) => questionsIn(group).filter((q) => progress[q.slug] === 'solved').length;
+  const progressOf = (group: QuestionGroup) => <Progress solved={solvedIn(group)} total={questionsIn(group).length} />;
 
-  const renderGroup = (group: QuestionGroup, depth: number): ReactNode => (
-    <AccordionGroup
+  const visibleTree = questionTree
+    .map((g) => (g.children.length ? { ...g, children: g.children.filter((c) => !filtering || topicMatches(c, term)) } : g))
+    .filter((g) => !filtering || (g.children.length ? g.children.length > 0 : topicMatches(g, term)));
+  const decks = filtering ? quizDecks.filter((d) => matches(term, d.title)) : quizDecks;
+  const sections = filtering
+    ? noteSections.filter((s) => matches(term, s.label, ...s.notes.map((n) => n.title)))
+    : noteSections;
+
+  const topicLink = (group: QuestionGroup) => (
+    <TopicLink
       key={group.id}
-      id={`questions/${group.id}`}
+      to={`/topics/${group.id}`}
       label={group.label}
-      count={countQuestions(group)}
-      depth={depth}
-      open={isOpen(`questions/${group.id}`)}
-      onToggle={toggle}
+      active={location.activeLeaf === `topic:${group.id}`}
       icon={GROUP_ICONS[group.id]}
-    >
-      {group.children.map((child) => renderGroup(child, depth + 1))}
-      {group.questions.map((q) => (
-        <QuestionItem key={q.slug} q={q} />
-      ))}
-    </AccordionGroup>
+      meta={progressOf(group)}
+    />
   );
 
   const openSectionFromRail = (id: string) => {
@@ -203,7 +216,8 @@ export default function Sidebar({
     onExpand();
   };
 
-  const nothingFound = filtering && !tree.length && !decks.length && !visibleNotes.length;
+  const nothingFound = filtering && !visibleTree.length && !decks.length && !sections.length;
+  const railActive = location.open[0];
 
   return (
     <aside
@@ -237,7 +251,7 @@ export default function Sidebar({
           <button
             key={id}
             type="button"
-            className={`icon-btn rail-btn${openIdsForPath(pathname)[0] === id ? ' active' : ''}`}
+            className={`icon-btn rail-btn${railActive === id ? ' active' : ''}`}
             onClick={() => openSectionFromRail(id)}
             aria-label={label}
             title={label}
@@ -264,7 +278,7 @@ export default function Sidebar({
         <input
           ref={filterRef}
           type="search"
-          placeholder="Filter…"
+          placeholder="Find a topic or question…"
           value={filter}
           onChange={(e) => onFilterChange(e.target.value)}
           onKeyDown={(e) => {
@@ -273,61 +287,86 @@ export default function Sidebar({
               e.currentTarget.blur();
             }
           }}
-          aria-label="Filter questions, decks and notes"
+          aria-label="Find a topic, question, deck or note"
         />
         {!filter && <Kbd>/</Kbd>}
       </div>
 
-      <nav className="sidebar-tree" aria-label="Content">
-        {(!filtering || tree.length > 0) && (
+      <nav className="sidebar-tree" aria-label="Topics">
+        {visibleTree.length > 0 && (
           <AccordionGroup
             id="questions"
             label="Questions"
-            count={totalQuestions}
+            meta={<Progress solved={questionTree.reduce((n, g) => n + solvedIn(g), 0)} total={questionTree.reduce((n, g) => n + questionsIn(g).length, 0)} />}
             depth={0}
             open={isOpen('questions')}
             onToggle={toggle}
             icon={Code2}
           >
-            {tree.map((group) => renderGroup(group, 1))}
+            {visibleTree.map((group) =>
+              group.children.length ? (
+                <AccordionGroup
+                  key={group.id}
+                  id={`questions/${group.id}`}
+                  label={group.label}
+                  meta={progressOf(group)}
+                  depth={1}
+                  open={isOpen(`questions/${group.id}`)}
+                  onToggle={toggle}
+                  icon={GROUP_ICONS[group.id]}
+                >
+                  {group.children.map(topicLink)}
+                </AccordionGroup>
+              ) : (
+                <div key={group.id} className="nav-leaf-row" style={{ '--depth': 1 } as CSSProperties}>
+                  {topicLink(group)}
+                </div>
+              ),
+            )}
           </AccordionGroup>
         )}
 
-        {(!filtering || decks.length > 0) && (
-          <AccordionGroup id="quiz" label="Quiz" count={decks.length} depth={0} open={isOpen('quiz')} onToggle={toggle} icon={ListChecks}>
+        {decks.length > 0 && (
+          <AccordionGroup
+            id="quiz"
+            label="Quiz"
+            meta={<span className="nav-count">{decks.length}</span>}
+            depth={0}
+            open={isOpen('quiz')}
+            onToggle={toggle}
+            icon={ListChecks}
+          >
             {decks.map((deck) => (
-              <NavItem key={deck.slug} to={`/quiz/${deck.slug}`} title={deck.title}>
-                <span className="nav-bullet" aria-hidden />
-                <span className="nav-item-label">{deck.title}</span>
-                <span className="nav-count">{deck.cards.length}</span>
-              </NavItem>
+              <TopicLink
+                key={deck.slug}
+                to={`/quiz/${deck.slug}`}
+                label={deck.title}
+                active={location.activeLeaf === `quiz:${deck.slug}`}
+                meta={<span className="nav-count">{deck.cards.length}</span>}
+              />
             ))}
           </AccordionGroup>
         )}
 
-        {(!filtering || visibleNotes.length > 0) && (
-          <AccordionGroup id="notes" label="Notes" count={visibleNotes.length} depth={0} open={isOpen('notes')} onToggle={toggle} icon={StickyNote}>
-            {noteSections.map((section) => {
-              const items = visibleNotes.filter((n: Note) => n.section === section);
-              return (
-                <AccordionGroup
-                  key={section}
-                  id={`notes/${section}`}
-                  label={section}
-                  count={items.length}
-                  depth={1}
-                  open={isOpen(`notes/${section}`)}
-                  onToggle={toggle}
-                >
-                  {items.map((n) => (
-                    <NavItem key={n.slug} to={`/notes/${n.slug}`} title={n.title}>
-                      <span className="nav-bullet" aria-hidden />
-                      <span className="nav-item-label">{n.title}</span>
-                    </NavItem>
-                  ))}
-                </AccordionGroup>
-              );
-            })}
+        {sections.length > 0 && (
+          <AccordionGroup
+            id="notes"
+            label="Notes"
+            meta={<span className="nav-count">{sections.length}</span>}
+            depth={0}
+            open={isOpen('notes')}
+            onToggle={toggle}
+            icon={StickyNote}
+          >
+            {sections.map((s) => (
+              <TopicLink
+                key={s.id}
+                to={`/notes/${s.id}`}
+                label={s.label}
+                active={location.activeLeaf === `notes:${s.id}`}
+                meta={<span className="nav-count">{s.notes.length}</span>}
+              />
+            ))}
           </AccordionGroup>
         )}
 
@@ -367,4 +406,3 @@ export default function Sidebar({
     </aside>
   );
 }
-

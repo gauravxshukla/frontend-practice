@@ -2,15 +2,16 @@ import { existsSync, globSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { defineConfig } from 'vitest/config';
 
-// Runs every reference solution against its own tests, so the answer key can't drift.
+// JS questions: Jest-style suites run against the reference solution.
 // Prompt-only questions (tests but no solution.js yet) are skipped.
-const testFiles = globSync('content/**/solution.test.js').filter((test) =>
+const jsSuites = globSync('content/**/solution.test.js').filter((test) =>
   existsSync(join(dirname(test), 'solution.js')),
 );
 
 export default defineConfig({
   test: {
-    include: testFiles,
+    // DSA questions are data-driven (cases.json) and graded by scripts/verify-dsa.test.js.
+    include: [...jsSuites, 'scripts/verify-dsa.test.js'],
     globals: true,
     environment: 'node',
   },

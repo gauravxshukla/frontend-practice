@@ -449,3 +449,17 @@
     opacity: 0;
   }
 }
+
+/* Leaf rows that sit directly in a group (e.g. JavaScript under Questions). */
+.nav-leaf-row > .nav-item {
+  --indent: calc(8px + var(--depth) * 14px + 22px);
+}
+
+.nav-count.complete {
+  display: inline-flex;
+  color: var(--easy);
+}
+
+.nav-item.active .nav-count {
+  color: inherit;
+}

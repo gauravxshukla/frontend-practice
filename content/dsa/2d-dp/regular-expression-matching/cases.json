@@ -1,0 +1,32 @@
+{
+  "fn": "isMatch",
+  "kind": "function",
+  "params": [
+    {
+      "name": "s",
+      "type": "string"
+    },
+    {
+      "name": "p",
+      "type": "string"
+    }
+  ],
+  "returns": "boolean",
+  "compare": "exact",
+  "cases": [
+    {"input":["aa","a"],"expected":false},
+    {"input":["aa","a*"],"expected":true},
+    {"input":["ab",".*"],"expected":true},
+    {"input":["aab","c*a*b"],"expected":true,"hidden":true},
+    {"input":["mississippi","mis*is*p*."],"expected":false,"hidden":true},
+    {"input":["a","ab*"],"expected":true,"hidden":true},
+    {"input":["ab",".*c"],"expected":false,"hidden":true},
+    {"input":["aaa","a*a"],"expected":true,"hidden":true},
+    {"input":["aaa","ab*a*c*a"],"expected":true,"hidden":true},
+    {"input":["a",".*..a*"],"expected":false,"hidden":true},
+    {"input":["bbbba",".*a*a"],"expected":true,"hidden":true},
+    {"input":["abcd","d*"],"expected":false,"hidden":true},
+    {"input":["aaaaaaaaaaaaaaaaaaab","a*a*a*a*a*a*a*a*a*c"],"expected":false,"hidden":true},
+    {"input":["aaaaaaaaaaaaaaaaaaab","a*a*a*a*a*a*a*a*a*b"],"expected":true,"hidden":true}
+  ]
+}

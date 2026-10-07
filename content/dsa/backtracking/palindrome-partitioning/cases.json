@@ -1,0 +1,18 @@
+{
+  "fn": "partition",
+  "kind": "function",
+  "params": [{"name":"s","type":"string"}],
+  "returns": "string[][]",
+  "compare": "unordered",
+  "cases": [
+    {"input":["aab"],"expected":[["aa","b"],["a","a","b"]]},
+    {"input":["a"],"expected":[["a"]]},
+    {"input":["ab"],"expected":[["a","b"]],"hidden":true},
+    {"input":["aaa"],"expected":[["aaa"],["a","aa"],["aa","a"],["a","a","a"]],"hidden":true},
+    {"input":["efe"],"expected":[["efe"],["e","f","e"]],"hidden":true},
+    {"input":["racecar"],"expected":[["racecar"],["r","aceca","r"],["r","a","cec","a","r"],["r","a","c","e","c","a","r"]],"hidden":true},
+    {"input":["abbab"],"expected":[["a","b","bab"],["abba","b"],["a","bb","a","b"],["a","b","b","a","b"]],"hidden":true},
+    {"input":["abcdefghij"],"expected":[["a","b","c","d","e","f","g","h","i","j"]],"hidden":true},
+    {"input":["aabbaacbcaab"],"expected":[["aa","b","baacbcaab"],["a","a","b","baacbcaab"],["aa","bb","aacbcaa","b"],["a","a","bb","aacbcaa","b"],["aa","b","b","aacbcaa","b"],["a","a","b","b","aacbcaa","b"],["aabbaa","cbc","aa","b"],["aa","bb","aa","cbc","aa","b"],["a","a","bb","aa","cbc","aa","b"],["aa","b","b","aa","cbc","aa","b"],["a","a","b","b","aa","cbc","aa","b"],["a","abba","a","cbc","aa","b"],["aa","bb","a","a","cbc","aa","b"],["a","a","bb","a","a","cbc","aa","b"],["aa","b","b","a","a","cbc","aa","b"],["a","a","b","b","a","a","cbc","aa","b"],["aabbaa","c","b","c","aa","b"],["aa","bb","aa","c","b","c","aa","b"],["a","a","bb","aa","c","b","c","aa","b"],["aa","b","b","aa","c","b","c","aa","b"],["a","a","b","b","aa","c","b","c","aa","b"],["a","abba","a","c","b","c","aa","b"],["aa","bb","a","a","c","b","c","aa","b"],["a","a","bb","a","a","c","b","c","aa","b"],["aa","b","b","a","a","c","b","c","aa","b"],["a","a","b","b","a","a","c","b","c","aa","b"],["a","abba","acbca","a","b"],["aa","bb","a","acbca","a","b"],["a","a","bb","a","acbca","a","b"],["aa","b","b","a","acbca","a","b"],["a","a","b","b","a","acbca","a","b"],["aabbaa","cbc","a","a","b"],["aa","bb","aa","cbc","a","a","b"],["a","a","bb","aa","cbc","a","a","b"],["aa","b","b","aa","cbc","a","a","b"],["a","a","b","b","aa","cbc","a","a","b"],["a","abba","a","cbc","a","a","b"],["aa","bb","a","a","cbc","a","a","b"],["a","a","bb","a","a","cbc","a","a","b"],["aa","b","b","a","a","cbc","a","a","b"],["a","a","b","b","a","a","cbc","a","a","b"],["aabbaa","c","b","c","a","a","b"],["aa","bb","aa","c","b","c","a","a","b"],["a","a","bb","aa","c","b","c","a","a","b"],["aa","b","b","aa","c","b","c","a","a","b"],["a","a","b","b","aa","c","b","c","a","a","b"],["a","abba","a","c","b","c","a","a","b"],["aa","bb","a","a","c","b","c","a","a","b"],["a","a","bb","a","a","c","b","c","a","a","b"],["aa","b","b","a","a","c","b","c","a","a","b"],["a","a","b","b","a","a","c","b","c","a","a","b"]],"hidden":true}
+  ]
+}
