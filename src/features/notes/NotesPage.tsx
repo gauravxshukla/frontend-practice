@@ -1,29 +1,37 @@
 import { Link, useParams } from 'react-router';
 import Markdown from '../../components/Markdown';
-import { getNote, notes } from '../../lib/content/notes';
+import { getNote, getNoteSection, noteSections, type NoteSection } from '../../lib/content/notes';
 
-function NotesIndex() {
-  const sections = [...new Set(notes.map((n) => n.section))];
+function SectionList({ section }: { section: NoteSection }) {
+  return (
+    <ul className="question-list">
+      {section.notes.map((n) => (
+        <li key={n.slug}>
+          <Link to={`/notes/${n.slug}`} className="question-row">
+            <span className="question-row-title">{n.title}</span>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function NotesIndex({ only }: { only?: NoteSection }) {
   return (
     <div className="page">
       <header className="page-header">
-        <h1>Notes</h1>
+        {only && (
+          <p className="eyebrow">
+            <Link to="/notes">Notes</Link>
+          </p>
+        )}
+        <h1>{only ? only.label : 'Notes'}</h1>
         <p className="muted">Read-only reference material.</p>
       </header>
-      {sections.map((section) => (
-        <section key={section} className="catalog-section">
-          <h2>{section}</h2>
-          <ul className="question-list">
-            {notes
-              .filter((n) => n.section === section)
-              .map((n) => (
-                <li key={n.slug}>
-                  <Link to={`/notes/${n.slug}`} className="question-row">
-                    <span className="question-row-title">{n.title}</span>
-                  </Link>
-                </li>
-              ))}
-          </ul>
+      {(only ? [only] : noteSections).map((section) => (
+        <section key={section.id} className="catalog-section">
+          {!only && <h2>{section.label}</h2>}
+          <SectionList section={section} />
         </section>
       ))}
     </div>
@@ -35,6 +43,8 @@ export default function NotesPage() {
   const note = getNote(slug);
 
   if (!slug) return <NotesIndex />;
+  const section = getNoteSection(slug);
+  if (section) return <NotesIndex only={section} />;
   if (!note) {
     return (
       <div className="page">
@@ -49,7 +59,7 @@ export default function NotesPage() {
   return (
     <div className="page">
       <p className="eyebrow">
-        <Link to="/notes">Notes</Link> / {note.section}
+        <Link to="/notes">Notes</Link> / <Link to={`/notes/${note.sectionId}`}>{note.section}</Link>
       </p>
       <article className="prose">
         <Markdown>{note.content}</Markdown>

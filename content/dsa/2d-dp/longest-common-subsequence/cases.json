@@ -1,0 +1,29 @@
+{
+  "fn": "longestCommonSubsequence",
+  "kind": "function",
+  "params": [
+    {
+      "name": "text1",
+      "type": "string"
+    },
+    {
+      "name": "text2",
+      "type": "string"
+    }
+  ],
+  "returns": "number",
+  "compare": "exact",
+  "cases": [
+    {"input":["abcde","ace"],"expected":3},
+    {"input":["abc","abc"],"expected":3},
+    {"input":["abc","def"],"expected":0},
+    {"input":["a","a"],"expected":1,"hidden":true},
+    {"input":["a","b"],"expected":0,"hidden":true},
+    {"input":["bl","yby"],"expected":1,"hidden":true},
+    {"input":["ezupkr","ubmrapg"],"expected":2,"hidden":true},
+    {"input":["oxcpqrsvwf","shmtulqrypy"],"expected":2,"hidden":true},
+    {"input":["abcba","abcbcba"],"expected":5,"hidden":true},
+    {"input":["bbbcabcbccbccc","bababcaccbabcacaaccc"],"expected":12,"hidden":true},
+    {"input":["ggcdhhfabbaabaaggddbchbgeehgfebbdchdccbfeebafdedghgcccbacdfdegddbdcgfbaegbhdbgadfcdebdaehaeehdgecfddhgcbahdagcfehbffcbdgegacadhebgfaedabebeggafeageeheebcabeaaeghfbfafhaffgdbfdahfdggdefdgaffcfedddhhbgeeagggebdgagbaaceebehabbaehhebcfdcddbdachehafechhbdefbdbghgchddadegegcdgdgddbeeabhebdbadgccghbgbbdgac","cdghbefedhaagfegcbfdehgfccheffccchdgacaehefhbddfchbefhfegechfbgcggafdfcdfaaaadfghahbbeeeabfeggbafefahbfhbeeagffgecechghedaghehddggefefdfhgefcgeefahhgcbhgbbceggbdcdbdfdccccbfchcbhbagebabegedghggbbbcfbfdaabdhcbdbfcddhafeghbcggbbfbcgagcahcagdahbahcffhfg"],"expected":136,"hidden":true}
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "fn": "partitionLabels",
+  "kind": "function",
+  "params": [
+    {
+      "name": "s",
+      "type": "string"
+    }
+  ],
+  "returns": "number[]",
+  "compare": "exact",
+  "cases": [
+    {
+      "input": [
+        "ababcbacadefegdehijhklij"
+      ],
+      "expected": [
+        9,
+        7,
+        8
+      ]
+    },
+    {
+      "input": [
+        "eccbbbbdec"
+      ],
+      "expected": [
+        10
+      ]
+    },
+    {
+      "input": [
+        "a"
+      ],
+      "expected": [
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "input": [
+        "abc"
+      ],
+      "expected": [
+        1,
+        1,
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "input": [
+        "aaaa"
+      ],
+      "expected": [
+        4
+      ],
+      "hidden": true
+    },
+    {
+      "input": [
+        "abca"
+      ],
+      "expected": [
+        4
+      ],
+      "hidden": true
+    },
+    {
+      "input": [
+        "abacdcef"
+      ],
+      "expected": [
+        3,
+        3,
+        1,
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "input": [
+        "caedbdedda"
+      ],
+      "expected": [
+        1,
+        9
+      ],
+      "hidden": true
+    },
+    {
+      "input": [
+        "qiejxqfnqceocmy"
+      ],
+      "expected": [
+        13,
+        1,
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "input": [
+        "jdggcfejcgidacacidjddaajadiafbbceijahibdaaaeeaecbijbhfjggegcgcjgfidaafhfedaecbbdebifiggfddjijaiheihifcdadahfidedejcffechdagdighjdefjhdchiicjjdefeaafidjjbdbejjdbgfjfdbjadeiccjbfiajchabgjhbdgfggajaibdgepnpkmknpopplkoonkmpopnmnonnmklmpppokmkopvtqwqtqyryxqtsquusqxrtzurzvzus"
+      ],
+      "expected": [
+        200,
+        40,
+        30
+      ],
+      "hidden": true
+    }
+  ]
+}

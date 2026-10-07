@@ -1,0 +1,91 @@
+{
+  "fn": "reverseList",
+  "kind": "function",
+  "params": [
+    {
+      "name": "head",
+      "type": "ListNode"
+    }
+  ],
+  "returns": "ListNode",
+  "cases": [
+    {
+      "input": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      ],
+      "expected": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "input": [
+        [
+          1,
+          2
+        ]
+      ],
+      "expected": [
+        2,
+        1
+      ]
+    },
+    {
+      "input": [
+        []
+      ],
+      "expected": [],
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          1
+        ]
+      ],
+      "expected": [
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          1,
+          1,
+          2
+        ]
+      ],
+      "expected": [
+        2,
+        1,
+        1
+      ],
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          -1,
+          0,
+          1
+        ]
+      ],
+      "expected": [
+        1,
+        0,
+        -1
+      ],
+      "hidden": true
+    }
+  ]
+}

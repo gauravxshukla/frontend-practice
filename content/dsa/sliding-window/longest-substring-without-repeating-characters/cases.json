@@ -1,0 +1,66 @@
+{
+  "fn": "lengthOfLongestSubstring",
+  "kind": "function",
+  "params": [
+    {
+      "name": "s",
+      "type": "string"
+    }
+  ],
+  "returns": "number",
+  "compare": "exact",
+  "cases": [
+    {
+      "input": ["zxyzxyz"],
+      "expected": 3
+    },
+    {
+      "input": ["xxxx"],
+      "expected": 1
+    },
+    {
+      "input": ["pwwkew"],
+      "expected": 3
+    },
+    {
+      "input": [""],
+      "expected": 0,
+      "hidden": true
+    },
+    {
+      "input": [" "],
+      "expected": 1,
+      "hidden": true
+    },
+    {
+      "input": ["au"],
+      "expected": 2,
+      "hidden": true
+    },
+    {
+      "input": ["abba"],
+      "expected": 2,
+      "hidden": true
+    },
+    {
+      "input": ["dvdf"],
+      "expected": 3,
+      "hidden": true
+    },
+    {
+      "input": ["tmmzuxt"],
+      "expected": 5,
+      "hidden": true
+    },
+    {
+      "input": ["a b!c a"],
+      "expected": 5,
+      "hidden": true
+    },
+    {
+      "input": ["dhhfiaddbagcdcdcagjbgahgiibiijgeffebjgaiedfdiegaiiggfcijadddbgdbigejicdejfcefhjhajiedbchijifahjjibfbedfichjjbgcfabggdcefegccijgdddgajjdgefefciciahjgifgehhaejaeeicghgdjahhjadjhagbdhfbddefbhddeheebfaccifbjbjdahgcbjicbjijjacgfiagjijiacfbgbejhhjjgdiffcaejabighjbjbficcfbbjihgicjffcjfjchgfaefgcijbiiddigif"],
+      "expected": 8,
+      "hidden": true
+    }
+  ]
+}

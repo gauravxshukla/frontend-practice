@@ -1,89 +1,124 @@
 # Frontend Practice
 
-A local interview-prep app: pick a question, attempt it cold in an in-browser editor, run tests or see a live preview, then reveal the reference solution.
+A local interview-prep app with JavaScript questions, the **NeetCode 150**, machine coding, quizzes and notes. You pick a topic, attempt a question cold in the editor, then **Run** against the examples and **Submit** against hidden edge cases, the way LeetCode works.
 
 ```bash
 npm install
 npm run dev        # http://localhost:5173
 ```
 
-- **Questions**: JavaScript and DSA questions run against tests. Machine-coding questions (React or vanilla JS) show a live preview and console. Your code is saved per question in the browser. **Reset** restores the starter.
-- **Quiz**: output-prediction and theory flashcards. The answer stays hidden until you reveal it.
-- **Notes**: read-only reference material (system design, DOM cheatsheet).
+## How it works
 
-The sidebar is the main navigation. **Questions** is an accordion (JavaScript, DSA, Machine coding › React / Vanilla JS). Quiz decks and notes are listed the same way. The sidebar collapses to an icon rail, and it remembers that state, the open groups, your theme and the prompt panel width.
+- **Sidebar = topics.** Questions › JavaScript, DSA · NeetCode 150 (18 topics + Sorting Basics), Machine coding › React / Vanilla JS. Quiz decks and notes sections live in the same tree. Each topic shows `solved / total`, and opening a topic shows its questions with status and difficulty filters.
+- **JS and DSA questions** use a LeetCode-style workspace:
+  - **Run** executes the visible example cases, plus any you edit or add in the **Testcase** tab. For custom inputs, the expected value comes from the reference solution.
+  - **Submit** runs every case, including hidden edge cases, and reports **Accepted**, **Wrong Answer** (with input / output / expected), **Runtime Error** (with the line), **Compile Error** or **Time Limit Exceeded**. Accepted marks the question **Solved**.
+  - The **Notes** and **Solution** tabs stay locked until you're accepted, unless you choose to reveal them.
+  - Code runs in a Web Worker in your browser. It works offline, `console.log` output is captured per case, and infinite loops are stopped after 3s (6s for JS suites).
+- **Machine coding** questions get a live preview and console ([Sandpack](https://sandpack.codesandbox.io/), which needs an internet connection), with Reveal solution to compare.
+- Your code, solved status, sidebar state, theme and panel sizes are saved in this browser.
 
 ### Keyboard shortcuts
 
 | Keys | Action |
 | --- | --- |
+| `⌘'` / `Ctrl+'` | Run |
+| `⌘↵` / `Ctrl+↵` | Submit |
 | `⌘B` / `Ctrl+B` | Collapse or expand the sidebar (opens the drawer on mobile) |
-| `/` | Filter questions, decks and notes |
-| `Alt+←` / `Alt+→` | Previous / next question in the same group |
+| `/` | Find a topic, question, deck or note |
+| `Alt+←` / `Alt+→` | Previous / next question in the same topic |
 | `Esc` | Clear the filter, or close the mobile drawer |
-
-The editor and runtime are [Sandpack](https://sandpack.codesandbox.io/) (CodeMirror plus CodeSandbox's in-browser bundler), so running code needs an internet connection.
 
 ## Layout
 
 ```
-content/                     ← the questions. Adding one never touches src/.
-  js/<slug>/                 implement-X questions (polyfills, lodash, async)
-  dsa/<slug>/                algorithms
-  machine-coding/react/<slug>/
-  machine-coding/vanilla/<slug>/
-  quiz/*.md                  one deck per file (see "Quiz format")
-  notes/**/*.md              rendered as-is
-src/                         the app
-  app/                       router + layout
-  features/                  catalog, workspace (editor/tests/preview), quiz, notes
-  lib/content/               loads content/ with import.meta.glob, parses frontmatter and decks
-scripts/                     new-question + validate-content
-legacy/                      old experiments not part of the app (Maestro/puppeteer flows, etc.)
+content/                          ← the questions. Adding one never touches src/.
+  js/<slug>/                      implement-X questions (polyfills, lodash, async)
+  dsa/topics.json                 topic list + NeetCode order (drives the sidebar)
+  dsa/<topic>/<slug>/             NeetCode 150 + extras
+  machine-coding/{react,vanilla}/<slug>/
+  quiz/*.md                       one deck per file
+  notes/**/*.md                   rendered as-is, grouped by folder
+src/
+  app/                            router, layout, sidebar
+  features/runner/                judge (core.js), worker, mini-Jest, verdicts
+  features/workspace/             question page, code workspace, testcase/result panels, preview sandbox
+  features/topic/ catalog/ quiz/ notes/
+  lib/                            content loaders, progress, drafts, theme
+scripts/                          new-question, validate-content, verify-dsa.test.js
+legacy/                           old experiments not part of the app
 ```
 
 ## Adding a question
 
 ```bash
 npm run new -- js promise-any "Promise.any"
-npm run new -- dsa valid-anagram
+npm run new -- dsa arrays-hashing majority-element "Majority Element"   # also registers it in topics.json
 npm run new -- react tabs
 npm run new -- vanilla modal-dialog
 ```
 
-This scaffolds the folder. Then fill in the prompt, starter, solution and tests, and run `npm run verify`.
+Fill in the files, then run `npm run verify`.
 
-### Folder contract
-
-Every question has a `README.md`:
+### README.md (every question)
 
 ```md
 ---
-title: Promise.all
-type: js            # js | dsa | react | vanilla (must match the folder)
-difficulty: medium  # easy | medium | hard
-tags: [promises, async]
-estimatedMinutes: 20
-dependencies: [lodash@4]   # optional, extra npm deps for machine-coding sandboxes
+title: Two Sum
+type: dsa                 # js | dsa | react | vanilla (must match the folder)
+difficulty: easy          # easy | medium | hard
+topic: arrays-hashing     # dsa only, with order = position in topics.json
+order: 3
+tags: [arrays, hash-map]
+estimatedMinutes: 10
 ---
 
-The prompt (markdown). Shown while you practise.
+The prompt (markdown), in your own words.
 
 ## Notes
 
-Approach, complexity, follow-ups, gotchas. Shown only after "Reveal solution".
+Approach, complexity, pitfalls, follow-ups. Locked until accepted or revealed.
 ```
 
-| Type | Files |
-| --- | --- |
-| `js`, `dsa` | `starter.js`, `solution.js`, `solution.test.js` |
-| `react` | `starter/App.js` (+ any other files), `solution/…` |
-| `vanilla` | `starter/index.js`, `starter/styles.css` (+ `index.html` if you need custom markup), `solution/…` |
+### DSA: `starter.js`, `solution.js`, `cases.json` (+ optional `checker.js`)
 
-- **JS/DSA:** export the function as `default`. The test file imports `./solution.js`: in the app that's your attempt, and in `npm run verify` it's the reference. Tests use Jest-style globals (`describe`, `test`, `expect`) and must run both in Sandpack and in Vitest, so stick to common matchers and real timers (short `setTimeout` waits) rather than fake timers.
-- **React:** Sandpack's React template supplies `index.js` (which imports `./styles.css`) and `public/index.html`. Your `App.js` default export is rendered.
-- **Vanilla:** the template supplies an `index.html` with `<div id="app">`.
-- **Prompt-only:** leave out `solution.js` / `solution/` and the app shows "No solution yet". `verify` skips its tests.
+Both JS files `export default` the function (or the class, for design problems). `cases.json` is data, so the browser and `npm run verify` grade with the same judge (`src/features/runner/core.js`):
+
+```json
+{
+  "fn": "twoSum",
+  "kind": "function",
+  "params": [{ "name": "nums", "type": "number[]" }, { "name": "target", "type": "number" }],
+  "returns": "number[]",
+  "compare": "unordered",
+  "cases": [
+    { "input": [[2, 7, 11, 15], 9], "expected": [0, 1] },
+    { "input": [[3, 3], 6], "expected": [0, 1], "hidden": true }
+  ]
+}
+```
+
+- **Rules:** `input` is always the argument list. At least 2 visible cases and 3 hidden ones are required.
+- **Types:**
+  - Plain JSON types: `number`, `string`, `boolean`, `number[]`, `number[][]`, `char[][]` and so on.
+  - Data structures, written as JSON: `ListNode` (array), `ListNode[]`, `ListNodeCycle` (`{ "list": [...], "pos": k }`), `TreeNode` (level order with `null`), `TreeNodeRef` (a node value inside param `of`), `GraphNode` (adjacency list), `RandomListNode` (`[[val, randomIndex]]`).
+  - Special return types: `TreeNodeVal`, and `void` together with `"mutates": <param index>` for in-place problems.
+- **`compare`:** `exact`, `unordered`, `unordered-deep`, `float`, or `checker` (a `checker.js` exporting `(input, output) => boolean`, for problems with many valid answers).
+- **`kind`:**
+  - `design`: class problems. The input is `[[ops], [args]]`, and the expected value is each op's return.
+  - `codec`: round trips, with `"methods": ["serialize", "deserialize"]`.
+- **Clone problems:** `"freshNodes": true` rejects answers that reuse input nodes.
+- **What `verify` checks:** every reference solution passes all its cases, and every starter fails at least one.
+
+### JS: `starter.js`, `solution.js`, `solution.test.js`
+
+The suite imports `./solution.js` and uses Jest-style globals (`describe`, `test`, `expect`, hooks). In the app it runs in a worker with a small Jest-compatible runner, and in `npm run verify` it runs with Vitest. Stick to common matchers and real timers. **Run** executes tests whose name starts with `example` (or the first two), and **Submit** runs them all.
+
+### Machine coding
+
+- **React:** `starter/App.js` (+ files) and `solution/…`. Sandpack's React template supplies `index.js` and `index.html`.
+- **Vanilla:** `starter/index.js`, `styles.css` (+ `index.html` if needed) and `solution/…`.
+- **Prompt-only:** leave out the solution and the question shows "No solution yet".
 
 ## Quiz format
 
@@ -98,9 +133,10 @@ Any markdown file in `content/quiz/` becomes a deck, so existing notes work as-i
 | --- | --- |
 | `npm run dev` | Start the app |
 | `npm run build` | Type-check and build |
-| `npm run new -- <type> <slug> ["Title"]` | Scaffold a question |
-| `npm run validate` | Check frontmatter and required files |
-| `npm run verify` | `validate` + run every reference solution against its tests (Vitest) |
+| `npm run new -- …` | Scaffold a question (see above) |
+| `npm run validate` | Check frontmatter, topic registration and the `cases.json` schema |
+| `npm run verify` | `validate`, then grade every reference solution and check every starter fails (Vitest) |
+| `DSA_ONLY=content/dsa/trees npm run test:solutions` | Verify one topic |
 
 ## Backlog
 

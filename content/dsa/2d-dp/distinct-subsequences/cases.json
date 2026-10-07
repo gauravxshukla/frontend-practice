@@ -1,0 +1,29 @@
+{
+  "fn": "numDistinct",
+  "kind": "function",
+  "params": [
+    {
+      "name": "s",
+      "type": "string"
+    },
+    {
+      "name": "t",
+      "type": "string"
+    }
+  ],
+  "returns": "number",
+  "compare": "exact",
+  "cases": [
+    {"input":["rabbbit","rabbit"],"expected":3},
+    {"input":["babgbag","bag"],"expected":5},
+    {"input":["a","a"],"expected":1,"hidden":true},
+    {"input":["a","b"],"expected":0,"hidden":true},
+    {"input":["abc","abcd"],"expected":0,"hidden":true},
+    {"input":["aaaaa","aa"],"expected":10,"hidden":true},
+    {"input":["aaaaaaaaaaaaaaaa","aaaaaaa"],"expected":11440,"hidden":true},
+    {"input":["abcabcabc","abc"],"expected":10,"hidden":true},
+    {"input":["ddd","ddd"],"expected":1,"hidden":true},
+    {"input":["baaaabbabbbaabaaba","aba"],"expected":153,"hidden":true},
+    {"input":["bfghagbbffhhcgghgdcacdgaghgefcbdddbdbcfhbadffbbddbhagcbhaehghbbcfffacbddefbhdafbfaacabbggaggdcfcfgbgdghbcbfefgccahhfgedcfecgbgcaccecfddefffgehccaafdcabecacbaaaegbfhagebdcefgadfgfhedaeehhcggbagbhaeahafghbdcdbggbeacgcdgadabaddbdffdggecgbgghggfbhdbdhgedcdgdebehaegggccbdhcabehfhheadgaabafghgeahaeahedbda","hhbfag"],"expected":5477980,"hidden":true}
+  ]
+}

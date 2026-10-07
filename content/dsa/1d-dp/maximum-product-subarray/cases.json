@@ -1,0 +1,102 @@
+{
+  "fn": "maxProduct",
+  "kind": "function",
+  "params": [
+    {
+      "name": "nums",
+      "type": "number[]"
+    }
+  ],
+  "returns": "number",
+  "cases": [
+    {
+      "input": [
+        [
+          2,
+          3,
+          -2,
+          4
+        ]
+      ],
+      "expected": 6
+    },
+    {
+      "input": [
+        [
+          -2,
+          0,
+          -1
+        ]
+      ],
+      "expected": 0
+    },
+    {
+      "input": [
+        [
+          -2,
+          3,
+          -4
+        ]
+      ],
+      "expected": 24,
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          -3
+        ]
+      ],
+      "expected": -3,
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          0,
+          2,
+          -1,
+          0,
+          3,
+          4
+        ]
+      ],
+      "expected": 12,
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          -2
+        ]
+      ],
+      "expected": -2,
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          -1,
+          -2,
+          -3,
+          0
+        ]
+      ],
+      "expected": 6,
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          2,
+          -5,
+          -2,
+          -4,
+          3
+        ]
+      ],
+      "expected": 24,
+      "hidden": true
+    }
+  ]
+}

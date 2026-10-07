@@ -1,0 +1,30 @@
+{
+  "fn": "minDistance",
+  "kind": "function",
+  "params": [
+    {
+      "name": "word1",
+      "type": "string"
+    },
+    {
+      "name": "word2",
+      "type": "string"
+    }
+  ],
+  "returns": "number",
+  "compare": "exact",
+  "cases": [
+    {"input":["horse","ros"],"expected":3},
+    {"input":["intention","execution"],"expected":5},
+    {"input":["",""],"expected":0,"hidden":true},
+    {"input":["","abc"],"expected":3,"hidden":true},
+    {"input":["abcd",""],"expected":4,"hidden":true},
+    {"input":["same","same"],"expected":0,"hidden":true},
+    {"input":["a","b"],"expected":1,"hidden":true},
+    {"input":["ab","ba"],"expected":2,"hidden":true},
+    {"input":["kitten","sitting"],"expected":3,"hidden":true},
+    {"input":["sunday","saturday"],"expected":3,"hidden":true},
+    {"input":["bcbaaaa","accbab"],"expected":5,"hidden":true},
+    {"input":["bbddcbdbdadcacdaacabcabaabaacaaaddbbdbbbccbdbccdaadcdbdabcdcbcadbdcabcbdaadaadaddabbdbbbdcbadccbdbdbccbaaadbbcadbddccaaa","accdddccdabddadcbaadabaacccaaadcbaaadcaddbacabcabdbabaaadcddcbddcbacbbaabbbcbbdddbddcaaadacdacaccadabcaddaabcd"],"expected":65,"hidden":true}
+  ]
+}

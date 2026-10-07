@@ -1,0 +1,22 @@
+{
+  "fn": "findItinerary",
+  "kind": "function",
+  "params": [
+    {
+      "name": "tickets",
+      "type": "string[][]"
+    }
+  ],
+  "returns": "string[]",
+  "compare": "exact",
+  "cases": [
+    {"input":[[["MUC","LHR"],["JFK","MUC"],["SFO","SJC"],["LHR","SFO"]]],"expected":["JFK","MUC","LHR","SFO","SJC"]},
+    {"input":[[["JFK","SFO"],["JFK","ATL"],["SFO","ATL"],["ATL","JFK"],["ATL","SFO"]]],"expected":["JFK","ATL","JFK","SFO","ATL","SFO"]},
+    {"input":[[["JFK","KUL"],["JFK","NRT"],["NRT","JFK"]]],"expected":["JFK","NRT","JFK","KUL"],"hidden":true},
+    {"input":[[["JFK","ATL"]]],"expected":["JFK","ATL"],"hidden":true},
+    {"input":[[["JFK","AAA"],["AAA","JFK"],["JFK","BBB"],["JFK","CCC"],["CCC","JFK"]]],"expected":["JFK","AAA","JFK","CCC","JFK","BBB"],"hidden":true},
+    {"input":[[["JFK","SFO"],["SFO","JFK"],["JFK","SFO"],["SFO","JFK"]]],"expected":["JFK","SFO","JFK","SFO","JFK"],"hidden":true},
+    {"input":[[["EZE","AXA"],["TIA","ANU"],["ANU","JFK"],["JFK","ANU"],["ANU","EZE"],["TIA","ANU"],["AXA","TIA"],["TIA","JFK"],["ANU","TIA"],["JFK","TIA"]]],"expected":["JFK","ANU","EZE","AXA","TIA","ANU","JFK","TIA","ANU","TIA","JFK"],"hidden":true},
+    {"input":[[["JFK","ATL"],["LAX","ORD"],["BOS","ORD"],["LAX","JFK"],["SFO","ATL"],["SFO","JFK"],["BOS","LAX"],["LAX","JFK"],["JFK","SFO"],["SFO","BOS"],["LAX","BOS"],["ATL","SFO"],["BOS","LAX"],["ATL","LAX"],["ATL","JFK"],["SFO","LAX"],["JFK","LAX"],["SFO","JFK"],["BOS","JFK"],["SFO","ORD"],["ORD","BOS"],["ORD","BOS"],["ORD","ATL"],["ATL","SFO"],["ORD","JFK"],["LAX","SFO"],["ATL","SFO"],["LAX","ORD"],["ATL","BOS"],["SFO","LAX"],["JFK","BOS"],["LAX","BOS"],["LAX","ATL"],["JFK","LAX"],["LAX","SFO"],["SFO","JFK"],["ATL","ORD"],["SFO","ORD"],["BOS","LAX"],["ORD","SFO"],["SFO","ATL"],["LAX","ORD"],["LAX","ATL"],["ORD","ATL"],["ORD","SFO"],["ATL","SFO"],["ATL","ORD"],["BOS","ORD"],["ORD","SFO"],["SFO","ORD"],["JFK","SFO"],["JFK","LAX"],["SFO","ATL"],["BOS","LAX"],["SFO","LAX"],["ORD","LAX"],["LAX","ATL"],["JFK","SFO"],["JFK","BOS"],["ORD","SFO"]]],"expected":["JFK","ATL","BOS","JFK","BOS","LAX","ATL","JFK","BOS","LAX","ATL","LAX","ATL","ORD","ATL","ORD","ATL","SFO","ATL","SFO","ATL","SFO","ATL","SFO","BOS","LAX","BOS","LAX","BOS","ORD","BOS","ORD","JFK","LAX","JFK","LAX","JFK","LAX","ORD","LAX","ORD","SFO","JFK","SFO","JFK","SFO","JFK","SFO","LAX","ORD","SFO","LAX","SFO","LAX","SFO","ORD","SFO","ORD","SFO","ORD","BOS"],"hidden":true}
+  ]
+}

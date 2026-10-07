@@ -1,0 +1,35 @@
+{
+  "fn": "isInterleave",
+  "kind": "function",
+  "params": [
+    {
+      "name": "s1",
+      "type": "string"
+    },
+    {
+      "name": "s2",
+      "type": "string"
+    },
+    {
+      "name": "s3",
+      "type": "string"
+    }
+  ],
+  "returns": "boolean",
+  "compare": "exact",
+  "cases": [
+    {"input":["aabcc","dbbca","aadbbcbcac"],"expected":true},
+    {"input":["aabcc","dbbca","aadbbbaccc"],"expected":false},
+    {"input":["","",""],"expected":true},
+    {"input":["","abc","abc"],"expected":true,"hidden":true},
+    {"input":["abc","","abd"],"expected":false,"hidden":true},
+    {"input":["a","b","abc"],"expected":false,"hidden":true},
+    {"input":["ab","ab","abab"],"expected":true,"hidden":true},
+    {"input":["aa","ab","aaba"],"expected":true,"hidden":true},
+    {"input":["aabd","abdc","aabdbadc"],"expected":false,"hidden":true},
+    {"input":["aaaaaaaaaa","aaaaaaaaab","aaaaaaaaaaaaaaaaaaab"],"expected":true,"hidden":true},
+    {"input":["aaaaaaaaab","aaaaaaaaaa","aaaaaaaaaaaaaaaaaaba"],"expected":true,"hidden":true},
+    {"input":["aaababbbaabbaaabaabbaabbbabbababaaaaaaaaaabaabbabbbabbabaabbbbbbabaababbababbbabbbbaababab","aabbbabbaaabbbaaabaaaaababbaaaaabaaaaabbbbbbbbbabbaaabbbaaabaaaababaabaaaaabaabb","aaabbbabaababaababbbaaabbabababaaaaababbaaaaaabaabaaaababababbabbbbbabbbbbabbababbaaaaaaaaabbbaaaaabaaaabbbabbaabaaabbbabaabaaabbaabaaabbbabbaabbaababbbababbbabbbbaababab"],"expected":true,"hidden":true},
+    {"input":["aaababbbaabbaaabaabbaabbbabbababaaaaaaaaaabaabbabbbabbabaabbbbbbabaababbababbbabbbbaababab","aabbbabbaaabbbaaabaaaaababbaaaaabaaaaabbbbbbbbbabbaaabbbaaabaaaababaabaaaaabaabb","aaabbbabaababaababbbaaabbabababaaaaababbaaaaaabaabaaaabababaababbbbbabbbbbabbababbaaaaaaaaabbbaaaaabaaaabbbabbaabaaabbbabaabaaabbaabaaabbbabbaabbaababbbababbbabbbbaababab"],"expected":false,"hidden":true}
+  ]
+}

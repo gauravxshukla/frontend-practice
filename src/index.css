@@ -118,6 +118,13 @@ button {
   border-radius: var(--radius-sm);
 }
 
+/* The code editor shows its own caret/active line; a focus ring around it is noise. */
+.cm-content:focus-visible,
+.cm-editor.cm-focused {
+  box-shadow: none;
+  outline: none;
+}
+
 code,
 pre,
 kbd {

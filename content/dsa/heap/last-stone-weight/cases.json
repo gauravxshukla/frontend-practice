@@ -1,0 +1,24 @@
+{
+  "fn": "lastStoneWeight",
+  "kind": "function",
+  "params": [
+    {
+      "name": "stones",
+      "type": "number[]"
+    }
+  ],
+  "returns": "number",
+  "compare": "exact",
+  "cases": [
+    {"input":[[2,7,4,1,8,1]],"expected":1},
+    {"input":[[1]],"expected":1},
+    {"input":[[2,2]],"expected":0,"hidden":true},
+    {"input":[[3,3,3]],"expected":3,"hidden":true},
+    {"input":[[3,3,3,3]],"expected":0,"hidden":true},
+    {"input":[[10,4]],"expected":6,"hidden":true},
+    {"input":[[1,1000]],"expected":999,"hidden":true},
+    {"input":[[9,3,2,10]],"expected":0,"hidden":true},
+    {"input":[[720,656,974,288,166,701,782,431,815,596,538,352,563,33,644,387,322,250,76,665,46,9,549,878,986,611,496,225,481,635]],"expected":1,"hidden":true},
+    {"input":[[821,641,507,34,934,840,747,371,79,687,255,832,274,504,168,976,309,528,276,150,654,593,874,863,622,179,272,637,731,638]],"expected":0,"hidden":true}
+  ]
+}

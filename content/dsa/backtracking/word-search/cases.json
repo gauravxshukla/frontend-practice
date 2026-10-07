@@ -1,0 +1,22 @@
+{
+  "fn": "exist",
+  "kind": "function",
+  "params": [{"name":"board","type":"char[][]"},{"name":"word","type":"string"}],
+  "returns": "boolean",
+  "compare": "exact",
+  "cases": [
+    {"input":[[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]],"ABCCED"],"expected":true},
+    {"input":[[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]],"SEE"],"expected":true},
+    {"input":[[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]],"ABCB"],"expected":false},
+    {"input":[[["a"]],"a"],"expected":true,"hidden":true},
+    {"input":[[["a"]],"b"],"expected":false,"hidden":true},
+    {"input":[[["a","a"]],"aaa"],"expected":false,"hidden":true},
+    {"input":[[["a","b"],["c","d"]],"abdc"],"expected":true,"hidden":true},
+    {"input":[[["a","b"],["c","d"]],"abcd"],"expected":false,"hidden":true},
+    {"input":[[["C","A","A"],["A","A","A"],["B","C","D"]],"AAB"],"expected":true,"hidden":true},
+    {"input":[[["A","B","C","E"],["S","F","E","S"],["A","D","E","E"]],"ABCESEEEFS"],"expected":true,"hidden":true},
+    {"input":[[["A","A","A","A","A"],["A","A","A","A","A"],["A","A","A","A","A"],["A","A","A","A","A"]],"AAAAAAAAAAAB"],"expected":false,"hidden":true},
+    {"input":[[["E","E","C","B","E","D"],["E","A","B","D","D","C"],["A","E","C","A","E","D"],["A","E","D","B","E","B"],["A","D","D","D","D","C"],["D","C","C","E","D","D"]],"CDDDDCBDEEBA"],"expected":true,"hidden":true},
+    {"input":[[["E","E","C","B","E","D"],["E","A","B","D","D","C"],["A","E","C","A","E","D"],["A","E","D","B","E","B"],["A","D","D","D","D","C"],["D","C","C","E","D","D"]],"CDDDDCBDF"],"expected":false,"hidden":true}
+  ]
+}

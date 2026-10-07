@@ -1,0 +1,27 @@
+{
+  "fn": "numDecodings",
+  "kind": "function",
+  "params": [
+    {
+      "name": "s",
+      "type": "string"
+    }
+  ],
+  "returns": "number",
+  "compare": "exact",
+  "cases": [
+    {"input":["12"],"expected":2},
+    {"input":["226"],"expected":3},
+    {"input":["06"],"expected":0},
+    {"input":["0"],"expected":0,"hidden":true},
+    {"input":["10"],"expected":1,"hidden":true},
+    {"input":["100"],"expected":0,"hidden":true},
+    {"input":["27"],"expected":1,"hidden":true},
+    {"input":["2101"],"expected":1,"hidden":true},
+    {"input":["11106"],"expected":2,"hidden":true},
+    {"input":["1201234"],"expected":3,"hidden":true},
+    {"input":["301"],"expected":0,"hidden":true},
+    {"input":["1111111111111111111111"],"expected":28657,"hidden":true},
+    {"input":["5312201286108123204261226320927146153202620999226912952636107426121232626747710262626132203262554364"],"expected":47185920,"hidden":true}
+  ]
+}

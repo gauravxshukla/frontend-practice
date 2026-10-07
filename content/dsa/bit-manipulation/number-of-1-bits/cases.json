@@ -1,0 +1,95 @@
+{
+  "fn": "hammingWeight",
+  "kind": "function",
+  "params": [
+    {
+      "name": "n",
+      "type": "number"
+    }
+  ],
+  "returns": "number",
+  "compare": "exact",
+  "cases": [
+    {
+      "input": [
+        11
+      ],
+      "expected": 3
+    },
+    {
+      "input": [
+        128
+      ],
+      "expected": 1
+    },
+    {
+      "input": [
+        2147483645
+      ],
+      "expected": 30
+    },
+    {
+      "input": [
+        0
+      ],
+      "expected": 0,
+      "hidden": true
+    },
+    {
+      "input": [
+        1
+      ],
+      "expected": 1,
+      "hidden": true
+    },
+    {
+      "input": [
+        4294967295
+      ],
+      "expected": 32,
+      "hidden": true
+    },
+    {
+      "input": [
+        2147483648
+      ],
+      "expected": 1,
+      "hidden": true
+    },
+    {
+      "input": [
+        4294967293
+      ],
+      "expected": 31,
+      "hidden": true
+    },
+    {
+      "input": [
+        2863311530
+      ],
+      "expected": 16,
+      "hidden": true
+    },
+    {
+      "input": [
+        255
+      ],
+      "expected": 8,
+      "hidden": true
+    },
+    {
+      "input": [
+        1648420124
+      ],
+      "expected": 12,
+      "hidden": true
+    },
+    {
+      "input": [
+        946070330
+      ],
+      "expected": 16,
+      "hidden": true
+    }
+  ]
+}

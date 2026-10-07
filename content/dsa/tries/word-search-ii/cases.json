@@ -1,0 +1,28 @@
+{
+  "fn": "findWords",
+  "kind": "function",
+  "params": [
+    {
+      "name": "board",
+      "type": "char[][]"
+    },
+    {
+      "name": "words",
+      "type": "string[]"
+    }
+  ],
+  "returns": "string[]",
+  "compare": "unordered",
+  "cases": [
+    {"input":[[["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]],["oath","pea","eat","rain"]],"expected":["oath","eat"]},
+    {"input":[[["a","b"],["c","d"]],["abcb"]],"expected":[]},
+    {"input":[[["a"]],["a"]],"expected":["a"],"hidden":true},
+    {"input":[[["a"]],["b"]],"expected":[],"hidden":true},
+    {"input":[[["a","a"]],["aaa"]],"expected":[],"hidden":true},
+    {"input":[[["a","b"],["c","d"]],["ab","abdc","acdb","ba","abcd","dbac"]],"expected":["ab","abdc","acdb","ba","dbac"],"hidden":true},
+    {"input":[[["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]],["oath","oat","oa","o","oathk"]],"expected":["oath","oat","oa","o","oathk"],"hidden":true},
+    {"input":[[["a","b","c"],["a","e","d"],["a","f","g"]],["abcdefg","gfedcbaaa","eaabcdgfa","befa","dgc","ade"]],"expected":["abcdefg","gfedcbaaa","eaabcdgfa","befa"],"hidden":true},
+    {"input":[[["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]],["zzz"]],"expected":[],"hidden":true},
+    {"input":[[["b","d","b","c","a","a","e","c"],["d","c","d","b","d","a","c","d"],["e","e","b","d","e","e","e","a"],["a","c","c","c","a","c","a","e"],["c","d","b","e","c","e","d","d"],["b","e","b","a","b","e","e","d"],["b","c","d","a","d","d","a","d"],["e","a","e","e","e","d","c","a"]],["bd","ddeb","b","dbc","ee","badcad","ed","ebda","dabcaae","ced","baadc","ac","beccbab","e","ec","aeeede","eba","d","cacdaeb","acee","eabb","ddadbe","dc","be","edec","ddeabdc","aaa","aace","ebbbeea","ccca","edd","dcddd","ebdaa","becbce","dcea","c","cdeeca","eeeaadb","cabcc","dae","de","dd","cddaebb","eccde","dcacb","aadeeda","db","abadac","bdaaad","ccc","ccdee","deddbea","acb","dda","badcce","aeeddbd","bad","eaeceae","daac","aaedee","becb","cacbeba","ccbedb","aedabb","a","beda","eae","dbdadc","bceb","eabea","accbdca","cadbb","cded","eead","cea","adeae","cddc","caadd","cbb","aea","ebbea","bc","beddac","ceeaadd","ecccbd","eab","beb","cdbe","beea","ccea","baae","caedbdb","acecc","eeadda","bcccc","eb","eaecaed","bccbcbd","dddb","eccea","ceaedb","ecbacae","bced","ceada","dbdaca","dccaabb","dccecdd","cbcccce","eceadd","dbeaebb","deddea","ddc","bedbb","debae","daebbb"]],"expected":["bd","ddeb","b","dbc","ee","ed","ebda","ced","baadc","ac","e","ec","eba","d","acee","eabb","ddadbe","dc","be","edec","aaa","aace","ccca","edd","ebdaa","dcea","c","cdeeca","dae","de","dd","dcacb","db","ccc","ccdee","acb","dda","becb","cacbeba","a","beda","eae","bceb","accbdca","cded","eead","cea","adeae","cbb","aea","ebbea","bc","eab","beb","cdbe","beea","ccea","baae","caedbdb","acecc","eeadda","eb","dddb","bced","ceada","eceadd","deddea","ddc","bedbb","debae"],"hidden":true}
+  ]
+}

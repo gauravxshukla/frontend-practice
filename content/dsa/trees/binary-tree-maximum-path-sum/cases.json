@@ -1,0 +1,19 @@
+{
+  "fn": "maxPathSum",
+  "kind": "function",
+  "params": [{"name":"root","type":"TreeNode"}],
+  "returns": "number",
+  "compare": "exact",
+  "cases": [
+    {"input":[[1,2,3]],"expected":6},
+    {"input":[[-10,9,20,null,null,15,7]],"expected":42},
+    {"input":[[-3]],"expected":-3,"hidden":true},
+    {"input":[[-2,-1]],"expected":-1,"hidden":true},
+    {"input":[[2,-1]],"expected":2,"hidden":true},
+    {"input":[[1,-2,3]],"expected":4,"hidden":true},
+    {"input":[[5,4,8,11,null,13,4,7,2,null,null,null,1]],"expected":48,"hidden":true},
+    {"input":[[-1,5,null,4,null,null,2,-4]],"expected":11,"hidden":true},
+    {"input":[[-324,-602,800,-623,-962,773,-678,-917,-620,922,374,368,null,140,-349,192,458,-218,-625,-235,-358,-32,303,null,-853,-333,773,347,-334,-677,-777,null,-973,null,140,null,73,906,-265,null,57,null,-898,788,null,null,-697,81,408,null,null,558,496,null,null,141,-885,365,-422,-564,null,null,null,-204,null,210,562,787,697,955,-803,null,null,null,null,null,null,-948,-55,340,616,264,null,-833,412,883,-393,null,-591,-559,53,-141,null,849,null,null,null,169,null,159,-654,-916,604,null,null,null,null,null,null,null,-516,29,null,null,null,null,null,null,null,617,888,null,-16,673,null,28,null,null,null,null,null,313,277,240,585,null,null,null,null,-827,35,-388,-588,727,null,981,null,72,null,null,null,null,null,null,null,-358,707,null,-636,-673,-467,null,493,null,null,null,null,null,null,null,null,null,-973,null,null,null,null,606,null,901,null,null,-880,null,null,169,null,-635,null,null,null,null,null,427,null,-67,285,null,null,608,null,203,null,null,null,null,null,null,-960,712,null,null,-785,null,null,null,null,null,null,-767,null,null,null,71,671,null,276,-439,null,null,830,null,null,254,-276,null,null,null,323]],"expected":5379,"hidden":true},
+    {"input":[[-492,-895,-642,-991,-640,-726,-866,-999,-317,-339,null,-139,-886,-267,-905,-299,-994,null,-685,null,-174,-561,-814,null,-338,-976,-314,-775,null,-570,null,-782,-406,-978,null,-930,null,-976,-796,-924,-521,null,null,-329,-579,null,null,null,-442,-517,null,-448,null,null,-5,null,-119,null,null,null,-504,-968,null,-287,-621,null,-496,null,null,null,null,null,null,null,-530,null,null,-471,null,null,null,-171,null,-269,-872,null,null,-503,-215,null,null,null,null,null,null,-396,-878,null,null,null,null,null,null,-386,-749,null,null,null,null,-52,null,-904,null,null,null,null,-990,-809]],"expected":-5,"hidden":true}
+  ]
+}

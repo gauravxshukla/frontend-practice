@@ -1,0 +1,102 @@
+{
+  "fn": "maxProfit",
+  "kind": "function",
+  "params": [
+    {
+      "name": "prices",
+      "type": "number[]"
+    }
+  ],
+  "returns": "number",
+  "cases": [
+    {
+      "input": [
+        [
+          7,
+          1,
+          5,
+          3,
+          6,
+          4
+        ]
+      ],
+      "expected": 5
+    },
+    {
+      "input": [
+        [
+          7,
+          6,
+          4,
+          3,
+          1
+        ]
+      ],
+      "expected": 0
+    },
+    {
+      "input": [
+        []
+      ],
+      "expected": 0,
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          5
+        ]
+      ],
+      "expected": 0,
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          3,
+          8,
+          1,
+          4
+        ]
+      ],
+      "expected": 5,
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          2,
+          4,
+          1
+        ]
+      ],
+      "expected": 2,
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          1,
+          2
+        ]
+      ],
+      "expected": 1,
+      "hidden": true
+    },
+    {
+      "input": [
+        [
+          2,
+          1,
+          2,
+          1,
+          0,
+          1,
+          2
+        ]
+      ],
+      "expected": 2,
+      "hidden": true
+    }
+  ]
+}

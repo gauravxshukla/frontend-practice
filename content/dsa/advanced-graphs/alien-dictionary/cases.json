@@ -1,0 +1,25 @@
+{
+  "fn": "alienOrder",
+  "kind": "function",
+  "params": [
+    {
+      "name": "words",
+      "type": "string[]"
+    }
+  ],
+  "returns": "string",
+  "compare": "checker",
+  "cases": [
+    {"input":[["wrt","wrf","er","ett","rftt"]],"expected":"wertf"},
+    {"input":[["z","x"]],"expected":"zx"},
+    {"input":[["z","x","z"]],"expected":""},
+    {"input":[["abc","ab"]],"expected":"","hidden":true},
+    {"input":[["z"]],"expected":"z","hidden":true},
+    {"input":[["ab","ab","abc"]],"expected":"cba","hidden":true},
+    {"input":[["ac","ab","zc","zb"]],"expected":"cbaz","hidden":true},
+    {"input":[["a","b","ca","cc"]],"expected":"abc","hidden":true},
+    {"input":[["ba","bc","ac","cab"]],"expected":"bac","hidden":true},
+    {"input":[["zy","zx"]],"expected":"yxz","hidden":true},
+    {"input":[["f","fhemo","fi","fim","fggmb","k","kkf","klgng","kle","klcge","kian","km","h","hi","bkem","bbncg","nkk","nbheg","ned","l","lg","lme","d","dcl","dmcfi","jbdlc","jl","jil","a","afbkg","al","aill","agm","aokfm","ik","imlj","gk","gnkg","gdo","gjel","o","olbc","olc","odfik","oge","ogeod","ooih","ocen","e","eh","ele","cf","chni","ca","cmhjm","m","mfoj","mhbg","mj","mcecj"]],"expected":"fkhbnldjaigoecm","hidden":true}
+  ]
+}
