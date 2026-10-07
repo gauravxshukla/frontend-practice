@@ -1,0 +1,9 @@
+[
+  { "id": "polyfills", "label": "Polyfills", "problems": ["array-map", "array-filter", "array-reduce", "array-for-each", "array-some", "array-every", "array-find-index", "array-at", "array-concat", "function-call", "function-apply", "function-bind", "object-assign", "string-repeat", "json-stringify"] },
+  { "id": "promises-async", "label": "Promises & Async", "problems": ["sleep", "promise-all", "promise-all-settled", "promise-race", "promise-any", "promise-with-resolvers", "promisify", "promise-timeout", "retry", "map-async", "map-async-limit", "task-queue", "promise-merge", "pipe-async", "task-scheduler-dependencies", "promise-polyfill"] },
+  { "id": "functions-closures", "label": "Functions, Closures & Timers", "problems": ["once", "make-counter", "cycle", "compose-pipe", "memoize", "limit", "infinite-sum", "curry", "debounce", "throttle", "cancellable-interval", "clear-all-timeouts", "rate-limiter"] },
+  { "id": "objects-utilities", "label": "Objects & Utilities", "problems": ["chunk", "range", "difference", "unique-array", "shuffle", "group-by", "count-by", "type-utilities", "is-empty", "get", "set", "pick", "flatten", "flatten-object", "deep-omit", "deep-filter", "camel-case-keys", "deep-clone", "deep-equal", "deep-merge"] },
+  { "id": "classes-design", "label": "Classes & Stateful Design", "problems": ["event-emitter", "local-storage-with-expiry", "redux-store", "undo-redo-manager", "feature-flags", "analytics-sdk"] },
+  { "id": "dom", "label": "DOM APIs", "problems": ["get-elements-by-class-name", "get-elements-by-tag-name", "identical-dom-trees", "event-delegation", "html-serializer", "virtual-dom-render"] },
+  { "id": "strings-parsing", "label": "Strings & Parsing", "problems": ["list-format", "classnames", "compare-versions", "string-compression", "template-engine"] }
+]

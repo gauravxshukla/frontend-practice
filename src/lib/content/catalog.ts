@@ -1,12 +1,13 @@
 import { parseFrontmatter } from './frontmatter.js';
 import dsaTopics from '../../../content/dsa/topics.json';
+import jsTopics from '../../../content/js/topics.json';
 
 export type QuestionType = 'js' | 'dsa' | 'react' | 'vanilla';
 export type Difficulty = 'easy' | 'medium' | 'hard';
 export type Track = 'js' | 'dsa' | 'machine-coding';
 
 export interface Question {
-  /** Folder path under /content, e.g. `js/promise-all` or `machine-coding/react/data-table`. */
+  /** Folder path under /content, e.g. `js/promises-async/promise-all` or `machine-coding/react/data-table`. */
   slug: string;
   track: Track;
   type: QuestionType;
@@ -20,10 +21,12 @@ export interface Question {
   /** The README's `## Notes` section, shown only after revealing the solution. */
   notes: string;
   hasSolution: boolean;
-  /** Sidebar/topic group this question lives in: `js`, `dsa/trees`, `machine-coding/react`. */
+  /** Sidebar/topic group this question lives in: `js/polyfills`, `dsa/trees`, `machine-coding/react`. */
   groupId: string;
-  /** Position inside its topic (DSA follows the NeetCode order). */
+  /** Position inside its topic (its index in the track's topics.json). */
   order?: number;
+  /** JS questions: `dom` runs the suite with a DOM (document, Element, events…). */
+  env?: 'dom';
 }
 
 /** Sandpack file map: `/App.js` → source. */
@@ -71,14 +74,15 @@ function buildQuestion(readmePath: string, raw: string): Question {
   const type = data.type as QuestionType;
   const isUI = type === 'react' || type === 'vanilla';
   const track = slug.split('/')[0] as Track;
-  const groupId =
-    track === 'machine-coding' ? `machine-coding/${type}` : track === 'dsa' ? `dsa/${slug.split('/')[1]}` : track;
+  // JS and DSA live in topic folders (`js/<topic>/<slug>`); machine coding is grouped by type.
+  const groupId = track === 'machine-coding' ? `machine-coding/${type}` : `${track}/${slug.split('/')[1]}`;
 
   return {
     slug,
     track,
     groupId,
     order: data.order,
+    env: data.env === 'dom' ? 'dom' : undefined,
     type,
     title: data.title ?? slug,
     difficulty: data.difficulty ?? 'medium',
@@ -105,7 +109,7 @@ export const questions: Question[] = Object.entries(readmes)
   .sort(
     (a, b) =>
       a.groupId.localeCompare(b.groupId) ||
-      // DSA keeps the curated NeetCode order inside a topic; elsewhere easy → hard.
+      // Topics keep their curated topics.json order; elsewhere easy → hard.
       (a.order ?? 0) - (b.order ?? 0) ||
       DIFFICULTY_ORDER[a.difficulty] - DIFFICULTY_ORDER[b.difficulty] ||
       a.title.localeCompare(b.title),
@@ -193,7 +197,6 @@ interface TopicDef {
   problems: string[];
 }
 
-const TOPICS = dsaTopics as TopicDef[];
 
 /** Which leaf group a question belongs to. */
 export function groupIdOf(q: Question) {
@@ -202,15 +205,25 @@ export function groupIdOf(q: Question) {
 
 const inGroup = (id: string) => questions.filter((q) => q.groupId === id);
 
-/** JavaScript, DSA › <NeetCode topics>, Machine coding › React / Vanilla. Leaves are topics. */
-export const questionTree: QuestionGroup[] = [
-  { id: 'js', label: TRACK_LABELS.js, questions: inGroup('js'), children: [] },
-  {
-    id: 'dsa',
-    label: 'DSA · NeetCode 150',
+/** A track whose leaves are the topics listed in its `content/<track>/topics.json`. */
+function topicTrack(track: 'js' | 'dsa', label: string, topics: TopicDef[]): QuestionGroup {
+  return {
+    id: track,
+    label,
     questions: [],
-    children: TOPICS.map((t) => ({ id: `dsa/${t.id}`, label: t.label, questions: inGroup(`dsa/${t.id}`), children: [] })),
-  },
+    children: topics.map((t) => ({
+      id: `${track}/${t.id}`,
+      label: t.label,
+      questions: inGroup(`${track}/${t.id}`),
+      children: [],
+    })),
+  };
+}
+
+/** JavaScript › <topics>, DSA › <NeetCode topics>, Machine coding › React / Vanilla. Leaves are topics. */
+export const questionTree: QuestionGroup[] = [
+  topicTrack('js', TRACK_LABELS.js, jsTopics as TopicDef[]),
+  topicTrack('dsa', 'DSA · NeetCode 150', dsaTopics as TopicDef[]),
   {
     id: 'machine-coding',
     label: TRACK_LABELS['machine-coding'],

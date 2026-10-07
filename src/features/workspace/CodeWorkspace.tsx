@@ -73,10 +73,12 @@ function Inner({ question, assets, onAccepted, onResetCode }: Props & { onResetC
   // JS questions: learn the suite's test names (registering tests doesn't run them).
   useEffect(() => {
     if (!assets.tests) return;
-    runJob({ type: 'jest-collect', userCode: assets.starter, testCode: assets.tests }, 5000).then((res) => {
-      if (res.type === 'collected') setTestNames(res.names);
-    });
-  }, [assets]);
+    runJob({ type: 'jest-collect', userCode: assets.starter, testCode: assets.tests, env: question.env }, 5000).then(
+      (res) => {
+        if (res.type === 'collected') setTestNames(res.names);
+      },
+    );
+  }, [assets, question.env]);
 
   const execute = useCallback(
     async (mode: 'run' | 'submit') => {
@@ -98,6 +100,7 @@ function Inner({ question, assets, onAccepted, onResetCode }: Props & { onResetC
           type: 'jest',
           userCode: codeRef.current,
           testCode: assets.tests,
+          env: question.env,
           only: mode === 'run' && testNames.length ? exampleTests(testNames) : undefined,
         };
       } else {
@@ -119,7 +122,7 @@ function Inner({ question, assets, onAccepted, onResetCode }: Props & { onResetC
         markAttempted(question.slug);
       }
     },
-    [running, spec, cases, assets, testNames, question.slug, onAccepted],
+    [running, spec, cases, assets, testNames, question.slug, question.env, onAccepted],
   );
 
   // ⌘' / Ctrl+' runs, ⌘↵ / Ctrl+↵ submits. Capture phase so the editor doesn't eat them.

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Scaffold a question folder:
-//   npm run new -- js <slug> ["Title"]
+//   npm run new -- js <topic-id> <slug> ["Title"]    (also registers it in content/js/topics.json)
 //   npm run new -- dsa <topic-id> <slug> ["Title"]   (also registers it in content/dsa/topics.json)
 //   npm run new -- react <slug> ["Title"]
 //   npm run new -- vanilla <slug> ["Title"]
@@ -9,20 +9,21 @@ import { join } from 'node:path';
 
 const args = process.argv.slice(2);
 const type = args[0];
-const topic = type === 'dsa' ? args[1] : undefined;
-const [slug, titleArg] = type === 'dsa' ? args.slice(2) : args.slice(1);
-const DIRS = { js: 'content/js', dsa: `content/dsa/${topic}`, react: 'content/machine-coding/react', vanilla: 'content/machine-coding/vanilla' };
+const hasTopic = type === 'js' || type === 'dsa';
+const topic = hasTopic ? args[1] : undefined;
+const [slug, titleArg] = hasTopic ? args.slice(2) : args.slice(1);
+const DIRS = { js: `content/js/${topic}`, dsa: `content/dsa/${topic}`, react: 'content/machine-coding/react', vanilla: 'content/machine-coding/vanilla' };
 const usage = () => {
-  console.error('Usage: npm run new -- <js|react|vanilla> <slug> ["Title"]\n       npm run new -- dsa <topic-id> <slug> ["Title"]');
+  console.error('Usage: npm run new -- <js|dsa> <topic-id> <slug> ["Title"]\n       npm run new -- <react|vanilla> <slug> ["Title"]');
   process.exit(1);
 };
 
 if (!DIRS[type] || !slug || !/^[a-z0-9-]+$/.test(slug)) usage();
 
-const topicsPath = 'content/dsa/topics.json';
-const topics = type === 'dsa' ? JSON.parse(readFileSync(topicsPath, 'utf8')) : [];
+const topicsPath = `content/${type}/topics.json`;
+const topics = hasTopic ? JSON.parse(readFileSync(topicsPath, 'utf8')) : [];
 const topicDef = topics.find((t) => t.id === topic);
-if (type === 'dsa' && !topicDef) {
+if (hasTopic && !topicDef) {
   console.error(`Unknown topic "${topic}". Topics: ${topics.map((t) => t.id).join(', ')}`);
   process.exit(1);
 }
@@ -41,7 +42,7 @@ const readme = `---
 title: ${title}
 type: ${type}
 difficulty: medium
-${type === 'dsa' ? `topic: ${topic}\norder: ${order}\nneetcode: false\n` : ''}tags: []
+${hasTopic ? `topic: ${topic}\norder: ${order}\n` : ''}${type === 'dsa' ? 'neetcode: false\n' : ''}tags: []
 estimatedMinutes: 20
 ---
 
@@ -59,7 +60,7 @@ const files = { 'README.md': readme };
 if (type === 'js') {
   files['starter.js'] = `export default function ${fnName}() {\n  // Your code here\n}\n`;
   files['solution.js'] = `export default function ${fnName}() {\n  // Reference solution\n}\n`;
-  files['solution.test.js'] = `import ${fnName} from './solution.js';\n\ndescribe('${fnName}', () => {\n  test('example: works', () => {\n    expect(${fnName}()).toBe(undefined);\n  });\n});\n`;
+  files['solution.test.js'] = `import ${fnName} from './solution.js';\n\ndescribe('${fnName}', () => {\n  test('example: works', () => {\n    expect(${fnName}()).toBe(undefined);\n  });\n\n  test('example: calls back', () => {\n    const spy = jest.fn();\n    spy(1);\n    expect(spy).toHaveBeenCalledWith(1);\n  });\n});\n`;
 } else if (type === 'dsa') {
   files['starter.js'] = `/**\n * @param {number[]} nums\n * @return {number}\n */\nexport default function ${fnName}(nums) {\n  // Your code here\n}\n`;
   files['solution.js'] = `/**\n * @param {number[]} nums\n * @return {number}\n */\nexport default function ${fnName}(nums) {\n  return nums.length;\n}\n`;
@@ -105,7 +106,12 @@ for (const [name, content] of Object.entries(files)) {
 
 if (topicDef) {
   topicDef.problems.push(slug);
-  writeFileSync(topicsPath, `${JSON.stringify(topics, null, 2)}\n`);
+  // One topic per line, matching the hand-written topics.json files.
+  const line = (t) =>
+    `{ ${Object.entries(t)
+      .map(([k, v]) => `${JSON.stringify(k)}: ${Array.isArray(v) ? `[${v.map((x) => JSON.stringify(x)).join(', ')}]` : JSON.stringify(v)}`)
+      .join(', ')} }`;
+  writeFileSync(topicsPath, `[\n${topics.map((t) => `  ${line(t)}`).join(',\n')}\n]\n`);
 }
 
 console.log(`Created ${dir}/ (${Object.keys(files).join(', ')})`);

@@ -5,8 +5,14 @@ import { join, relative } from 'node:path';
 import { DIFFICULTIES, QUESTION_TYPES, expectedTypeForSlug, parseFrontmatter } from '../src/lib/content/frontmatter.js';
 import { KNOWN_TYPES } from '../src/features/runner/core.js';
 
-const TOPICS = JSON.parse(readFileSync('content/dsa/topics.json', 'utf8'));
-const TOPIC_OF = new Map(TOPICS.flatMap((t) => t.problems.map((p, i) => [p, { topic: t.id, order: i + 1 }])));
+// JS and DSA questions live in topic folders registered in content/<track>/topics.json.
+const topicIndex = (track) =>
+  new Map(
+    JSON.parse(readFileSync(`content/${track}/topics.json`, 'utf8')).flatMap((t) =>
+      t.problems.map((p, i) => [p, { topic: t.id, order: i + 1 }]),
+    ),
+  );
+const TOPIC_OF = { js: topicIndex('js'), dsa: topicIndex('dsa') };
 const COMPARES = ['exact', 'unordered', 'unordered-deep', 'float', 'checker'];
 const KINDS = ['function', 'design', 'codec'];
 
@@ -71,13 +77,14 @@ for (const readme of readmes) {
     if (!existsSync(join(folder, 'starter.js'))) fail('missing starter.js');
   }
   if (data.type === 'js' && !existsSync(join(folder, 'solution.test.js'))) fail('missing solution.test.js');
-  if (data.type === 'dsa') {
-    validateCases(folder, fail);
+  if (data.type === 'dsa') validateCases(folder, fail);
+  if (data.type === 'js' || data.type === 'dsa') {
+    const track = data.type;
     const name = slug.split('/').pop();
-    const expected = TOPIC_OF.get(name);
-    if (!expected) fail('not listed in content/dsa/topics.json');
+    const expected = TOPIC_OF[track].get(name);
+    if (!expected) fail(`not listed in content/${track}/topics.json`);
     else {
-      if (slug !== `dsa/${expected.topic}/${name}`) fail(`should live in content/dsa/${expected.topic}/${name}`);
+      if (slug !== `${track}/${expected.topic}/${name}`) fail(`should live in content/${track}/${expected.topic}/${name}`);
       if (data.topic !== expected.topic) fail(`frontmatter topic should be ${expected.topic}`);
       if (data.order !== expected.order) fail(`frontmatter order should be ${expected.order}`);
     }

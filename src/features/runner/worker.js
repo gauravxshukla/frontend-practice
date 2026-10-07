@@ -2,6 +2,7 @@
 // timeout, which is how infinite loops become "Time Limit Exceeded".
 import { errorLine, execute, formatInput, judge } from './core.js';
 import { createJest, format } from './miniJest.js';
+import { installDom } from './dom.js';
 
 /* ------------------------------------------------------------ console capture */
 
@@ -11,6 +12,11 @@ for (const level of ['log', 'info', 'warn', 'error', 'debug']) {
     if (logs.length < 200) logs.push(args.map((a) => format(a)).join(' '));
   };
 }
+
+// Suites hand rejected promises to user code, and an unfinished solution often
+// ignores them. Those rejections aren't the user's bug to see in DevTools; the
+// verdict already reports what went wrong.
+self.addEventListener('unhandledrejection', (event) => event.preventDefault());
 
 async function importSource(code) {
   const url = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
@@ -68,7 +74,9 @@ async function runDsa({ userCode, refCode, checkerCode, spec, cases }) {
 
 /* -------------------------------------------------------------------- JS jobs */
 
-async function loadSuite(userCode, testCode) {
+async function loadSuite(userCode, testCode, env) {
+  // DOM questions get a fresh document before any user code runs.
+  if (env === 'dom') await installDom();
   let user;
   try {
     user = await importSource(userCode);
@@ -83,8 +91,8 @@ async function loadSuite(userCode, testCode) {
   return { jest, user };
 }
 
-async function runJest({ userCode, testCode, only }) {
-  const loaded = await loadSuite(userCode, testCode);
+async function runJest({ userCode, testCode, env, only }) {
+  const loaded = await loadSuite(userCode, testCode, env);
   if (loaded.compileError) return { type: 'compile-error', message: loaded.compileError };
 
   const started = performance.now();
@@ -115,8 +123,8 @@ async function runJest({ userCode, testCode, only }) {
   };
 }
 
-async function collectJest({ userCode, testCode }) {
-  const loaded = await loadSuite(userCode, testCode);
+async function collectJest({ userCode, testCode, env }) {
+  const loaded = await loadSuite(userCode, testCode, env);
   return { type: 'collected', names: loaded.jest ? loaded.jest.collect() : [] };
 }
 
