@@ -26,8 +26,8 @@ export type RunResponse =
 
 export type RunJob =
   | { type: 'dsa'; userCode: string; refCode?: string; checkerCode?: string; spec: DsaSpec; cases: DsaCase[] }
-  | { type: 'jest'; userCode: string; testCode: string; only?: string[] }
-  | { type: 'jest-collect'; userCode: string; testCode: string };
+  | { type: 'jest'; userCode: string; testCode: string; env?: 'dom'; only?: string[] }
+  | { type: 'jest-collect'; userCode: string; testCode: string; env?: 'dom' };
 
 /**
  * Runs a job in a fresh module worker and terminates it after `limitMs`.

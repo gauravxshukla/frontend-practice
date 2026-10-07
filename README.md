@@ -1,6 +1,6 @@
 # Frontend Practice
 
-A local interview-prep app with JavaScript questions, the **NeetCode 150**, machine coding, quizzes and notes. You pick a topic, attempt a question cold in the editor, then **Run** against the examples and **Submit** against hidden edge cases, the way LeetCode works.
+A local interview-prep app with ~80 JavaScript interview questions, the **NeetCode 150**, machine coding, quizzes and notes. You pick a topic, attempt a question cold in the editor, then **Run** against the examples and **Submit** against hidden edge cases, the way LeetCode works.
 
 ```bash
 npm install
@@ -9,7 +9,7 @@ npm run dev        # http://localhost:5173
 
 ## How it works
 
-- **Sidebar = topics.** Questions › JavaScript, DSA · NeetCode 150 (18 topics + Sorting Basics), Machine coding › React / Vanilla JS. Quiz decks and notes sections live in the same tree. Each topic shows `solved / total`, and opening a topic shows its questions with status and difficulty filters.
+- **Sidebar = topics.** Questions › JavaScript (7 topics), DSA · NeetCode 150 (18 topics + Sorting Basics), Machine coding › React / Vanilla JS. Quiz decks and notes sections live in the same tree. Each topic shows `solved / total`, and opening a topic shows its questions with status and difficulty filters.
 - **JS and DSA questions** use a LeetCode-style workspace:
   - **Run** executes the visible example cases, plus any you edit or add in the **Testcase** tab. For custom inputs, the expected value comes from the reference solution.
   - **Submit** runs every case, including hidden edge cases, and reports **Accepted**, **Wrong Answer** (with input / output / expected), **Runtime Error** (with the line), **Compile Error** or **Time Limit Exceeded**. Accepted marks the question **Solved**.
@@ -33,8 +33,9 @@ npm run dev        # http://localhost:5173
 
 ```
 content/                          ← the questions. Adding one never touches src/.
-  js/<slug>/                      implement-X questions (polyfills, lodash, async)
-  dsa/topics.json                 topic list + NeetCode order (drives the sidebar)
+  js/topics.json                  JS topic list + order (drives the sidebar)
+  js/<topic>/<slug>/              implement-X questions: polyfills, promises, closures, lodash, classes, DOM, strings
+  dsa/topics.json                 topic list + NeetCode order
   dsa/<topic>/<slug>/             NeetCode 150 + extras
   machine-coding/{react,vanilla}/<slug>/
   quiz/*.md                       one deck per file
@@ -52,8 +53,8 @@ legacy/                           old experiments not part of the app
 ## Adding a question
 
 ```bash
-npm run new -- js promise-any "Promise.any"
-npm run new -- dsa arrays-hashing majority-element "Majority Element"   # also registers it in topics.json
+npm run new -- js promises-async promise-any "Promise.any"            # registers it in content/js/topics.json
+npm run new -- dsa arrays-hashing majority-element "Majority Element"   # registers it in content/dsa/topics.json
 npm run new -- react tabs
 npm run new -- vanilla modal-dialog
 ```
@@ -67,7 +68,7 @@ Fill in the files, then run `npm run verify`.
 title: Two Sum
 type: dsa                 # js | dsa | react | vanilla (must match the folder)
 difficulty: easy          # easy | medium | hard
-topic: arrays-hashing     # dsa only, with order = position in topics.json
+topic: arrays-hashing     # js and dsa: the topic folder, with order = position in topics.json
 order: 3
 tags: [arrays, hash-map]
 estimatedMinutes: 10
@@ -112,7 +113,15 @@ Both JS files `export default` the function (or the class, for design problems).
 
 ### JS: `starter.js`, `solution.js`, `solution.test.js`
 
-The suite imports `./solution.js` and uses Jest-style globals (`describe`, `test`, `expect`, hooks). In the app it runs in a worker with a small Jest-compatible runner, and in `npm run verify` it runs with Vitest. Stick to common matchers and real timers. **Run** executes tests whose name starts with `example` (or the first two), and **Submit** runs them all.
+The suite imports `./solution.js` and uses Jest-style globals. In the app it runs in a worker with a small Jest-compatible runner (`src/features/runner/miniJest.js`). In `npm run verify` it runs twice: with Vitest, and with that same mini-Jest in Node (`scripts/verify-js-minijest.test.js`), where the reference must pass and the starter must fail.
+
+- **Run** executes tests whose name starts with `example` (or the first two). **Submit** runs them all.
+- **Available:**
+  - **Structure:** `describe`, `test`/`it`, `test.each`, and the hooks.
+  - **Matchers:** the common ones, plus `.not`, `.resolves` / `.rejects`, `expect.any()` and `toMatchObject`.
+  - **Mocks:** `jest.fn()` / `jest.spyOn()` and their call matchers. Under Vitest, `jest` is aliased to `vi`.
+- **Not available:** fake timers, snapshots, module mocks. Use real timers with short waits (each test times out after 2s).
+- **DOM questions:** add `env: dom` to the frontmatter. The suite then gets a `document`, `Element`, events and so on from [linkedom](https://github.com/WebReflection/linkedom), the same in the worker and in Vitest. Build fixtures with `document.body.innerHTML = '…'`. Layout APIs (`getComputedStyle`, sizes) don't exist there.
 
 ### Machine coding
 
@@ -136,13 +145,19 @@ Any markdown file in `content/quiz/` becomes a deck, so existing notes work as-i
 | `npm run new -- …` | Scaffold a question (see above) |
 | `npm run validate` | Check frontmatter, topic registration and the `cases.json` schema |
 | `npm run verify` | `validate`, then grade every reference solution and check every starter fails (Vitest) |
-| `DSA_ONLY=content/dsa/trees npm run test:solutions` | Verify one topic |
+| `DSA_ONLY=content/dsa/trees npm run test:solutions` | Verify one DSA topic |
+| `JS_ONLY=content/js/dom npx vitest run content/js/dom scripts/verify-js-minijest.test.js` | Verify one JS topic under Vitest and mini-Jest |
 
 ## Backlog
 
-Questions mentioned in the old notes that don't exist yet:
+The JS list is curated from GreatFrontEnd, NamasteDev and devtools.tech: questions that several of those sites list, or that companies are tagged on, were built. These lower-priority ones are not built yet:
 
-- **JS:** `Array.prototype.reduce`, `Function.prototype.call/apply/bind`, EventEmitter, `JSON.stringify`, type utilities, `Promise.any`, promisify, `intersectionBy`/`intersectionWith`, `isEmpty`, `getElementsByClassName`, `getElementsByTagName`, identical DOM tree, table of contents
+- **JS polyfills:** `findLast`/`findLastIndex`, `lastIndexOf`, `includes`, `fill`, `reverse`, `sort`, `with`, `square`, `push`/`pop`/`shift`/`unshift`, `Array.isArray`, `Promise.resolve`/`reject`, `JSON.stringify` II (replacer/space), `URLSearchParams`
+- **JS variants:** Curry II/III (placeholders), Memoize II, Deep Clone II (circular), Debounce II (leading/trailing, cancel/flush), Promisify II, Event Emitter II
+- **JS lodash:** `compact`, `fromPairs`, `sortBy`, `invert`, `clamp`, `inRange`, `mean`/`maxBy`/`minBy`, `intersection`/`intersectionBy`/`intersectionWith`, `unionBy`, unsquash object, `deepMap`, `unset`
+- **JS company-specific:** spreadsheet, mini-ORM, map with history, styled text ranges, superjson, immer, test runner, schema validator, Backbone model
+- **JS DOM:** `getElementsByStyle`, table of contents, CSS selector generator, focus trap, `jQuery.css`, text between nodes
+- **JS strings:** number to words, currency formatter, credit-card mask, prettify JSON
 - **Machine coding:** Accordion II/III, Modal Dialog I–IV, Tabs I–III, Data Table II/III (sorting/filtering)
 - **Notes:** `system-design/accessibility/keyboard.md`, `storage/webStorage.md` and `storage/mobileAppStorage.md` are empty and hidden until written
 - **Quiz:** HTML/CSS and mobile decks (the old files were empty)

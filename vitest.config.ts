@@ -11,7 +11,8 @@ const jsSuites = globSync('content/**/solution.test.js').filter((test) =>
 export default defineConfig({
   test: {
     // DSA questions are data-driven (cases.json) and graded by scripts/verify-dsa.test.js.
-    include: [...jsSuites, 'scripts/verify-dsa.test.js'],
+    include: [...jsSuites, 'scripts/verify-dsa.test.js', 'scripts/verify-js-minijest.test.js'],
+    setupFiles: ['scripts/vitest-setup.js'],
     globals: true,
     environment: 'node',
   },
