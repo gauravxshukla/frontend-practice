@@ -96,7 +96,7 @@ const router = createBrowserRouter([
       { path: 'notes/*', element: <NotesPage /> },
     ],
   },
-]);
+], { basename: import.meta.env.BASE_URL });
 
 export default function App() {
   return <RouterProvider router={router} />;
