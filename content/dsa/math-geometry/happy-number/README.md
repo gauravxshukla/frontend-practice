@@ -35,10 +35,10 @@ Explanation: 2 → 4 → 16 → 37 → 58 → 89 → 145 → 42 → 20 → 4, a 
 
 ## Notes
 
-- **Key insight:** the sequence can't grow without bound. Any number with d digits maps to at most 81·d, so it quickly drops below a few hundred and must either hit 1 or repeat.
-- So this is **cycle detection**. Keep a `Set` of numbers seen; stop when you hit 1 (happy) or a repeat (not happy). O(log n) per step, with a small constant number of steps.
-- **O(1) space:** Floyd's tortoise and hare. `slow` takes one step, `fast` takes two. They either meet at 1 or meet inside the cycle.
-- Digit-square sum: loop `while (x > 0) { d = x % 10; sum += d * d; x = Math.floor(x / 10); }`.
-- Pitfall: integer division in JS. Use `Math.floor` (or `Math.trunc`); `x / 10` alone gives a float that never reaches 0.
-- Fun fact: every unhappy number falls into the same 8-cycle 4 → 16 → 37 → 58 → 89 → 145 → 42 → 20 → 4, so checking for 4 also works.
-- Follow-up: the same Floyd idea solves Linked List Cycle and Find the Duplicate Number.
+- **Identify:** repeat "sum of squared digits" until 1 or a loop → cycle detection (fast and slow)
+- **Brute force:** remember every value in a set and stop on a repeat, O(log n) space per value seen
+- **Insight:** the sequence either reaches 1 or loops forever, so Floyd's two pointers detect it without a set
+- **Steps:** slow = next(n), fast = next(next(n)); advance until they meet; happy if they meet at 1
+- **Complexity:** O(log n) time per step; O(k) → O(1) space
+- **Pitfall:** 1 maps to itself, so a happy number also "cycles"; check the meeting value, not just the meeting
+- **Related:** Linked List Cycle, Find the Duplicate Number, Plus One

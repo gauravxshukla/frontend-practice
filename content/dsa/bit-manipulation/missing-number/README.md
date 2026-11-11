@@ -40,10 +40,11 @@ Output: 8
 
 ## Notes
 
-- **Key insight (XOR):** XOR all indices `0..n` together with all values. Every present number appears twice and cancels; the missing one is left.
-- Start with `result = n`, then for each `i`: `result ^= i ^ nums[i]`.
-- **Sum alternative:** `n(n + 1)/2 − sum(nums)`. Just as fast; in fixed-width languages it could overflow for large n, which XOR never does.
-- O(n) time, O(1) space for both.
-- Baselines: a `Set` lookup for each of `0..n` (O(n) space), or sort and find the first `i` with `nums[i] !== i` (O(n log n)).
-- Edge cases: the missing number is `0` (e.g. `[1]`) or `n` itself (e.g. `[0, 1]`). The sort approach often forgets the second one.
-- Follow-up: First Missing Positive, where values can be anything and you must use the array itself as a hash table.
+- **Identify:** one number missing from 0..n → XOR indices with values (or use the sum formula)
+- **Key formula:** XOR of 0..n and all nums leaves the missing number (pairs cancel)
+- **Brute force:** sort and find the first gap, O(n log n); or a hash set, O(n) space
+- **Insight:** every present number cancels with its own index, so only the missing one remains
+- **Steps:** result = n; for each i: result ^= i ^ nums[i]
+- **Complexity:** O(n log n) → O(n) time, O(n) → O(1) space
+- **Pitfall:** start with n, since indices only cover 0..n − 1
+- **Related:** Single Number, Find the Duplicate Number, Contains Duplicate

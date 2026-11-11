@@ -4,23 +4,20 @@
  * @return {string}
  */
 export default function multiply(num1, num2) {
-  if (num1 === '0' || num2 === '0') return '0';
-
   const m = num1.length;
   const n = num2.length;
-  const res = new Array(m + n).fill(0);
-
+  // the product has at most m + n digits
+  const out = new Array(m + n).fill(0);
   for (let i = m - 1; i >= 0; i--) {
     for (let j = n - 1; j >= 0; j--) {
-      // Digit product lands at positions i+j (carry) and i+j+1 (ones).
-      const sum = (num1.charCodeAt(i) - 48) * (num2.charCodeAt(j) - 48) + res[i + j + 1];
-      res[i + j + 1] = sum % 10;
-      res[i + j] += Math.floor(sum / 10);
+      // digits i and j contribute to positions i + j (carry) and i + j + 1 (units)
+      const sum = Number(num1[i]) * Number(num2[j]) + out[i + j + 1];
+      out[i + j + 1] = sum % 10;
+      out[i + j] += Math.floor(sum / 10);
     }
   }
-
-  // At most one leading zero (the product of an m- and n-digit number has m+n-1 or m+n digits).
+  // drop leading zeros, but keep one digit so 0 stays "0"
   let start = 0;
-  while (start < res.length - 1 && res[start] === 0) start++;
-  return res.slice(start).join('');
+  while (start < out.length - 1 && out[start] === 0) start++;
+  return out.slice(start).join('');
 }

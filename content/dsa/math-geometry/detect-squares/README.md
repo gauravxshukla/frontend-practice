@@ -47,12 +47,10 @@ Explanation: The unit square counts once from [0,0]. Nothing makes a square with
 
 ## Notes
 
-- **Key insight:** fix the query point `q`. Any square is determined by its **diagonal** corner `p`: once you know `p`, the other two corners are forced to be `(qx, py)` and `(px, qy)`.
-- Store a count for each point (`Map` keyed by `"x,y"`) plus a list of distinct points.
-- For `count(q)`: loop over stored points `p` with `|px − qx| === |py − qy|` and `px ≠ qx` (positive area). Add `cnt[p] · cnt[(qx, py)] · cnt[(px, qy)]`.
-- `add` is O(1). `count` is O(number of distinct points) instead of O(n³) over all triples.
-- Alternative: index points by x-coordinate and iterate only over points sharing the query's x, trying side length `|py − qy|` both left and right.
-- Multiplying counts handles duplicates: two copies of one corner double the number of squares.
-- Pitfall: forgetting the zero-area check (`p === q`), or only checking one diagonal direction.
-- Pitfall: string keys like `x + y` collide (`1,23` vs `12,3`). Use a separator or `x * 1001 + y`.
-- Follow-up: count rectangles instead of squares, or squares at any angle.
+- **Identify:** count axis-aligned squares using a query point → count points, then try each diagonal corner
+- **Brute force:** try every triple of stored points with the query, O(n³) per count
+- **Insight:** the diagonal corner fixes the whole square, so the other two corners are just lookups
+- **Steps:** keep counts per point; for each stored point (px, py) with |px − x| = |py − y| > 0, add cnt(p) × cnt(x, py) × cnt(px, y)
+- **Complexity:** O(n³) → O(n) per count, O(1) per add, O(n) space
+- **Pitfall:** duplicate points each count, so multiply counts; a zero-size "square" (same point) is not allowed
+- **Related:** Two Sum, Group Anagrams, Valid Sudoku

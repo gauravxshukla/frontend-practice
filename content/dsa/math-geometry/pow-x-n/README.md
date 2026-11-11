@@ -40,12 +40,11 @@ Explanation: 2⁻² = 1 / 2² = 1/4.
 
 ## Notes
 
-- **Key insight (fast exponentiation):** xⁿ = (x²)^(n/2) for even n, and x · (x²)^((n−1)/2) for odd n. Halving n each step takes O(log n) multiplications instead of n.
-- Handle negatives up front: if `n < 0`, use `x = 1 / x` and `n = −n`.
-- Iterative form: while `n > 0`, if `n` is odd multiply the result by `x`; then `x *= x` and `n = Math.floor(n / 2)`.
-- O(log |n|) time, O(1) space (the recursive version uses O(log n) stack).
-- Brute force: multiply `x` by itself |n| times, O(|n|). That is about 2 billion steps for n = 2³¹ − 1.
-- JS pitfall: `n >> 1` and `n & 1` treat numbers as signed 32-bit ints, so `−(−2³¹)` = 2³¹ breaks with `>>`. Use `Math.floor(n / 2)` and `n % 2`, or `>>>`.
-- In languages with fixed-size ints, `−n` overflows for n = −2³¹; widen to 64 bits first.
-- Edge cases: `n = 0` gives 1; `x = 1` or `x = −1` with huge `n`; tiny bases underflow to 0.
-- Follow-up: modular exponentiation `(xⁿ) mod m`, which is the same loop with `% m` after each multiply.
+- **Identify:** x to an integer power, n up to ±2³¹ → fast exponentiation by squaring
+- **Key formula:** x^n = (x²)^(n/2), times x once more when n is odd
+- **Brute force:** multiply x by itself |n| times, O(n)
+- **Insight:** square the base and halve the exponent each step; odd bits of n multiply into the result
+- **Steps:** if n < 0, x = 1/x and n = −n; while n > 0: if n is odd result *= x; x *= x; n //= 2
+- **Complexity:** O(n) → O(log n) time, O(1) space
+- **Pitfall:** −2³¹ can't be negated in a 32-bit int; use a 64-bit copy of n (Java long)
+- **Related:** Multiply Strings, Sum of Two Integers, Reverse Integer

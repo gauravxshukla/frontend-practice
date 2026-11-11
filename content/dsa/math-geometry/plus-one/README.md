@@ -39,10 +39,10 @@ Explanation: 9 + 1 = 10, so the array grows by one digit.
 
 ## Notes
 
-- **Key insight:** only trailing 9s are affected by a carry. Walk from the end: a digit below 9 just gets `+1` and you're done; a 9 becomes 0 and the carry moves left.
-- If every digit was 9, the result is a 1 followed by all zeros, one digit longer.
-- O(n) time worst case (all 9s), O(1) extra space unless the array grows.
-- Pitfall: converting to a `Number`, adding 1, and splitting back. That loses precision past 2⁵³ (about 16 digits). `BigInt` works but misses the point of the exercise.
-- Pitfall: forgetting the all-9s case and returning `[0, 0, 0]` for `[9, 9, 9]`.
-- Decide whether you may mutate the input. Copying first (`[...digits]`) is the safer default.
-- Follow-up: Add Binary or Add Strings, which add two digit strings with a general carry.
+- **Identify:** add 1 to a number stored as a digit array → carry from the last digit leftward
+- **Brute force:** convert to an integer, add 1, convert back; overflows for long arrays
+- **Insight:** stop at the first digit that isn't 9; only trailing 9s turn into 0s
+- **Steps:** from the right: if digit < 9, increment and return; else set it to 0; if all were 9, prepend 1
+- **Complexity:** O(n) time either way, but no overflow; O(1) extra space (O(n) only for all 9s)
+- **Pitfall:** all nines ([9, 9, 9]) grow by one digit: [1, 0, 0, 0]
+- **Related:** Add Two Numbers, Multiply Strings, Sum of Two Integers

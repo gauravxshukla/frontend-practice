@@ -33,11 +33,10 @@ Output (matrix after the call): [[15,13,2,5],[14,3,4,1],[12,6,8,9],[16,7,10,11]]
 
 ## Notes
 
-- **Key insight:** a clockwise rotation is a **transpose** (swap across the main diagonal) followed by **reversing each row**. Both steps are easy to do in place.
-- Transpose: for `i < j`, swap `m[i][j]` and `m[j][i]`. Only touch the upper triangle, or you'll swap everything back.
-- Then `row.reverse()` for every row.
-- O(n²) time, O(1) extra space.
-- Alternative: rotate layer by layer, moving four cells at a time (`top → right → bottom → left → top`). Same complexity, more index bookkeeping.
-- Baseline (not allowed here): build a new matrix with `out[j][n − 1 − i] = m[i][j]` and copy it back. O(n²) extra space.
-- Pitfall: reassigning `matrix = newMatrix` inside the function doesn't change the caller's matrix.
-- Follow-up: counter-clockwise is transpose then reverse the **columns** (or reverse rows first, then transpose).
+- **Identify:** rotate an n × n matrix 90° clockwise in place → transpose, then reverse each row
+- **Brute force:** copy into a new matrix with result[c][n − 1 − r] = m[r][c], O(n²) extra space
+- **Insight:** a clockwise turn equals a flip over the main diagonal followed by a left–right mirror
+- **Steps:** for r < c swap m[r][c] and m[c][r]; then reverse every row
+- **Complexity:** O(n²) time either way; O(n²) → O(1) extra space
+- **Pitfall:** transpose only the upper triangle (c > r), or every pair is swapped back
+- **Related:** Spiral Matrix, Set Matrix Zeroes, Valid Sudoku

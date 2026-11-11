@@ -9,28 +9,6 @@ const OPTIONAL = new Set(['Key formula', 'Better']);
 const MAX_WORDS = 30;
 
 const only = process.env.DSA_ONLY; // e.g. DSA_ONLY=content/dsa/trees
-
-// Topics already rewritten in the revision format. The rest show as todo until
-// they're converted; when every topic is listed this set (and the todo branch) goes away.
-const CONVERTED = new Set([
-  'arrays-hashing',
-  'two-pointers',
-  'sliding-window',
-  'stack',
-  'binary-search',
-  'linked-list',
-  'trees',
-  'tries',
-  'heap',
-  'backtracking',
-  'graphs',
-  'advanced-graphs',
-  '1d-dp',
-  '2d-dp',
-  'greedy',
-  'intervals',
-]);
-const topicOf = (dir) => dir.split('/')[2];
 const frontmatter = (raw) => Object.fromEntries(
   (/^---\n([\s\S]*?)\n---/.exec(raw)?.[1] ?? '')
     .split('\n')
@@ -65,12 +43,7 @@ test('finds the NeetCode 150', () => {
   if (!only) expect(problems).toHaveLength(150);
 });
 
-const selected = problems.filter((p) => !only || p.dir.startsWith(only));
-for (const p of selected.filter((p) => !CONVERTED.has(topicOf(p.dir)))) {
-  test.todo(`${p.dir}: revision notes and JS / Python / Java solutions`);
-}
-
-describe.each(selected.filter((p) => CONVERTED.has(topicOf(p.dir))).map((p) => [p.dir, p]))('%s', (_dir, p) => {
+describe.each(problems.filter((p) => !only || p.dir.startsWith(only)).map((p) => [p.dir, p]))('%s', (_dir, p) => {
   const notes = p.raw.split(/^## Notes\s*$/m)[1]?.trim() ?? '';
   const lines = notes.split('\n').filter((l) => l.trim());
 

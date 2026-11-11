@@ -1,17 +1,15 @@
 /**
- * Rotates the matrix 90° clockwise in place: transpose, then reverse each row.
- * @param {number[][]} matrix
- * @return {void}
+ * @param {number[][]} matrix n x n
+ * @return {void} rotates in place
  */
 export default function rotate(matrix) {
   const n = matrix.length;
-
-  // Transpose across the main diagonal (upper triangle only).
-  for (let i = 0; i < n; i++) {
-    for (let j = i + 1; j < n; j++) {
-      [matrix[i][j], matrix[j][i]] = [matrix[j][i], matrix[i][j]];
+  // 1. transpose: swap across the main diagonal (upper triangle only, or pairs swap back)
+  for (let r = 0; r < n; r++) {
+    for (let c = r + 1; c < n; c++) {
+      [matrix[r][c], matrix[c][r]] = [matrix[c][r], matrix[r][c]];
     }
   }
-  // Mirror each row left to right.
+  // 2. mirror each row left to right; together the two steps are a clockwise turn
   for (const row of matrix) row.reverse();
 }

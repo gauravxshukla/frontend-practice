@@ -1,20 +1,19 @@
 /**
- * Iterative fast exponentiation (binary exponentiation).
  * @param {number} x
  * @param {number} n
  * @return {number}
  */
 export default function myPow(x, n) {
-  if (n < 0) {
-    x = 1 / x;
-    n = -n; // safe in JS: numbers are doubles, so 2^31 fits
-  }
-
+  // a negative power is the positive power of the reciprocal
+  let base = n < 0 ? 1 / x : x;
+  let exp = Math.abs(n);
   let result = 1;
-  while (n > 0) {
-    if (n % 2 === 1) result *= x; // odd exponent: take one x out
-    x *= x;
-    n = Math.floor(n / 2); // not n >> 1, which breaks at 2^31
+  while (exp > 0) {
+    // the lowest bit of exp is set: this power of base is part of the answer
+    if (exp % 2 === 1) result *= base;
+    // move to the next bit: base^(2k), half the exponent
+    base *= base;
+    exp = Math.floor(exp / 2);
   }
   return result;
 }

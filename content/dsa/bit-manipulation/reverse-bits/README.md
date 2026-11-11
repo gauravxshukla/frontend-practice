@@ -35,11 +35,10 @@ Explanation: 11111111111111111111111111111101 reversed is 1011111111111111111111
 
 ## Notes
 
-- **Key insight:** peel bits off the right of `n` and push them onto the right of the result. After 32 steps, the first bit you peeled is in the top position.
-- Loop 32 times: `result = (result << 1) | (n & 1)`, then `n >>>= 1`. Return `result >>> 0`.
-- O(32) = O(1) time and space.
-- JS pitfall: `result << 1` becomes negative once bit 31 is set. That bit pattern is still correct, but you must return `result >>> 0` to report it as unsigned.
-- JS pitfall: use `>>>` rather than `>>` when shifting `n`, or inputs ≥ 2³¹ shift in 1s.
-- Pitfall: stopping when `n` reaches 0 instead of always doing 32 iterations loses the trailing zeros, which become leading bits after the reverse.
-- Baseline: `n.toString(2).padStart(32, "0")`, reverse the string, `parseInt(..., 2)`.
-- Follow-up: if this is called many times, reverse a byte at a time with a 256-entry lookup table, or use the divide-and-conquer swaps (swap halves, then quarters, and so on down to single bits) with masks like `0x55555555`.
+- **Identify:** reverse the 32 bits of an unsigned integer → shift bits out of n and into the result
+- **Brute force:** convert to a 32-character binary string, reverse it and parse it back
+- **Insight:** take n's lowest bit each step and push it onto the result from the right, 32 times
+- **Steps:** repeat 32 times: result = (result << 1) | (n & 1); n >>= 1
+- **Complexity:** O(32) time either way, O(1) space without the string
+- **Pitfall:** loop exactly 32 times (leading zeros matter), and keep the result unsigned
+- **Related:** Number of 1 Bits, Reverse Integer, Counting Bits
