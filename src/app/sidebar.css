@@ -470,6 +470,12 @@
   min-width: 0;
 }
 
+/* Three labelled options plus the shortcuts button share 248px. */
+.sidebar-footer .theme-switch button {
+  gap: 5px;
+  padding: 0 6px;
+}
+
 .sidebar-keys {
   width: 32px;
   height: 32px;
