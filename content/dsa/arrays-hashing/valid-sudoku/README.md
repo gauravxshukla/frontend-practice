@@ -48,11 +48,11 @@ Explanation: row 0 (and the top-left box) now contains "1" twice.
 
 ## Notes
 
-- **Key insight:** a single pass works if you keep one "seen" set per row, per column, and per box.
-- Box index for cell `(r, c)` is `Math.floor(r / 3) * 3 + Math.floor(c / 3)`, which numbers the boxes 0–8 left to right, top to bottom.
-- For each filled cell, if its digit is already in the row, column, or box set, return `false`. Otherwise add it to all three.
-- O(81) = O(1) time and space for a fixed-size board. In general it's O(n²) for an n×n board.
-- **Alternative:** three separate passes (rows, then columns, then boxes). It's the same complexity with more code, and a fine baseline.
-- Pitfall: getting the box mapping wrong. Test a duplicate that shares a box but *not* a row or column, such as `(3,3)` and `(4,4)`.
-- Pitfall: treating `"."` as a value, so two empty cells look like a duplicate.
-- Follow-up: use three arrays of 9-bit masks instead of sets, which is smaller and faster. Then extend to a backtracking Sudoku solver.
+- **Identify:** no repeated digit in any row, column or 3×3 box → one hash set per unit
+- **Key formula:** box index = (r / 3) × 3 + c / 3, with integer division
+- **Brute force:** validate each row, each column, then each box in three separate scans
+- **Insight:** one pass is enough: each filled cell checks its row, column and box sets at once
+- **Steps:** for each filled cell, if its digit is already in its row, column or box set return false; else add it
+- **Complexity:** O(81) either way, i.e. O(1) time and space; one pass instead of three
+- **Pitfall:** skip '.' cells, and don't check solvability: only filled cells must be valid
+- **Related:** Contains Duplicate, Set Matrix Zeroes, N-Queens

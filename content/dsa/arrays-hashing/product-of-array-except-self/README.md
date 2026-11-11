@@ -36,11 +36,12 @@ Explanation: every product except the one that skips the 0 includes the 0.
 
 ## Notes
 
-- **Key insight:** the answer at `i` is (product of everything left of `i`) × (product of everything right of `i`).
-- **Pass 1:** walk left to right with a running `prefix` (starting at 1). Store `prefix` into `result[i]`, then multiply it by `nums[i]`.
-- **Pass 2:** walk right to left with a running `suffix`. Multiply `result[i]` by `suffix`, then multiply `suffix` by `nums[i]`.
-- O(n) time and O(1) extra space, since the output array doesn't count.
-- **Baseline:** a nested loop for each position is O(n²).
-- Why no division: the "total ÷ nums[i]" trick breaks on zeros. With one zero, only that slot is non-zero. With two or more zeros, everything is zero.
-- Pitfall: in JavaScript, `0 * -3` is `-0`. Most graders treat it as 0, but don't be surprised if you see it in a console.
-- Follow-up: explain how you'd handle zeros if division *were* allowed (count zeros and track the product of non-zero values).
+- **Identify:** product of every other element, no division allowed → prefix and suffix products
+- **Key formula:** answer[i] = (product of everything left of i) × (product of everything right of i)
+- **Brute force:** for each index, multiply all the other elements, O(n²)
+- **Better:** build prefix[] and suffix[] arrays, O(n) time, O(n) extra space
+- **Insight:** instead of two extra arrays, write prefixes into the output, then multiply in a running suffix
+- **Steps:** left-to-right pass stores the product left of i; right-to-left pass multiplies by the running product right of i
+- **Complexity:** O(n²) → O(n) time, O(n) → O(1) extra space (output excluded)
+- **Pitfall:** total ÷ nums[i] breaks on zeros; one zero or two zeros change every answer
+- **Related:** Trapping Rain Water, Maximum Product Subarray

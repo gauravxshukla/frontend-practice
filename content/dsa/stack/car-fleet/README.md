@@ -40,11 +40,11 @@ Explanation: arrival times alone are 3, 4.5, 10, 3. The car at 4 catches the car
 
 ## Notes
 
-- **Key insight:** process cars from the one closest to the target backwards. Compute each car's solo arrival time, `(target − position) / speed`.
-- If a car's time is ≤ the time of the fleet directly ahead, it catches that fleet (and then moves at its pace), so it merges. Otherwise it arrives later and starts a new fleet, whose time becomes the new bar.
-- O(n log n) for the sort, then an O(n) scan. O(n) space.
-- The classic stack framing: push arrival times and pop (merge) when the new time is ≤ the top. The reference just keeps the top in one variable, since only the last fleet matters.
-- **Baseline:** simulate hour by hour. It's complicated, slow, and suffers from floating-point issues.
-- Pitfall: sorting by speed or by arrival time instead of by **position**.
-- Pitfall: "meets exactly at the target" counts as merging, so use `≤` when comparing times. (Cross-multiplying avoids float noise if you're worried about it.)
-- Follow-up: "Car Fleet II" asks for each car's collision time and needs a monotonic stack with time comparisons.
+- **Identify:** cars catch up and merge before the target → sort by position, compare arrival times
+- **Key formula:** time to target = (target − position) / speed
+- **Brute force:** simulate the cars moving step by step until all arrive
+- **Insight:** going from the car nearest the target backwards, a car that would arrive sooner joins the fleet ahead
+- **Steps:** sort by position descending; for each car's time, if it's greater than the last fleet's time, it starts a new fleet
+- **Complexity:** simulation → O(n log n) time, O(n) space
+- **Pitfall:** a car arriving at exactly the same time joins the fleet (use >, not ≥, for a new fleet)
+- **Related:** Daily Temperatures, Largest Rectangle in Histogram, Merge Intervals

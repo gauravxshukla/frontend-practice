@@ -39,10 +39,10 @@ Explanation: rotated a full n times, so it looks unrotated.
 
 ## Notes
 
-- **Key insight:** compare `nums[mid]` with `nums[hi]`. If `nums[mid] > nums[hi]`, the rotation point is strictly right of `mid`. Otherwise `mid … hi` is sorted and the minimum is at `mid` or to its left.
-- Loop `while (lo < hi)`: either `lo = mid + 1` or `hi = mid`. When they meet, `nums[lo]` is the answer.
-- O(log n) time, O(1) space. Brute force is `Math.min(...nums)` in O(n).
-- Pitfall: comparing against `nums[lo]` instead of `nums[hi]` breaks on an unrotated array, because the left half also looks sorted.
-- Pitfall: `hi = mid - 1` can skip the minimum when `mid` is the minimum.
-- Edge cases: one element, two elements, no rotation, rotation by `n − 1` (minimum at the end).
-- Follow-up: with duplicates allowed (LeetCode 154), when `nums[mid] === nums[hi]` you can only shrink `hi--`, and the worst case becomes O(n).
+- **Identify:** sorted array rotated at an unknown point, O(log n) → binary search on which half is sorted
+- **Brute force:** scan for the smallest value, O(n)
+- **Insight:** compare mid with the right end: nums[mid] > nums[r] means the drop (the minimum) is right of mid
+- **Steps:** l = 0, r = n − 1; while l < r: if nums[mid] > nums[r] then l = mid + 1, else r = mid; return nums[l]
+- **Complexity:** O(n) → O(log n) time, O(1) space
+- **Pitfall:** compare with nums[r], not nums[l]; an unrotated array must still return the first element
+- **Related:** Search in Rotated Sorted Array, Binary Search, Koko Eating Bananas

@@ -23,7 +23,6 @@ import { useTheme } from '../../lib/theme';
 import { ariaKeysFor, keysFor } from '../../lib/shortcuts';
 import { groupUrl, parseRoute, questionUrl } from '../../lib/routes';
 import { useColumnResize } from '../../lib/useColumnResize';
-import { usePersistentState } from '../../lib/usePersistentState';
 import { LANGUAGES, languageInfo } from '../runner/languages/registry';
 import type { LanguageId } from '../runner/languages/types';
 import { useOpenSearch } from '../../app/openSearch';
@@ -54,18 +53,17 @@ function WorkspaceSkeleton() {
 
 type SolutionSources = Partial<Record<LanguageId, string>>;
 
-/** Read-only reference solution(s): JS always, Python where a solution.py exists. */
+/** Read-only reference solutions: JavaScript, plus Python / Java where they exist. Opens on JavaScript. */
 function SolutionCode({ question }: { question: Question }) {
   const { resolved } = useTheme();
   const [sources, setSources] = useState<SolutionSources | null>(null);
-  // The language picked in the editor (only read here); a tab click overrides it.
-  const [preferred] = usePersistentState<LanguageId>('fp:dsaLanguage', 'javascript');
   const [picked, setPicked] = useState<LanguageId | null>(null);
   useEffect(() => {
     loadSolutionSources(question).then(setSources);
   }, [question]);
 
-  const current: LanguageId = picked ?? (sources?.[preferred] !== undefined ? preferred : 'javascript');
+  // Every question has a JavaScript reference, so it's the stable default; a tab click switches.
+  const current: LanguageId = picked && sources?.[picked] !== undefined ? picked : 'javascript';
   const editorLanguages = useEditorLanguages(current);
   const file = languageInfo(current).file;
   const files = useMemo(() => ({ [file]: sources?.[current] ?? '' }), [file, sources, current]);
@@ -73,7 +71,6 @@ function SolutionCode({ question }: { question: Question }) {
 
   if (sources === null) return <WorkspaceSkeleton />;
   const available = LANGUAGES.filter((l) => sources[l.id] !== undefined);
-  const missingPreferred = question.type === 'dsa' && picked === null && current !== preferred;
 
   return (
     <>
@@ -85,11 +82,6 @@ function SolutionCode({ question }: { question: Question }) {
             </button>
           ))}
         </div>
-      )}
-      {missingPreferred && (
-        <p className="solution-note">
-          Reference shown in {languageInfo(current).label}: this question has no {languageInfo(preferred).label} reference yet.
-        </p>
       )}
       <SandpackProvider key={current} files={files} theme={sandpackThemes[resolved]} options={options}>
         <div className="solution-viewer">

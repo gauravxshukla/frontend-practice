@@ -18,5 +18,10 @@ maxProfit([7, 6, 4, 3, 1]);    // 0
 
 ## Notes
 
-- Track the lowest price so far, and at each day compute `price - minSoFar`. One pass, O(1) space.
-- This is Kadane's algorithm in disguise: max subarray over the daily price differences.
+- **Identify:** one buy before one sell, maximise the difference → track the cheapest price so far
+- **Brute force:** try every buy day with every later sell day, O(n²)
+- **Insight:** instead of pairing days, keep the lowest price seen; today's best profit is price − that low
+- **Steps:** for each price, update the running minimum, then the best profit as price − minimum
+- **Complexity:** O(n²) → O(n) time, O(1) space
+- **Pitfall:** profit can't go negative: falling prices, empty or single-day input all return 0
+- **Related:** Maximum Subarray, Best Time to Buy and Sell Stock with Cooldown, Sliding Window Maximum

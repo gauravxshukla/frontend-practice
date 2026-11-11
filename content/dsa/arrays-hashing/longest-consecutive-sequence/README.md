@@ -36,11 +36,10 @@ Explanation: 0 through 8.
 
 ## Notes
 
-- **Key insight:** put everything in a `Set`. A number `n` *starts* a run exactly when `n - 1` is not in the set.
-- For each run start, count upward (`n + 1`, `n + 2`, …) while the values are present, and keep the best length.
-- O(n) time overall: each number is visited by the counting loop at most once, because only run starts trigger counting. O(n) space.
-- **Baseline:** sort, then scan and count runs while skipping duplicates. O(n log n), simple and often acceptable.
-- Pitfall: counting from *every* number instead of only run starts makes it O(n²) on input like `[1..n]`.
-- Pitfall: duplicates. With sorting, `[1,2,2,3]` must still give 3. Iterate the set, not the array, to skip repeats for free.
-- Pitfall: an empty input must return 0, not 1.
-- Follow-up: a union-find over value neighbours also works, and generalizes to a stream of insertions.
+- **Identify:** longest run of consecutive values, unsorted, O(n) required → hash set
+- **Brute force:** sort, then count runs while skipping duplicates, O(n log n)
+- **Insight:** only start counting from a run's first value: a num whose `num − 1` isn't in the set
+- **Steps:** put nums in a set; for each run start, walk num + 1, num + 2… while present; keep the longest
+- **Complexity:** O(n log n) → O(n) time, O(1) → O(n) space
+- **Pitfall:** loop over the set, not nums, or many duplicate run starts repeat the same walk
+- **Related:** Contains Duplicate, Top K Frequent Elements, Two Sum

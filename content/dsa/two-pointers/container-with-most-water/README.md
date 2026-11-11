@@ -33,11 +33,11 @@ Output: 4
 
 ## Notes
 
-- **Two pointers (optimal):** start with the widest pair (`0`, `n - 1`). Record the area, then move the pointer at the **shorter** wall inward.
-- Why that's correct: the shorter wall caps the area. Pairing it with any wall closer in can only shrink the width without raising the cap, so it can never beat the area just recorded. It's safe to discard.
-- O(n) time and O(1) space.
-- **Baseline:** try every pair for O(n²), which is too slow for 10⁵ walls.
-- Pitfall: moving the taller wall, or both walls, can skip the optimal pair.
-- Pitfall: when the heights are equal, moving either one is fine, since neither can be part of a better pair with the other.
-- Don't confuse this with Trapping Rain Water, which sums water over every bar. Here only two walls matter.
-- Follow-up: prove the greedy step formally (an exchange argument), since interviewers often ask "why is it safe to move the shorter side?"
+- **Identify:** pick two lines to hold the most water → two pointers from the widest pair
+- **Key formula:** area = min(height[l], height[r]) × (r − l)
+- **Brute force:** try every pair of lines, O(n²)
+- **Insight:** the shorter line caps the area, so move it inward; moving the taller one can only lose width
+- **Steps:** l = 0, r = n − 1; record the area; move whichever side is shorter; repeat until they meet
+- **Complexity:** O(n²) → O(n) time, O(1) space
+- **Pitfall:** moving the taller line is the classic mistake; it never finds a bigger area
+- **Related:** Trapping Rain Water, Two Sum II, 3Sum

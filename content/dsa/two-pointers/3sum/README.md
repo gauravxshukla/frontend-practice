@@ -37,12 +37,11 @@ Output: [[0,0,0]]
 
 ## Notes
 
-- **Key insight:** sort first. Then fix the smallest value `nums[i]` and solve Two Sum II for `-nums[i]` on the part to its right with two pointers.
-- Skip duplicate anchors: if `nums[i] === nums[i - 1]`, continue. After recording a triplet, move `left` forward past equal values.
-- Early exit: once `nums[i] > 0`, no triplet can sum to zero.
-- O(n²) time. O(1) extra space beyond the output (or O(n) if you copy before sorting so you don't mutate the input).
-- **Baseline:** three nested loops plus a set of sorted-triplet keys is O(n³), too slow for 3000 elements.
-- **Hash-set variant:** for each `i`, run the Two Sum hash approach on the rest. It's also O(n²) but deduplication is messier.
-- Pitfall: deduplicating with a set of stringified triplets *after* finding them works but hides the real skip logic interviewers look for.
-- Pitfall: only skipping duplicates of `left` *after* a match. Skipping on every move is fine but not required.
-- Follow-up: 4Sum / kSum. Recurse down to the two-pointer base case for O(n^(k−1)).
+- **Identify:** all unique triplets summing to 0 → sort, fix one number, two-pointer the rest
+- **Brute force:** three nested loops plus a set to drop duplicate triplets, O(n³)
+- **Better:** fix i, then a hash set finds the third number, O(n²) time but messy dedupe
+- **Insight:** after sorting, each fixed nums[i] turns the rest into Two Sum II on a sorted range
+- **Steps:** sort; for each i (skip repeats), l = i + 1, r = end; move by sum; on a hit, skip repeats on both sides
+- **Complexity:** O(n³) → O(n²) time, O(1) extra space besides sorting and output
+- **Pitfall:** skip duplicate values for i, l and r, or the same triplet appears more than once
+- **Related:** Two Sum, Two Sum II, Container With Most Water

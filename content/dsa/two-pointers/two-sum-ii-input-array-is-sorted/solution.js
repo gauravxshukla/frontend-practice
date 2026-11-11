@@ -1,18 +1,19 @@
 /**
- * @param {number[]} numbers sorted in non-decreasing order
+ * @param {number[]} numbers sorted ascending
  * @param {number} target
- * @return {number[]} 1-based indices [i, j] with i < j
+ * @return {number[]} 1-indexed positions
  */
 export default function twoSum(numbers, target) {
-  let left = 0;
-  let right = numbers.length - 1;
-
-  while (left < right) {
-    const sum = numbers[left] + numbers[right];
-    if (sum === target) return [left + 1, right + 1];
-    // Too small: only moving left up can grow the sum. Too big: move right down.
-    if (sum < target) left++;
-    else right--;
+  let l = 0;
+  let r = numbers.length - 1;
+  while (l < r) {
+    const sum = numbers[l] + numbers[r];
+    // found it; the problem wants 1-indexed positions
+    if (sum === target) return [l + 1, r + 1];
+    // too small: only a bigger left value can raise the sum
+    if (sum < target) l++;
+    // too big: only a smaller right value can lower it
+    else r--;
   }
-  return [];
+  return []; // unreachable: exactly one answer is guaranteed
 }

@@ -31,13 +31,10 @@ Output: ["((()))","(()())","(())()","()(())","()()()"]
 
 ## Notes
 
-- **Backtracking with counts:** build the string one character at a time, tracking `open` and `close` used so far.
-  - You may add `(` while `open < n`.
-  - You may add `)` while `close < open`, so you never close something that isn't open.
-  - When the length reaches `2n`, record the string.
-- These two rules only ever produce valid strings, so there's no filtering and no wasted work.
-- The number of results is the n-th Catalan number, about 4ⁿ / (n^1.5 · √π). Time is O(4ⁿ / √n) overall, and recursion depth is O(n).
-- **Baseline:** generate all 2²ⁿ strings and keep the balanced ones. Correct, but it does far more work.
-- Pitfall: building strings with `s + '('` in each call is fine. If you use a shared array for the path, remember to `pop()` after recursing.
-- Why it's in the stack section: the `close < open` rule is exactly a stack-depth check, a counter standing in for a stack.
-- Follow-up: generate them in lexicographic order, or count them without generating them (Catalan DP).
+- **Identify:** all well-formed strings of n pairs → backtracking with open/close counts
+- **Brute force:** generate all 2^(2n) strings of ( and ), keep the valid ones, O(2^(2n)·n)
+- **Insight:** never build an invalid prefix: add "(" while open < n, add ")" only while close < open
+- **Steps:** recurse with the current string; branch on "(" and ")" under those two rules; save at length 2n
+- **Complexity:** O(2^(2n)·n) → O(4^n / √n) time (Catalan count), O(n) recursion depth
+- **Pitfall:** adding ")" when close == open creates a prefix that can never be fixed
+- **Related:** Valid Parentheses, Subsets, Letter Combinations of a Phone Number

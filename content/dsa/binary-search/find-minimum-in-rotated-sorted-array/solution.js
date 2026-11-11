@@ -1,16 +1,17 @@
 /**
- * @param {number[]} nums a rotated ascending array of distinct values
- * @return {number} the smallest value
+ * @param {number[]} nums rotated sorted array of distinct values
+ * @return {number}
  */
 export default function findMin(nums) {
-  let lo = 0;
-  let hi = nums.length - 1;
-
-  while (lo < hi) {
-    const mid = lo + ((hi - lo) >> 1);
-    // If mid is bigger than the right end, the drop (and the minimum) is to the right of mid.
-    if (nums[mid] > nums[hi]) lo = mid + 1;
-    else hi = mid; // mid itself might be the minimum
+  let l = 0;
+  let r = nums.length - 1;
+  while (l < r) {
+    const mid = l + Math.floor((r - l) / 2);
+    // mid is bigger than the right end, so the drop to the minimum is after mid
+    if (nums[mid] > nums[r]) l = mid + 1;
+    // mid..r is sorted, so the minimum is mid or to its left
+    else r = mid;
   }
-  return nums[lo];
+  // l and r meet on the minimum
+  return nums[l];
 }

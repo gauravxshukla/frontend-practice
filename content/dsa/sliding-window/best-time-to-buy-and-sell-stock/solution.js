@@ -3,16 +3,13 @@
  * @return {number}
  */
 export default function maxProfit(prices) {
-  let minBuyPrice = Infinity;
-  let best = 0;
-
-  for (let i = 0; i < prices.length; i++) {
-    if (minBuyPrice > prices[i]) {
-      minBuyPrice = prices[i];
-    } else {
-      best = Math.max(best, prices[i] - minBuyPrice);
-    }
+  let minPrice = Infinity; // cheapest buy seen so far
+  let best = 0; // never negative: not trading is allowed
+  for (const price of prices) {
+    // a lower price is a better buy for every later day
+    minPrice = Math.min(minPrice, price);
+    // selling today against the cheapest earlier buy
+    best = Math.max(best, price - minPrice);
   }
-
   return best;
 }

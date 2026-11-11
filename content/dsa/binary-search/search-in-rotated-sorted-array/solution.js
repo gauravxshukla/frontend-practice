@@ -1,24 +1,22 @@
 /**
- * @param {number[]} nums a rotated ascending array of distinct values
+ * @param {number[]} nums rotated sorted array of distinct values
  * @param {number} target
- * @return {number} index of target, or -1
+ * @return {number}
  */
 export default function search(nums, target) {
-  let lo = 0;
-  let hi = nums.length - 1;
-
-  while (lo <= hi) {
-    const mid = lo + ((hi - lo) >> 1);
+  let l = 0;
+  let r = nums.length - 1;
+  while (l <= r) {
+    const mid = l + Math.floor((r - l) / 2);
     if (nums[mid] === target) return mid;
-
-    if (nums[lo] <= nums[mid]) {
-      // Left half [lo, mid] is sorted.
-      if (nums[lo] <= target && target < nums[mid]) hi = mid - 1;
-      else lo = mid + 1;
+    if (nums[l] <= nums[mid]) {
+      // left half is sorted: the target is there only if it's inside its range
+      if (nums[l] <= target && target < nums[mid]) r = mid - 1;
+      else l = mid + 1;
     } else {
-      // Right half [mid, hi] is sorted.
-      if (nums[mid] < target && target <= nums[hi]) lo = mid + 1;
-      else hi = mid - 1;
+      // right half is sorted: same test on its range
+      if (nums[mid] < target && target <= nums[r]) l = mid + 1;
+      else r = mid - 1;
     }
   }
   return -1;

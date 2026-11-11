@@ -4,16 +4,14 @@
  * @return {boolean}
  */
 export default function isAnagram(s, t) {
+  // different lengths can never use the same letters
   if (s.length !== t.length) return false;
-
-  // Count characters of s up, characters of t down; every count must end at 0.
-  const counts = new Map();
+  const counts = new Array(26).fill(0); // one counter per letter a-z
   for (let i = 0; i < s.length; i++) {
-    counts.set(s[i], (counts.get(s[i]) ?? 0) + 1);
-    counts.set(t[i], (counts.get(t[i]) ?? 0) - 1);
+    // s adds a letter, t takes one away; anagrams cancel out exactly
+    counts[s.charCodeAt(i) - 97]++;
+    counts[t.charCodeAt(i) - 97]--;
   }
-  for (const c of counts.values()) {
-    if (c !== 0) return false;
-  }
-  return true;
+  // any non-zero counter is a letter one string has more of
+  return counts.every((c) => c === 0);
 }

@@ -4,20 +4,17 @@
  * @return {number[]}
  */
 export default function maxSlidingWindow(nums, k) {
-  // Monotonic deque of indices; their values are strictly decreasing front to back.
-  const deque = new Array(nums.length);
-  let head = 0;
-  let tail = 0; // deque occupies deque[head..tail)
+  const dq = []; // indices whose values decrease from front to back
+  let head = 0; // front of the deque (an index into dq, so shifting is O(1))
   const result = [];
-
   for (let i = 0; i < nums.length; i++) {
-    // Drop the front index once it slides out of the window.
-    if (head < tail && deque[head] <= i - k) head++;
-    // Smaller values behind nums[i] can never be a maximum again.
-    while (head < tail && nums[deque[tail - 1]] <= nums[i]) tail--;
-    deque[tail++] = i;
-
-    if (i >= k - 1) result.push(nums[deque[head]]);
+    // smaller values behind a bigger newcomer can never be a window max again
+    while (dq.length > head && nums[dq[dq.length - 1]] <= nums[i]) dq.pop();
+    dq.push(i);
+    // the front index slid out of the window
+    if (dq[head] <= i - k) head++;
+    // once the first full window exists, the front holds its max
+    if (i >= k - 1) result.push(nums[dq[head]]);
   }
   return result;
 }

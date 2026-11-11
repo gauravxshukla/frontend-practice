@@ -37,11 +37,11 @@ Explanation: "wke". Note that "pwke" is not contiguous.
 
 ## Notes
 
-- **Sliding window:** keep a window `[left, right]` with no repeats, and grow `right` one step at a time.
-- **Jump version (optimal):** remember each character's last index. When `s[right]` was last seen at an index ≥ `left`, jump `left` to that index + 1. Then update the best length.
-- O(n) time and O(min(n, alphabet)) space.
-- **Set version:** keep a `Set` of the window's characters, and while `s[right]` is in it, delete `s[left]` and `left++`. It's also O(n), since each character enters and leaves once.
-- **Baseline:** check every substring for uniqueness. O(n²) with an incremental set, O(n³) naively.
-- Pitfall: in the jump version, never move `left` *backwards*. In `"abba"`, the last `a` was seen at 0, but `left` is already at 2. That's why you check `>= left`.
-- Pitfall: the empty string returns 0, and a single space counts as a character.
-- Follow-up: return the substring itself, or allow at most k distinct characters (a classic variant).
+- **Identify:** longest contiguous substring with all-distinct characters → variable sliding window
+- **Brute force:** check every substring for repeats, O(n³) (O(n²) with a set per start)
+- **Better:** window + set, shrinking one char at a time on a repeat, O(n) but up to 2n steps
+- **Insight:** instead of shrinking step by step, jump the left edge past the repeat's last index
+- **Steps:** for each r, if s[r] was seen inside the window, set l = lastIndex + 1; record r; update best
+- **Complexity:** O(n³) → O(n) time, O(min(n, alphabet)) space
+- **Pitfall:** only jump when the last index is inside the window ("abba"), never move l backwards
+- **Related:** Longest Repeating Character Replacement, Permutation in String, Minimum Window Substring

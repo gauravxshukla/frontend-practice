@@ -1,42 +1,40 @@
 export default class TimeMap {
   constructor() {
-    // key -> array of [timestamp, value], already sorted because timestamps only increase
+    // key -> [timestamp, value] pairs, in the order they were set (so sorted by time)
     this.store = new Map();
   }
 
   /**
    * @param {string} key
    * @param {string} value
-   * @param {number} timestamp strictly increasing across all set() calls
-   * @return {void}
+   * @param {number} timestamp
    */
   set(key, value, timestamp) {
     if (!this.store.has(key)) this.store.set(key, []);
+    // timestamps only increase, so appending keeps the list sorted
     this.store.get(key).push([timestamp, value]);
   }
 
   /**
    * @param {string} key
    * @param {number} timestamp
-   * @return {string} value with the largest stored timestamp <= timestamp, or ""
+   * @return {string}
    */
   get(key, timestamp) {
-    const entries = this.store.get(key);
-    if (!entries) return '';
-
-    // Find the last entry whose timestamp is <= the query.
-    let lo = 0;
-    let hi = entries.length - 1;
-    let answer = '';
-    while (lo <= hi) {
-      const mid = lo + ((hi - lo) >> 1);
+    const entries = this.store.get(key) ?? [];
+    let result = ''; // nothing set at or before timestamp yet
+    let l = 0;
+    let r = entries.length - 1;
+    // find the last entry whose time is <= timestamp
+    while (l <= r) {
+      const mid = l + Math.floor((r - l) / 2);
       if (entries[mid][0] <= timestamp) {
-        answer = entries[mid][1];
-        lo = mid + 1;
+        result = entries[mid][1]; // a candidate; a later one may also fit
+        l = mid + 1;
       } else {
-        hi = mid - 1;
+        r = mid - 1;
       }
     }
-    return answer;
+    return result;
   }
 }

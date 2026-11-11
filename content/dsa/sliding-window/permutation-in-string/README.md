@@ -33,10 +33,11 @@ Output: false
 
 ## Notes
 
-- **Key insight:** any match is a window of length exactly `s1.length`. Slide a fixed-size window over `s2` and compare letter counts.
-- **Simple sliding window:** keep 26-slot counts for `s1` and for the current window. Each step adds one letter and removes one, then compares the 26 slots. That's O(26 · n), which is effectively linear.
-- **Matches counter (optimal):** track how many of the 26 letters currently have equal counts. Each add/remove changes at most one letter's equality, so it updates in O(1). Return `true` when matches hits 26. O(n) time and O(1) space.
-- **Baseline:** sort each window and compare it with sorted `s1`. O(n · m log m).
-- Pitfall: if `s1` is longer than `s2`, return `false` right away. Don't index out of bounds building the first window.
-- Pitfall: check the *last* window too. A loop that checks before sliding needs one final comparison after the loop.
-- Follow-up: "Find All Anagrams in a String" returns every start index and uses the same window.
+- **Identify:** does s2 contain an anagram of s1 → fixed-size sliding window of letter counts
+- **Brute force:** sort every s1-length substring of s2 and compare, O(n·m log m)
+- **Better:** recount each window's 26 letters and compare arrays, O(26·n)
+- **Insight:** instead of recounting, slide: add the entering char, remove the leaving one, track matching letters
+- **Steps:** count s1; slide a len(s1) window over s2; keep "matches" of the 26 counts; 26 matches → true
+- **Complexity:** O(n·m log m) → O(n) time, O(26) space
+- **Pitfall:** if s1 is longer than s2 return false before building the first window
+- **Related:** Valid Anagram, Minimum Window Substring, Longest Substring Without Repeating Characters

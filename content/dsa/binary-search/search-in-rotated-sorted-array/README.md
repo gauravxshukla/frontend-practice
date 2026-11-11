@@ -38,11 +38,11 @@ Output: -1
 
 ## Notes
 
-- **Key insight:** whichever way you split a rotated array at `mid`, at least one half is fully sorted. You can tell which by comparing `nums[lo]` with `nums[mid]`.
-- If the left half is sorted and `nums[lo] <= target < nums[mid]`, search left. Otherwise search right. Mirror the logic when the right half is the sorted one.
-- O(log n) time, O(1) space. Brute force is `indexOf` in O(n).
-- Alternative: first find the rotation point (like *Find Minimum*), then do a normal binary search in the correct half. Two passes, same complexity.
-- Pitfall: use `nums[lo] <= nums[mid]` (with `=`). When `lo === mid` the "left half" is one element and it counts as sorted.
-- Pitfall: getting the strict/non-strict bounds wrong on the range checks, which drops targets sitting at `lo` or `hi`.
-- Edge cases: one element, two elements, no rotation, target at the pivot, target missing.
-- Follow-up: with duplicates (LeetCode 81) you can't always tell which half is sorted, so the worst case degrades to O(n).
+- **Identify:** find a target in a rotated sorted array in O(log n) → binary search, one half is always sorted
+- **Brute force:** scan every element, O(n)
+- **Better:** find the rotation point first, then binary search the right half, two passes
+- **Insight:** at any mid, one side is sorted; check whether the target lies in that sorted side's range
+- **Steps:** if nums[l] ≤ nums[mid] the left is sorted: go left if target is in [nums[l], nums[mid]); else mirror for the right
+- **Complexity:** O(n) → O(log n) time, O(1) space
+- **Pitfall:** use ≤ in nums[l] ≤ nums[mid], or a two-element range picks the wrong sorted side
+- **Related:** Find Minimum in Rotated Sorted Array, Binary Search, Search a 2D Matrix

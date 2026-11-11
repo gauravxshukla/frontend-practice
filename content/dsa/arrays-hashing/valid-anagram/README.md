@@ -33,10 +33,10 @@ Explanation: "car" has a "c" where "rat" has a "t".
 
 ## Notes
 
-- **Key insight:** two strings are anagrams exactly when their character counts match.
-- **Optimal:** return `false` early if the lengths differ. Then walk both strings together, incrementing a count for `s[i]` and decrementing it for `t[i]`. Every count must end at zero.
-- O(n) time. The extra space is O(k) for k distinct characters, which is O(1) (26 slots) for lowercase letters.
-- **Baseline:** sort both strings and compare them. That is O(n log n) and simple, which is a fine first answer.
-- Pitfall: skipping the length check. `"ab"` vs `"a"` would then only fail if you remember to check leftover counts.
-- Pitfall: comparing two count objects with `===`, which checks identity, not contents.
-- Follow-up: for full Unicode input, iterate with `for...of` (code points) and a `Map` instead of a fixed 26-slot array.
+- **Identify:** same letters with the same counts, any order → frequency count
+- **Brute force:** sort both strings and compare, O(n log n)
+- **Insight:** instead of sorting, count up for `s` and down for `t`; all zeros means anagram
+- **Steps:** different lengths → false; tally +1 per char of s, −1 per char of t; every count must be 0
+- **Complexity:** O(n log n) → O(n) time, O(1) space (26 counters)
+- **Pitfall:** the 26-slot array assumes lowercase a–z; Unicode input needs a hash map
+- **Related:** Group Anagrams, Permutation in String, Contains Duplicate

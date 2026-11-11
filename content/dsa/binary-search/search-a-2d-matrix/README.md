@@ -37,10 +37,12 @@ Output: false
 
 ## Notes
 
-- **Key insight:** because rows chain together in order, reading the grid row by row gives one sorted array of `m · n` values.
-- Binary search over virtual indices `0 … m·n − 1`, and map index `i` to `matrix[Math.floor(i / n)][i % n]`.
-- O(log(m · n)) time, O(1) space. Brute force scans every cell in O(m · n).
-- Alternative: binary search the first column to pick the row, then binary search inside that row. Same complexity, two loops to get right.
-- Pitfall: dividing by the row count instead of the column count when converting the index.
-- Edge cases: a single row, a single column, target smaller than everything or larger than everything.
-- Follow-up: if rows and columns are sorted but rows don't chain (LeetCode 240), start from the top-right corner and walk left/down in O(m + n).
+- **Identify:** rows sorted and each row starts after the previous ends → one sorted list in disguise
+- **Key formula:** index i maps to row i / cols, column i % cols
+- **Brute force:** scan every cell, O(m·n)
+- **Better:** binary search for the row, then within it, O(log m + log n)
+- **Insight:** treat the matrix as one sorted array of m·n items and binary search it once
+- **Steps:** l = 0, r = m·n − 1; map mid to (row, col); compare and halve as in plain binary search
+- **Complexity:** O(m·n) → O(log(m·n)) time, O(1) space
+- **Pitfall:** divide and mod by the column count, not the row count, when converting mid
+- **Related:** Binary Search, Search in Rotated Sorted Array, Koko Eating Bananas

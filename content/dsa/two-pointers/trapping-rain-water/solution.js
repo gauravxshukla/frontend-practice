@@ -3,22 +3,23 @@
  * @return {number}
  */
 export default function trap(height) {
-  let left = 0;
-  let right = height.length - 1;
-  let leftMax = 0;
-  let rightMax = 0;
-  let water = 0;
-
-  while (left < right) {
-    if (height[left] < height[right]) {
-      leftMax = Math.max(leftMax, height[left]);
-      water += leftMax - height[left];
-      left++;
+  let l = 0;
+  let r = height.length - 1;
+  let lmax = 0;
+  let rmax = 0;
+  let res = 0;
+  while (l < r) {
+    // the lower side is the bottleneck, so its water is known now
+    if (height[l] < height[r]) {
+      lmax = Math.max(lmax, height[l]); // update max first
+      res += lmax - height[l]; // water above this bar
+      l++;
     } else {
-      rightMax = Math.max(rightMax, height[right]);
-      water += rightMax - height[right];
-      right--;
+      rmax = Math.max(rmax, height[r]);
+      res += rmax - height[r];
+      r--;
     }
   }
-  return water;
+  // empty or single-bar input never enters the loop and traps 0
+  return res;
 }

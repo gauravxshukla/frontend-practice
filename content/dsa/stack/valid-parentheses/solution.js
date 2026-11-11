@@ -1,25 +1,18 @@
 /**
- * @param {string} str
+ * @param {string} s
  * @return {boolean}
  */
-export default function isValid(str) {
-  const currentStack = [];
-
-  for (let i = 0; i < str.length; i++) {
-    const char = str[i];
-    const top = currentStack[currentStack.length - 1];
-
-    if (char === '(' || char === '[' || char === '{') {
-      currentStack.push(char);
-    } else if (
-      (char === ')' && top === '(') ||
-      (char === ']' && top === '[') ||
-      (char === '}' && top === '{')
-    ) {
-      currentStack.pop();
-    } else {
+export default function isValid(s) {
+  const pairs = { ')': '(', ']': '[', '}': '{' }; // closer -> the opener it needs
+  const stack = []; // openers still waiting to be closed
+  for (const ch of s) {
+    if (!(ch in pairs)) {
+      stack.push(ch);
+    } else if (stack.pop() !== pairs[ch]) {
+      // the latest unclosed opener must match (an empty stack fails too)
       return false;
     }
   }
-  return currentStack.length === 0;
+  // anything left was opened but never closed
+  return stack.length === 0;
 }
