@@ -19,6 +19,10 @@ Nodes are plain objects: `{ val, next }`, and the last node's `next` is `null`.
 
 ## Notes
 
-- Three pointers: `prev = null`, `curr = head`. Loop: `next = curr.next; curr.next = prev; prev = curr; curr = next`. Return `prev`.
-- O(n) time, O(1) space.
-- Recursive version: `const newHead = reverse(head.next); head.next.next = head; head.next = null; return newHead`. Its O(n) stack is worth mentioning.
+- **Identify:** reverse a singly linked list in place → flip each next pointer while walking
+- **Brute force:** copy values into an array and rebuild the list backwards, O(n) extra space
+- **Insight:** instead of copying, re-point each node at the one before it, saving next first
+- **Steps:** prev = null; for each node: save next, point node.next at prev, advance prev and node
+- **Complexity:** O(n) → O(n) time, O(n) → O(1) space
+- **Pitfall:** save node.next before overwriting it, or the rest of the list is lost
+- **Related:** Reverse Nodes in k-Group, Reorder List, Merge Two Sorted Lists

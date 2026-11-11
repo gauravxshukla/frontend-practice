@@ -1,39 +1,40 @@
 export default class WordDictionary {
   constructor() {
-    this.root = { children: new Map(), isEnd: false };
+    // each node: children by character, plus whether a word ends here
+    this.root = { children: new Map(), end: false };
   }
 
-  /**
-   * @param {string} word
-   * @return {void}
-   */
+  /** @param {string} word */
   addWord(word) {
     let node = this.root;
     for (const ch of word) {
-      if (!node.children.has(ch)) node.children.set(ch, { children: new Map(), isEnd: false });
+      if (!node.children.has(ch)) node.children.set(ch, { children: new Map(), end: false });
       node = node.children.get(ch);
     }
-    node.isEnd = true;
+    node.end = true;
   }
 
   /**
-   * @param {string} word may contain '.', which matches any single letter
+   * @param {string} word may contain '.' matching any letter
    * @return {boolean}
    */
   search(word) {
-    // DFS: a letter follows one edge, a '.' tries every child.
-    const dfs = (node, i) => {
-      if (i === word.length) return node.isEnd;
+    // does word[i..] match some path starting at node?
+    const match = (i, node) => {
+      // the pattern is used up: it matches only if a word ends here
+      if (i === word.length) return node.end;
       const ch = word[i];
       if (ch === '.') {
+        // a wildcard may be any child, so try each one
         for (const child of node.children.values()) {
-          if (dfs(child, i + 1)) return true;
+          if (match(i + 1, child)) return true;
         }
         return false;
       }
-      const next = node.children.get(ch);
-      return next ? dfs(next, i + 1) : false;
+      // a fixed letter has exactly one place to go
+      const child = node.children.get(ch);
+      return child !== undefined && match(i + 1, child);
     };
-    return dfs(this.root, 0);
+    return match(0, this.root);
   }
 }

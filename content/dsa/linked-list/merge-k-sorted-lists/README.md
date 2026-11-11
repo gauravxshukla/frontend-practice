@@ -39,10 +39,11 @@ Output: []
 
 ## Notes
 
-- **Key insight:** merging two sorted lists is easy and linear. The question is how to combine k of them without re-scanning the long merged list over and over.
-- **Divide and conquer:** merge lists in pairs (`0+1`, `2+3`, …), then merge the results in pairs, until one list remains. Each round touches every node once and there are `log k` rounds, so it's O(N log k) time and O(1) extra space (O(log k) if done recursively).
-- **Min-heap:** push each list's head into a heap keyed by `val`. Pop the smallest, append it, and push its `next`. Also O(N log k) time, with O(k) heap space. In JS you have to write the heap yourself.
-- Brute force: merge lists one at a time into an accumulator. The accumulator keeps growing, so it's O(N · k). Or collect all values and sort them, which is O(N log N) and allocates new nodes.
-- Pitfall: an empty `lists` array or lists that are all `null`. Both must return `null`.
-- Pitfall: when pairing, an odd list out must be carried to the next round, not dropped.
-- Follow-up: how does this change for k sorted streams that don't fit in memory? (External merge with a heap.)
+- **Identify:** merge k sorted lists → reuse Merge Two Sorted Lists in balanced rounds (or a min-heap)
+- **Brute force:** merge lists one after another into a growing result, O(N·k)
+- **Better:** a min-heap of the k current heads, O(N log k), needs a heap structure
+- **Insight:** merge lists in pairs each round; every node is touched once per round and there are log k rounds
+- **Steps:** while more than one list remains, merge lists[0]+lists[1], lists[2]+lists[3]…; keep the results
+- **Complexity:** O(N·k) → O(N log k) time, O(1) extra space besides the list of heads
+- **Pitfall:** an empty input or lists that are all empty must return null
+- **Related:** Merge Two Sorted Lists, Kth Largest Element in an Array, Find Median from Data Stream

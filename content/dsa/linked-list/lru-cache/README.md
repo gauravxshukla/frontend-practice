@@ -51,12 +51,10 @@ Explanation: put(1, 20) only updates key 1. With capacity 1, put(2) then evicts 
 
 ## Notes
 
-- **Key insight:** you need O(1) lookup (hash map) **and** O(1) "move to most recent" / "remove least recent" (doubly linked list). Combine them: the map stores key → list node.
-- Keep the list ordered from least recent (front) to most recent (back), with sentinel `head`/`tail` nodes so unlink and append never need null checks.
-- `get`: look up the node, unlink it, append it at the back, and return its value.
-- `put`: if the key exists, update the value and move it to the back. Otherwise, if full, remove `head.next` (from the list *and* the map), then append the new node.
-- O(1) per operation, O(capacity) space.
-- JS shortcut: a `Map` iterates in insertion order, so `delete` + `set` moves a key to the end and `map.keys().next().value` is the LRU key. It's fine to mention, but interviewers usually want the linked-list version.
-- Pitfall: storing the key in the node is required, otherwise you can't delete the evicted entry from the map.
-- Pitfall: updating an existing key must not trigger an eviction.
-- Follow-up: LFU cache, or making it thread-safe.
+- **Identify:** O(1) get and put with least-recently-used eviction → hash map + doubly linked list
+- **Brute force:** keep a list ordered by use; moving or evicting an entry scans it, O(n) per call
+- **Insight:** the map finds a node in O(1); the doubly linked list moves or removes it in O(1)
+- **Steps:** keep the most recent node at the front; get/put move the node to the front; overflow drops the back node
+- **Complexity:** O(n) → O(1) per operation, O(capacity) space
+- **Pitfall:** put on an existing key must update its value and move it, not add a second node
+- **Related:** Copy List with Random Pointer, Time Based Key-Value Store, Design Twitter

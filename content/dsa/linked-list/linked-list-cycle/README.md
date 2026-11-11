@@ -15,6 +15,10 @@ Aim for O(1) extra space.
 
 ## Notes
 
-- Floyd's tortoise and hare: `slow` moves 1 step and `fast` moves 2. If they ever meet, there's a cycle. If `fast` reaches `null`, there isn't.
-- The `Set` of visited nodes is O(n) space, which is fine to mention as the first idea.
-- Follow-up: find the cycle's **start**. After they meet, reset one pointer to `head` and move both 1 step at a time. They meet at the start.
+- **Identify:** does following next ever loop back → fast and slow pointers (Floyd)
+- **Brute force:** store every visited node in a set; a repeat means a cycle, O(n) space
+- **Insight:** instead of remembering nodes, run one pointer twice as fast; in a loop it must catch the slow one
+- **Steps:** slow moves 1, fast moves 2; if they meet → cycle; if fast reaches the end → no cycle
+- **Complexity:** O(n) → O(n) time, O(n) → O(1) space
+- **Pitfall:** check fast and fast.next before stepping twice, or the end of the list crashes
+- **Related:** Find the Duplicate Number, Reorder List, Remove Nth Node From End of List

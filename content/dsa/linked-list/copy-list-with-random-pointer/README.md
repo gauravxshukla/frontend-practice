@@ -40,10 +40,11 @@ The output looks identical to the input because it's a faithful copy. The judge 
 
 ## Notes
 
-- **Key insight:** the hard part is that `random` can point *forward* to a node you haven't copied yet. Decouple creation from wiring.
-- Two passes with a `Map<original, copy>`: first create every copy, then set `copy.next = map.get(node.next)` and `copy.random = map.get(node.random)`.
-- O(n) time, O(n) extra space for the map.
-- O(1) extra space trick: interleave copies into the original list (`A → A' → B → B'`), set `A'.random = A.random.next`, then unweave the two lists. Mention it as the follow-up.
-- Pitfall: setting `copy.random = node.random` copies the *original* pointer, so the "copy" still points into the old list.
-- Pitfall: the interleaving trick must restore the original list's `next` pointers when unweaving.
-- Edge cases: empty list, a node whose `random` points to itself, all `random` null, duplicate values (so you can't key the map by value).
+- **Identify:** deep copy where random can point anywhere → map each original node to its copy
+- **Brute force:** for each random, find its target's position by scanning from the head, O(n²)
+- **Better:** interleave copies inside the original list for O(1) extra space, at the cost of clarity
+- **Insight:** a map from original to copy lets every next and random be wired in O(1)
+- **Steps:** pass 1 creates a copy of each node in the map; pass 2 sets copy.next and copy.random via the map
+- **Complexity:** O(n²) → O(n) time, O(n) space
+- **Pitfall:** map null to null, so tail.next and empty random pointers copy cleanly
+- **Related:** Clone Graph, LRU Cache, Reverse Linked List

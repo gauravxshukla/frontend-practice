@@ -43,12 +43,10 @@ Output: []
 
 ## Notes
 
-- **Key insight:** a traversal alone doesn't fix a tree's shape, but a traversal **with null markers** does.
-- **Pre-order DFS:** write each value and a `#` for every missing child, joined by commas. To decode, read tokens in the same order: `#` means null, otherwise make a node and build its left and then its right subtree. O(n) time and space for both directions.
-- **Level-order BFS:** the same idea, close to how LeetCode prints trees. Decoding pairs each dequeued node with the next two tokens.
-- Use a delimiter. Without one, `12` and `1,2` look the same, and negative numbers are ambiguous.
-- Pitfall: decoding with `split` and then `shift()` on every token is O(n²). Use an index pointer.
-- Pitfall: very deep (skewed) trees can overflow a recursive encoder or decoder. An iterative version avoids that.
-- Pitfall: encoding without null markers, then trying to recover the shape from values alone.
-- Follow-up: for a BST, pre-order without nulls is enough, because the value bounds recover the shape (Serialize and Deserialize BST).
-- Follow-up: make it compact, e.g. with binary encoding or by trimming trailing nulls in level order.
+- **Identify:** turn a tree into a string and back → preorder DFS with null markers
+- **Brute force:** level-order with nulls padded for every missing position, which bloats on skewed trees
+- **Insight:** preorder plus an explicit marker for each null child fixes the shape uniquely
+- **Steps:** serialize: write val then left then right, "#" for null; deserialize: read tokens in the same order
+- **Complexity:** O(n) time and space both ways; null markers keep it O(n) even for skewed trees
+- **Pitfall:** without null markers different shapes give the same string; values can be negative
+- **Related:** Construct Binary Tree from Preorder and Inorder Traversal, Encode and Decode Strings, Same Tree

@@ -38,10 +38,10 @@ Output: [1]
 
 ## Notes
 
-- **Key insight:** if one pointer starts `n + 1` steps ahead of another, then when the leader falls off the end, the follower sits right before the node to delete. One pass, no length count.
-- Start both pointers at a **dummy** node whose `next` is `head`. Move `fast` forward `n + 1` times, then move both until `fast` is null, and finally `slow.next = slow.next.next`.
-- Return `dummy.next`, not `head`, since the head itself may have been removed.
-- O(n) time (one pass), O(1) space.
-- Two-pass baseline: count the length `L`, then walk to node `L − n − 1`. Same complexity, but interviewers usually ask for the one-pass version.
-- Pitfall: removing the head (`n === length`) without a dummy node needs a special case and is easy to forget.
-- Edge cases: single node, removing the first node, removing the last node.
+- **Identify:** nth node from the end in one pass → two pointers n apart
+- **Brute force:** count the length, then walk to node length − n, two passes
+- **Insight:** start a lead pointer n steps ahead; when it reaches the end, the trailer sits before the target
+- **Steps:** dummy → head; move lead n + 1 steps; move both until lead is null; skip trailer.next
+- **Complexity:** two passes → one pass, O(n) time, O(1) space
+- **Pitfall:** removing the head itself (n = length) needs the dummy node
+- **Related:** Linked List Cycle, Reorder List, Reverse Linked List

@@ -36,11 +36,11 @@ Explanation: 15 → 20 → 7. Including -10 would only lower the sum.
 
 ## Notes
 
-- **Key insight:** every path has a highest node where it can bend and use both children. But a path passed **up** to a parent can only continue down one side.
-- **Optimal:** post-order DFS where `gain(node)` returns the best sum of a downward path starting at `node`. At each node, compute `left = max(0, gain(left))` and `right = max(0, gain(right))`, update `best` with `node.val + left + right`, and return `node.val + max(left, right)`. O(n) time, O(h) stack.
-- Clamping a child's gain at 0 means "don't take that branch" when it would lower the sum.
-- **Brute force:** for every pair of nodes, sum the path between them through their LCA. That's O(n²) pairs times O(h) per path.
-- Pitfall: starting `best` at 0. If every value is negative, the answer is the largest single value, such as -1 in `[-2,-1]`.
-- Pitfall: returning `node.val + left + right` to the parent. A path can't branch twice.
-- Same structure as Diameter of Binary Tree, with values instead of edge counts.
-- Follow-up: return the path's nodes as well, or limit paths to go downward only.
+- **Identify:** max sum of any node-to-node path → DFS returning the best downward "gain"
+- **Key formula:** path through node = node.val + max(leftGain, 0) + max(rightGain, 0)
+- **Brute force:** try every pair of nodes and sum the path between them, O(n²) or worse
+- **Insight:** a path bends at exactly one node; return a one-sided gain up, record the two-sided sum at each node
+- **Steps:** gain(node): l, r = max(gain(child), 0); best = max(best, val + l + r); return val + max(l, r)
+- **Complexity:** O(n²) → O(n) time, O(h) space
+- **Pitfall:** start best at −∞ (or the root value); all-negative trees must return the largest single node
+- **Related:** Diameter of Binary Tree, Count Good Nodes in Binary Tree, Maximum Subarray

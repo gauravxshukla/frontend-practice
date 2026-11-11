@@ -49,11 +49,10 @@ Output: [null,null,null,true,false,false]
 
 ## Notes
 
-- **Key insight:** each node represents a prefix. Its children are keyed by the next character, and an `isEnd` flag marks nodes where a complete word stops.
-- `insert`: walk from the root, creating missing children, then set `isEnd = true` on the last node.
-- `search` and `startsWith` share one helper that walks the path and returns the final node (or `null`). `search` additionally requires `isEnd`.
-- Each operation is O(L) for a string of length L. Space is O(total characters inserted) in the worst case.
-- Baseline: keep a `Set` of words and scan it for `startsWith`. That's O(n · L) per prefix query, which is what the trie avoids.
-- Children as a `Map` (or a plain object) handle any alphabet. A fixed array of 26 is faster and is what interviewers often expect in typed languages.
-- Pitfall: `search` returning `true` for a prefix because it forgot to check `isEnd`.
-- Follow-ups: `delete(word)` (unmark `isEnd` and prune empty nodes), counting words with a given prefix (store a counter on each node), or autocomplete.
+- **Identify:** insert words, then exact search and prefix search → trie (prefix tree)
+- **Brute force:** store words in a list and scan it for every query, O(n·L) per call
+- **Insight:** words sharing a prefix share a path, so any query walks just L nodes
+- **Steps:** each node has children by char and an end flag; insert creates the path; search/startsWith walk it
+- **Complexity:** O(n·L) → O(L) per operation, O(total characters) space
+- **Pitfall:** search needs the end flag on the last node; startsWith only needs the path to exist
+- **Related:** Design Add and Search Words Data Structure, Word Search II, Word Search

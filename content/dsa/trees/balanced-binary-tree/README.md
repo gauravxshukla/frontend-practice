@@ -38,10 +38,10 @@ Output: true
 
 ## Notes
 
-- **Key insight:** a single bottom-up pass can return each subtree's height and also report "unbalanced" with a sentinel like `-1`.
-- **Optimal:** post-order DFS. If either child returns `-1`, or the two heights differ by more than 1, return `-1`. Otherwise return `1 + max(left, right)`. O(n) time, O(h) stack.
-- **Brute force:** at each node, call a separate `height()` on both children, then recurse. That's O(n log n) on a balanced tree and O(n²) on a skewed one.
-- Pitfall: checking only the root. `[1,2,2,3,null,null,3,4,null,null,4]` has equal heights at the root but unbalanced children.
-- Pitfall: the rule is about heights, not node counts.
-- Short-circuit once a subtree is unbalanced, so you don't keep walking it.
-- Follow-up: rebalance a BST (in-order to a sorted array, then build from the middle).
+- **Identify:** every node's subtree heights differ by at most 1 → bottom-up height DFS
+- **Brute force:** at every node, compute both heights from scratch, O(n²)
+- **Insight:** return the height up the recursion and use −1 to mean "already unbalanced"
+- **Steps:** height(null) = 0; if a child is −1 or |hl − hr| > 1 return −1; else 1 + max
+- **Complexity:** O(n²) → O(n) time, O(h) space
+- **Pitfall:** checking only the root's two heights misses imbalance deeper down
+- **Related:** Maximum Depth of Binary Tree, Diameter of Binary Tree, Same Tree

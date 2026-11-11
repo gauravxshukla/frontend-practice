@@ -48,11 +48,10 @@ Explanation: patterns must be the same length as a stored word.
 
 ## Notes
 
-- **Key insight:** a trie handles exact letters in O(L). The `.` wildcard just means "try every child here", which turns `search` into a DFS over the trie.
-- `addWord` is the standard trie insert, O(L).
-- `search(pattern, i, node)`: at the end, return `node.isEnd`. On a letter, follow that one child. On `.`, recurse into each child and return `true` on the first success.
-- Time: O(L) without dots. With dots the worst case is O(26^d · L) for d dots, which the "at most 2 dots" bound keeps small.
-- Baseline: store words bucketed by length and compare the pattern against each word of that length. O(n · L) per search, simple and fine to mention first.
-- Pitfall: returning `true` when the path exists but `isEnd` is false (a pattern matching only a prefix of a stored word).
-- Pitfall: returning from the `.` loop after the first child instead of only on success.
-- Follow-up: support `*` (any sequence of letters), or cache results of repeated patterns.
+- **Identify:** add words, search with "." wildcards → trie + DFS that branches on "."
+- **Brute force:** keep a list and compare each word char by char with the pattern, O(n·L) per search
+- **Insight:** a trie handles fixed letters in one step; only "." needs to try every child
+- **Steps:** addWord inserts into the trie; search(i, node): letter → follow one child; "." → try all children
+- **Complexity:** O(n·L) → O(L) per search without dots, up to O(26^dots · L) with them
+- **Pitfall:** a match must end on a node marked as a word end, not just any node at that depth
+- **Related:** Implement Trie (Prefix Tree), Word Search II, Regular Expression Matching

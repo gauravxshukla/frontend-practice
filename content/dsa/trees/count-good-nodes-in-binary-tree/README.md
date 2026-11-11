@@ -39,11 +39,10 @@ Output: 1
 
 ## Notes
 
-- **Key insight:** a node is good exactly when its value is at least the maximum on its root path, so carry that maximum down as you go.
-- **Optimal:** DFS with `(node, maxSoFar)`. Count the node if `node.val >= maxSoFar`, then recurse with `max(maxSoFar, node.val)`. O(n) time, O(h) stack.
-- An iterative stack or BFS of `[node, maxSoFar]` pairs works the same way and avoids recursion depth limits.
-- **Brute force:** keep the whole path and scan it at each node. That's O(n · h).
-- Pitfall: comparing only with the parent instead of with the maximum of the whole path.
-- Pitfall: using `>` instead of `>=`. Equal values still count as good.
-- Pitfall: starting `maxSoFar` at 0. Trees can hold negatives, so start at `-Infinity` (or the root's value).
-- Follow-up: return the good nodes themselves, or count paths whose values strictly increase.
+- **Identify:** nodes with no larger value above them → DFS carrying the max on the path
+- **Brute force:** for each node, walk its whole root path again to check, O(n·h)
+- **Insight:** pass the path's maximum down the recursion so each node is checked in O(1)
+- **Steps:** dfs(node, maxSoFar): count 1 if node.val ≥ maxSoFar; recurse with max(maxSoFar, node.val)
+- **Complexity:** O(n·h) → O(n) time, O(h) space
+- **Pitfall:** equal values count as good (≥, not >), and the root is always good
+- **Related:** Validate Binary Search Tree, Binary Tree Maximum Path Sum, Maximum Depth of Binary Tree

@@ -35,10 +35,11 @@ Explanation: the sorted values are 1, 2, 3, 4, 5, 6.
 
 ## Notes
 
-- **Key insight:** an in-order traversal of a BST visits values in ascending order, so the k-th visited value is the answer.
-- **Optimal:** iterative in-order with an explicit stack. Push left children, pop, decrement `k`, and stop when it hits 0. O(h + k) time, O(h) space.
-- A recursive in-order with a counter also works. Be sure to stop early once the answer is found.
-- **Brute force:** collect every value, sort, and index `k - 1`. O(n log n) time, O(n) space, and it ignores the BST property.
-- Pitfall: off-by-one. `k` is 1-based.
-- Pitfall: continuing the traversal after finding the answer, which wastes O(n) on big trees.
-- Follow-up: if the tree changes often and you query often, store the subtree size in each node. Then each query is O(h): compare `k` with the left subtree's size to choose a direction.
+- **Identify:** k-th smallest in a BST → in-order traversal visits values in sorted order
+- **Brute force:** collect every value, sort, take index k − 1, O(n log n)
+- **Better:** full in-order list, then index k − 1, O(n) time and space
+- **Insight:** count nodes during the in-order walk and stop as soon as the k-th one is visited
+- **Steps:** in-order DFS (left, node, right); decrement k at each node; when k hits 0, record and stop
+- **Complexity:** O(n log n) → O(h + k) time, O(h) space
+- **Pitfall:** k is 1-indexed; stop recursing once found, or later nodes overwrite the answer
+- **Related:** Validate Binary Search Tree, Lowest Common Ancestor of a Binary Search Tree, Kth Largest Element in an Array

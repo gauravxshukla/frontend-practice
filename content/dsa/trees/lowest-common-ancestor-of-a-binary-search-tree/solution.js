@@ -1,5 +1,8 @@
 /**
  * @typedef {{ val: number, left: TreeNode | null, right: TreeNode | null }} TreeNode
+ */
+
+/**
  * @param {TreeNode} root
  * @param {TreeNode} p
  * @param {TreeNode} q
@@ -8,12 +11,12 @@
 export default function lowestCommonAncestor(root, p, q) {
   let node = root;
   while (node) {
-    // Both targets smaller: the split point is further left.
+    // both targets are smaller, so both live in the left subtree
     if (p.val < node.val && q.val < node.val) node = node.left;
-    // Both larger: go right.
+    // both are larger, so both live in the right subtree
     else if (p.val > node.val && q.val > node.val) node = node.right;
-    // They split here (or one of them is this node).
+    // they split here (or one of them is this node): this is the lowest shared ancestor
     else return node;
   }
-  return null;
+  return null; // unreachable when p and q are in the tree
 }

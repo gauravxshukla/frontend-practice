@@ -1,29 +1,33 @@
 class Codec:
     def serialize(self, root: Optional[TreeNode]) -> str:
-        # Preorder with "#" for empty children.
         out = []
 
-        def walk(node):
+        # preorder: node, then left, then right; "#" marks a missing child
+        def write(node: Optional[TreeNode]) -> None:
             if not node:
                 out.append("#")
                 return
             out.append(str(node.val))
-            walk(node.left)
-            walk(node.right)
+            write(node.left)
+            write(node.right)
 
-        walk(root)
+        write(root)
         return ",".join(out)
 
     def deserialize(self, data: str) -> Optional[TreeNode]:
-        tokens = iter(data.split(","))
+        tokens = data.split(",")
+        i = 0
 
-        def build():
-            token = next(tokens)
+        # read tokens back in the same preorder they were written
+        def read() -> Optional[TreeNode]:
+            nonlocal i
+            token = tokens[i]
+            i += 1
             if token == "#":
                 return None
             node = TreeNode(int(token))
-            node.left = build()
-            node.right = build()
+            node.left = read()
+            node.right = read()
             return node
 
-        return build()
+        return read()

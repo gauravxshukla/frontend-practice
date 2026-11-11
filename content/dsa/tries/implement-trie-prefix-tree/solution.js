@@ -1,26 +1,24 @@
 export default class Trie {
   constructor() {
-    // Each node: { children: Map<char, node>, isEnd: boolean }
-    this.root = { children: new Map(), isEnd: false };
+    // each node: children by character, plus whether a word ends here
+    this.root = { children: new Map(), end: false };
   }
 
-  /**
-   * @param {string} word
-   * @return {void}
-   */
+  /** @param {string} word */
   insert(word) {
     let node = this.root;
+    // create the missing part of the path, sharing any existing prefix
     for (const ch of word) {
-      if (!node.children.has(ch)) node.children.set(ch, { children: new Map(), isEnd: false });
+      if (!node.children.has(ch)) node.children.set(ch, { children: new Map(), end: false });
       node = node.children.get(ch);
     }
-    node.isEnd = true;
+    node.end = true;
   }
 
-  // Walks the path for `s` and returns the last node, or null if the path breaks.
-  walk(s) {
+  // the node reached by following the string, or null if the path breaks
+  walk(str) {
     let node = this.root;
-    for (const ch of s) {
+    for (const ch of str) {
       node = node.children.get(ch);
       if (!node) return null;
     }
@@ -29,18 +27,20 @@ export default class Trie {
 
   /**
    * @param {string} word
-   * @return {boolean} true if this exact word was inserted
+   * @return {boolean}
    */
   search(word) {
+    // the path must exist and a word must end exactly there
     const node = this.walk(word);
-    return node !== null && node.isEnd;
+    return node !== null && node.end;
   }
 
   /**
    * @param {string} prefix
-   * @return {boolean} true if any inserted word starts with prefix
+   * @return {boolean}
    */
   startsWith(prefix) {
+    // any inserted word continuing this path makes the prefix valid
     return this.walk(prefix) !== null;
   }
 }

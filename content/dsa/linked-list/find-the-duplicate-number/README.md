@@ -38,11 +38,10 @@ Output: 3
 
 ## Notes
 
-- **Key insight:** read the array as a linked list where index `i` points to index `nums[i]`. Index 0 is never a target (values start at 1), so it's a clean entry point. Two indices point at the duplicate value, which creates a cycle whose entrance **is** the duplicate.
-- Phase 1 (Floyd): move `slow = nums[slow]` and `fast = nums[nums[fast]]` until they meet inside the cycle.
-- Phase 2: reset `slow` to the start and step both one at a time. Where they meet is the cycle entrance, so return it.
-- O(n) time, O(1) space, and the array is untouched.
-- Baselines: a `Set` gives O(n) time and O(n) space. Sorting a copy gives O(n log n). Neither meets the constraints.
-- Alternative within the rules: binary search on the value range, counting how many numbers are `<= mid` (pigeonhole). O(n log n) time, O(1) space.
-- Pitfall: marking visited entries by negating values is O(1) space but **modifies** the input, which this problem forbids.
-- Edge cases: the duplicate appears many times, or the smallest array `[1,1]`.
+- **Identify:** n + 1 values in 1..n, O(1) space, can't modify → treat i → nums[i] as a linked list with a cycle
+- **Brute force:** sort a copy or use a set, O(n log n) time or O(n) space
+- **Insight:** the duplicate value is where two indices point, i.e. the entrance of the cycle, so use Floyd
+- **Steps:** slow/fast until they meet; restart one at 0; step both by one; they meet at the duplicate
+- **Complexity:** O(n log n) → O(n) time, O(n) → O(1) space
+- **Pitfall:** phase 2 must move both pointers one step at a time from 0 and the meeting point
+- **Related:** Linked List Cycle, Missing Number, Contains Duplicate

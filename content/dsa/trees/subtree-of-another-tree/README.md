@@ -36,11 +36,11 @@ Explanation: the node 4 in root has an extra 0 under its child 2, so its subtree
 
 ## Notes
 
-- **Key insight:** reuse Same Tree. At each node of `root`, ask whether the tree starting there equals `subRoot`.
-- **Straightforward:** DFS over `root` and call `sameTree(node, subRoot)` at every node. O(n · m) worst case, O(h) stack. This is the standard interview answer.
-- **Faster:** serialize both trees in pre-order with null markers, then check substring containment with KMP. O(n + m).
-- **Also faster:** Merkle-style hashing. Hash each subtree from its value and its children's hashes, then compare hashes (and confirm matches to avoid collisions).
-- Pitfall with serialization: without delimiters, `12` contains `2`. Wrap every value, e.g. `,12,` vs `,2,`.
-- Pitfall: matching only the top part. The subtree must match all the way to the leaves, so `[1,2,3]` doesn't contain `[1,2]`.
-- Pitfall: stopping at the first node whose value equals `subRoot.val`. Duplicate values mean you must keep searching.
-- Follow-up: count how many subtrees match, or find all duplicate subtrees (hash map of serializations).
+- **Identify:** does subRoot appear exactly somewhere in root → Same Tree check at every node
+- **Brute force:** at every node of root, run Same Tree against subRoot, O(m·n)
+- **Better:** serialise both with null markers and do a substring search, O(m + n) with KMP
+- **Insight:** a match must start at some node, so try Same Tree there and recurse on both children otherwise
+- **Steps:** subRoot null → true; root null → false; sameTree(root, subRoot) or recurse left or right
+- **Complexity:** O(m·n) time, O(h) space (the serialise + KMP version is O(m + n))
+- **Pitfall:** a matching value isn't enough; the whole subtree, down to the leaves, must match
+- **Related:** Same Tree, Invert Binary Tree, Serialize and Deserialize Binary Tree

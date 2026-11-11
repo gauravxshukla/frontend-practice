@@ -35,11 +35,10 @@ Output: 1
 
 ## Notes
 
-- **Key insight:** every path has one highest node where it bends. The longest path bending at node `x` has `height(x.left) + height(x.right)` edges.
-- **Optimal:** one post-order DFS that returns each subtree's height and, along the way, updates a running `best` with `leftHeight + rightHeight`. O(n) time, O(h) stack.
-- **Brute force:** for every node, compute both subtree heights from scratch. That's O(n²) on a skewed tree. Or compare every pair of nodes, which is worse.
-- Pitfall: assuming the answer passes through the root. In `[1,2,null,3,4,5,null,null,6]` the longest path stays inside the left subtree.
-- Pitfall: mixing up nodes and edges. With height counted in nodes (empty = 0), `left + right` is already the edge count.
-- A single node has diameter 0.
-- Follow-up: return the path itself, not just its length. Keep the bend node and rebuild each side by walking the taller child.
-- Follow-up: the same idea gives Binary Tree Maximum Path Sum, with values instead of edge counts.
+- **Identify:** longest path between any two nodes → at each node, left height + right height
+- **Brute force:** for each node, compute both subtree heights separately, O(n²)
+- **Insight:** one DFS returns each subtree's height and updates the best left + right sum on the way up
+- **Steps:** height(null) = 0; at each node best = max(best, hl + hr); return 1 + max(hl, hr)
+- **Complexity:** O(n²) → O(n) time, O(h) space
+- **Pitfall:** the longest path need not pass through the root; diameter counts edges, not nodes
+- **Related:** Maximum Depth of Binary Tree, Balanced Binary Tree, Binary Tree Maximum Path Sum

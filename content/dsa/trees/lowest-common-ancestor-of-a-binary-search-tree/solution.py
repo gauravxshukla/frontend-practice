@@ -1,10 +1,14 @@
 class Solution:
-    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
-        # Walk down until p and q fall on different sides.
-        while root:
-            if p.val < root.val and q.val < root.val:
-                root = root.left
-            elif p.val > root.val and q.val > root.val:
-                root = root.right
+    def lowestCommonAncestor(self, root: "TreeNode", p: "TreeNode", q: "TreeNode") -> "TreeNode":
+        node = root
+        while node:
+            # both targets are smaller, so both live in the left subtree
+            if p.val < node.val and q.val < node.val:
+                node = node.left
+            # both are larger, so both live in the right subtree
+            elif p.val > node.val and q.val > node.val:
+                node = node.right
+            # they split here (or one of them is this node): this is the lowest shared ancestor
             else:
-                return root
+                return node
+        return None  # unreachable when p and q are in the tree
