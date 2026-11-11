@@ -1,14 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type KeyboardEvent as ReactKeyboardEvent,
-  type PointerEvent as ReactPointerEvent,
-  type RefObject,
-} from 'react';
+import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import { SandpackCodeViewer, SandpackProvider } from '@codesandbox/sandpack-react';
 import { ArrowLeft, ArrowRight, CheckCircle2, ChevronRight, Clock, Eye, Lock, RotateCcw, Undo2 } from 'lucide-react';
@@ -31,17 +21,20 @@ import { applyDraft, clearDraft, draftKey, loadDraft, saveDraft } from '../../li
 import { useProgress } from '../../lib/progress';
 import { useTheme } from '../../lib/theme';
 import { ariaKeysFor, keysFor } from '../../lib/shortcuts';
+import { useColumnResize } from '../../lib/useColumnResize';
 import { usePersistentState } from '../../lib/usePersistentState';
 import { LANGUAGES, languageInfo } from '../runner/languages/registry';
 import type { LanguageId } from '../runner/languages/types';
 import CodeWorkspace from './CodeWorkspace';
+import LayoutToggles from './LayoutToggles';
+import PromptStrip from './PromptStrip';
+import { useWorkspaceLayout, type PanelId } from './useWorkspaceLayout';
 import type { Platform } from './native/nativeSetup';
 import Workspace from './Workspace';
 import { sandpackThemes } from './sandpackThemes';
 import { useEditorLanguages } from './useEditorLanguages';
 
-const MIN_PROMPT = 300;
-const MAX_PROMPT_RATIO = 0.6;
+const PROMPT_LIMITS = { unit: 'px', min: 300, max: 0.6 } as const;
 
 type LeftTab = 'description' | 'notes' | 'solution';
 
@@ -54,41 +47,6 @@ function WorkspaceSkeleton() {
       <div className="skeleton-bar" style={{ width: '30%' }} />
     </div>
   );
-}
-
-/** Draggable (and keyboard-adjustable) divider between prompt and workspace. */
-function useResizablePrompt(containerRef: RefObject<HTMLDivElement | null>) {
-  const [width, setWidth] = usePersistentState('fp:promptWidth', 440);
-
-  const clamp = useCallback(
-    (px: number) => {
-      const total = containerRef.current?.clientWidth ?? window.innerWidth;
-      return Math.round(Math.min(Math.max(px, MIN_PROMPT), total * MAX_PROMPT_RATIO));
-    },
-    [containerRef],
-  );
-
-  const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const left = containerRef.current?.getBoundingClientRect().left ?? 0;
-    // Iframes would swallow pointer events mid-drag.
-    document.body.classList.add('is-resizing');
-    const onMove = (ev: PointerEvent) => setWidth(clamp(ev.clientX - left));
-    const onUp = () => {
-      document.body.classList.remove('is-resizing');
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onUp);
-    };
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
-  };
-
-  const onKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'ArrowLeft') setWidth((w) => clamp(w - 24));
-    if (e.key === 'ArrowRight') setWidth((w) => clamp(w + 24));
-  };
-
-  return { width, onPointerDown, onKeyDown };
 }
 
 type SolutionSources = Partial<Record<LanguageId, string>>;
@@ -183,8 +141,7 @@ export default function QuestionPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const progress = useProgress();
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const divider = useResizablePrompt(bodyRef);
+  const divider = useColumnResize('fp:promptWidth', 400, PROMPT_LIMITS);
   const confirm = useConfirm();
   const toast = useToast();
 
@@ -203,6 +160,12 @@ export default function QuestionPage() {
   const [starter, setStarter] = useState<FileMap | null>(null);
   const [solutionFiles, setSolutionFiles] = useState<FileMap | null>(null);
   const [resetKey, setResetKey] = useState(0);
+  const [consoleErrors, setConsoleErrors] = useState(0);
+
+  // Panels: code questions only have the description to hide; machine coding also files and preview.
+  const panels = useMemo<PanelId[]>(() => (isCode ? ['description'] : ['description', 'files', 'preview']), [isCode]);
+  const shownFiles = uiView === 'solution' ? solutionFiles : starter;
+  const layout = useWorkspaceLayout({ panels, paths: useMemo(() => Object.keys(shownFiles ?? {}), [shownFiles]) });
 
   useEffect(() => {
     setLeftTab('description');
@@ -315,6 +278,13 @@ export default function QuestionPage() {
     setUiView('attempt');
   };
 
+  const workspacePanels = {
+    filesOpen: layout.state.files,
+    onFilesOpenChange: layout.setFiles,
+    previewOpen: layout.state.preview,
+    onConsoleErrors: setConsoleErrors,
+  };
+
   const hasUiSolution = platform === 'native' ? question.hasNativeSolution : question.hasSolution;
   const changePlatform = (next: Platform) =>
     setSearchParams(next === 'native' ? { platform: 'native' } : {}, { replace: true });
@@ -354,6 +324,7 @@ export default function QuestionPage() {
         </div>
 
         <div className="question-actions">
+          <LayoutToggles panels={panels} state={layout.state} onToggle={layout.toggle} previewAlert={consoleErrors > 0} />
           {question.type === 'react' && <PlatformToggle value={platform} onChange={changePlatform} />}
           <div className="btn-group" role="group" aria-label="Question navigation">
             <button
@@ -405,52 +376,66 @@ export default function QuestionPage() {
         </div>
       </header>
 
-      <div className="question-body" ref={bodyRef} style={{ '--prompt-width': `${divider.width}px` } as CSSProperties}>
-        <section className="prompt-panel" aria-label="Problem">
-          <div className="panel-tabs" role="tablist">
-            {tabs.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                role="tab"
-                aria-selected={leftTab === t.id}
-                onClick={() => setLeftTab(t.id)}
-              >
-                {t.label}
-                {t.id !== 'description' && !unlocked && <Lock size={11} aria-label="locked" />}
-              </button>
-            ))}
-          </div>
-          <div className="panel-scroll">
-            {leftTab === 'description' && (
-              <>
-                {question.tags.length > 0 && (
-                  <div className="tag-list">
-                    {question.tags.map((tag) => (
-                      <Tag key={tag}>{tag}</Tag>
-                    ))}
-                  </div>
+      <div className="question-body" style={{ '--prompt-width': `${divider.value}px` } as CSSProperties}>
+        {!layout.state.description && (
+          <PromptStrip
+            tabs={tabs}
+            onOpen={(tab) => {
+              setLeftTab(tab);
+              layout.setDescription(true);
+            }}
+          />
+        )}
+        {layout.state.description && (
+          <>
+            <section className="prompt-panel" aria-label="Problem">
+              <div className="panel-tabs" role="tablist">
+                {tabs.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={leftTab === t.id}
+                    onClick={() => setLeftTab(t.id)}
+                  >
+                    {t.label}
+                    {t.id !== 'description' && !unlocked && <Lock size={11} aria-label="locked" />}
+                  </button>
+                ))}
+              </div>
+              <div className="panel-scroll">
+                {leftTab === 'description' && (
+                  <>
+                    {question.tags.length > 0 && (
+                      <div className="tag-list">
+                        {question.tags.map((tag) => (
+                          <Tag key={tag}>{tag}</Tag>
+                        ))}
+                      </div>
+                    )}
+                    <Markdown>{question.prompt}</Markdown>
+                  </>
                 )}
-                <Markdown>{question.prompt}</Markdown>
-              </>
-            )}
-            {leftTab === 'notes' &&
-              (unlocked ? <Markdown>{question.notes}</Markdown> : <LockedPanel what="Notes" onReveal={reveal} />)}
-            {leftTab === 'solution' &&
-              (unlocked ? <SolutionCode question={question} /> : <LockedPanel what="Solutions" onReveal={reveal} />)}
-          </div>
-        </section>
+                {leftTab === 'notes' &&
+                  (unlocked ? <Markdown>{question.notes}</Markdown> : <LockedPanel what="Notes" onReveal={reveal} />)}
+                {leftTab === 'solution' &&
+                  (unlocked ? <SolutionCode question={question} /> : <LockedPanel what="Solutions" onReveal={reveal} />)}
+              </div>
+            </section>
 
-        <div
-          className="resize-handle"
-          role="separator"
-          aria-orientation="vertical"
-          aria-label="Resize problem panel"
-          aria-valuenow={divider.width}
-          tabIndex={0}
-          onPointerDown={divider.onPointerDown}
-          onKeyDown={divider.onKeyDown}
-        />
+            <div
+              className="resize-handle"
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Resize problem panel"
+              aria-valuenow={divider.value}
+              tabIndex={0}
+              onPointerDown={divider.onPointerDown}
+              onKeyDown={divider.onKeyDown}
+              onDoubleClick={divider.reset}
+            />
+          </>
+        )}
 
         <section className="workspace-panel" aria-label="Workspace">
           {isCode ? (
@@ -475,6 +460,7 @@ export default function QuestionPage() {
                     files={starter}
                     draftSlug={draftId}
                     platform={platform}
+                    {...workspacePanels}
                   />
                 ) : (
                   <WorkspaceSkeleton />
@@ -487,6 +473,7 @@ export default function QuestionPage() {
                     files={solutionFiles}
                     platform={platform}
                     readOnly
+                    {...workspacePanels}
                   />
                 ) : (
                   <WorkspaceSkeleton />

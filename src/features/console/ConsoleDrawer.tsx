@@ -1,5 +1,5 @@
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Ban, ChevronRight, CircleX, TriangleAlert } from 'lucide-react';
+import { Ban, ChevronRight, CircleX, Search, TriangleAlert } from 'lucide-react';
 import { usePersistentState } from '../../lib/usePersistentState';
 import { useRowResize } from '../../lib/useRowResize';
 import type { LogEntry } from './types';
@@ -27,6 +27,8 @@ const STICKY_PX = 24;
 interface ConsoleDrawerProps {
   entries: LogEntry[];
   onClear: () => void;
+  /** Reports the error count, e.g. so a hidden preview can still flag errors. */
+  onErrorCount?: (errors: number) => void;
 }
 
 /**
@@ -34,11 +36,14 @@ interface ConsoleDrawerProps {
  * collapsed, and a new error re-opens it unless the user closed it themselves.
  * Renders the resize handle as a sibling so it sits directly in the parent column.
  */
-export default function ConsoleDrawer({ entries, onClear }: ConsoleDrawerProps) {
+export default function ConsoleDrawer({ entries, onClear, onErrorCount }: ConsoleDrawerProps) {
   const [open, setOpen] = usePersistentState('fp:consoleOpen', true);
   const resize = useRowResize('fp:previewConsoleHeight', 220, 96);
   const [filter, setFilter] = useState<LevelFilter>('all');
   const [query, setQuery] = useState('');
+  // In a narrow pane the text filter folds into a search button until it's needed.
+  const [searching, setSearching] = useState(false);
+  const queryRef = useRef<HTMLInputElement>(null);
   const bodyId = useId();
   const bodyRef = useRef<HTMLDivElement>(null);
   const atBottom = useRef(true);
@@ -60,6 +65,8 @@ export default function ConsoleDrawer({ entries, onClear }: ConsoleDrawerProps) 
     if (counts.error > seenErrors.current && !open && !closedByUser.current) setOpen(true);
     seenErrors.current = counts.error;
   }, [counts.error, open, setOpen]);
+
+  useEffect(() => onErrorCount?.(counts.error), [counts.error, onErrorCount]);
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -112,7 +119,7 @@ export default function ConsoleDrawer({ entries, onClear }: ConsoleDrawerProps) 
             )}
           </button>
           {open && (
-            <div className="console-drawer-tools">
+            <div className={`console-drawer-tools${searching || query ? ' searching' : ''}`}>
               <select
                 className="console-filter-level"
                 aria-label="Filter by level"
@@ -125,13 +132,33 @@ export default function ConsoleDrawer({ entries, onClear }: ConsoleDrawerProps) 
                   </option>
                 ))}
               </select>
+              <button
+                type="button"
+                className="icon-btn console-search-toggle"
+                aria-label="Filter logs"
+                data-tooltip="Filter logs"
+                onClick={() => {
+                  setSearching(true);
+                  requestAnimationFrame(() => queryRef.current?.focus());
+                }}
+              >
+                <Search size={14} />
+              </button>
               <input
+                ref={queryRef}
                 type="search"
                 className="console-filter-text"
                 placeholder="Filter"
                 aria-label="Filter logs"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                onBlur={() => setSearching(false)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    setQuery('');
+                    e.currentTarget.blur();
+                  }
+                }}
               />
               <button type="button" className="icon-btn" data-tooltip="Clear console" aria-label="Clear console" onClick={onClear}>
                 <Ban size={14} />

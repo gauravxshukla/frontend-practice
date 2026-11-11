@@ -1,9 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import { SandpackCodeEditor, SandpackLayout, SandpackProvider } from '@codesandbox/sandpack-react';
 import { PanelLeftOpen } from 'lucide-react';
 import type { FileMap, Question } from '../../lib/content/catalog';
 import { useTheme } from '../../lib/theme';
-import { usePersistentState } from '../../lib/usePersistentState';
+import { useColumnResize } from '../../lib/useColumnResize';
 import ConsoleDrawer from '../console/ConsoleDrawer';
 import { useSandpackLogs } from '../console/useSandpackLogs';
 import DraftSaver from './DraftSaver';
@@ -31,9 +31,6 @@ const PROTECTED: Record<Kind, string[]> = {
   vanilla: ['/index.js', '/index.html'],
 };
 
-/** Below this width the file tree starts hidden so the editor keeps room. */
-const EXPLORER_MIN_VIEWPORT = 1100;
-
 interface WorkspaceProps {
   question: Question;
   files: FileMap;
@@ -42,22 +39,37 @@ interface WorkspaceProps {
   draftSlug?: string;
   /** React questions: `native` runs the files through react-native-web. */
   platform?: Platform;
+  /** Panel visibility is owned by the question page (its header has the toggles). */
+  filesOpen: boolean;
+  onFilesOpenChange: (open: boolean) => void;
+  previewOpen: boolean;
+  onConsoleErrors?: (errors: number) => void;
 }
 
-function SandpackConsoleDrawer() {
+function SandpackConsoleDrawer({ onErrorCount }: { onErrorCount?: (errors: number) => void }) {
   const { entries, clear } = useSandpackLogs();
-  return <ConsoleDrawer entries={entries} onClear={clear} />;
+  return <ConsoleDrawer entries={entries} onClear={clear} onErrorCount={onErrorCount} />;
 }
+
+const SPLIT_LIMITS = { unit: 'fraction', min: 0.3, max: 0.7 } as const;
 
 /** Live-preview sandbox for machine-coding (React / vanilla) questions: files · editor · preview + console. */
-export default function Workspace({ question, files, readOnly = false, draftSlug, platform = 'web' }: WorkspaceProps) {
+export default function Workspace({
+  question,
+  files,
+  readOnly = false,
+  draftSlug,
+  platform = 'web',
+  filesOpen,
+  onFilesOpenChange,
+  previewOpen,
+  onConsoleErrors,
+}: WorkspaceProps) {
   const { resolved } = useTheme();
   const kind: Kind = question.type === 'react' ? 'react' : 'vanilla';
-  const [explorerOpen, setExplorerOpen] = usePersistentState(
-    'fp:explorerOpen',
-    typeof window === 'undefined' || window.innerWidth >= EXPLORER_MIN_VIEWPORT,
-  );
   const [maximized, setMaximized] = useState(false);
+  // Editor's share of the editor + preview area.
+  const split = useColumnResize('fp:mcSplit', 0.5, SPLIT_LIMITS);
 
   const isNative = kind === 'react' && platform === 'native';
 
@@ -99,13 +111,13 @@ export default function Workspace({ question, files, readOnly = false, draftSlug
       {draftSlug && !readOnly && <DraftSaver slug={draftSlug} hidden={hidden} />}
       {/* SandpackLayout (not a plain div): it anchors Sandpack's lazy start, without which the
           preview's loading overlay never clears. */}
-      <SandpackLayout className={`mc-workspace${maximized ? ' is-maximized' : ''}`}>
-        {explorerOpen ? (
+      <SandpackLayout className={`mc-workspace${maximized && previewOpen ? ' is-maximized' : ''}`}>
+        {filesOpen ? (
           <FileExplorer
             hidden={hidden}
             protectedPaths={PROTECTED[kind]}
             readOnly={readOnly}
-            onCollapse={() => setExplorerOpen(false)}
+            onCollapse={() => onFilesOpenChange(false)}
           />
         ) : (
           <div className="explorer-rail">
@@ -114,34 +126,56 @@ export default function Workspace({ question, files, readOnly = false, draftSlug
               className="icon-btn"
               data-tooltip="Show files"
               aria-label="Show files"
-              onClick={() => setExplorerOpen(true)}
+              onClick={() => onFilesOpenChange(true)}
             >
               <PanelLeftOpen size={15} />
             </button>
           </div>
         )}
-        <div className="mc-editor">
-          <SandpackCodeEditor
-            className="workspace-editor"
-            showTabs
-            showLineNumbers
-            showInlineErrors
-            wrapContent
-            closableTabs
-            readOnly={readOnly}
-            showReadOnly={readOnly}
-          />
-        </div>
-        <div className="mc-output">
-          <PreviewPane
-            maximized={maximized}
-            onToggleMaximize={() => setMaximized((m) => !m)}
-            platform={isNative ? 'native' : 'web'}
-            isUserFile={isUserFile}
-            title={question.title}
-            dependencies={question.dependencies}
-          />
-          <SandpackConsoleDrawer />
+        <div
+          className={`mc-split${previewOpen ? '' : ' preview-hidden'}`}
+          style={{ '--split': `${split.value * 100}%` } as CSSProperties}
+        >
+          <div className="mc-editor">
+            <SandpackCodeEditor
+              className="workspace-editor"
+              showTabs
+              showLineNumbers
+              showInlineErrors
+              wrapContent
+              closableTabs
+              readOnly={readOnly}
+              showReadOnly={readOnly}
+            />
+          </div>
+          {previewOpen && (
+            <div
+              className="resize-handle split-handle"
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Resize editor and preview"
+              aria-valuemin={30}
+              aria-valuemax={70}
+              aria-valuenow={Math.round(split.value * 100)}
+              tabIndex={0}
+              data-tooltip="Drag to resize · double-click to reset"
+              onPointerDown={split.onPointerDown}
+              onKeyDown={split.onKeyDown}
+              onDoubleClick={split.reset}
+            />
+          )}
+          {/* Hidden, not unmounted: the preview keeps running and the console keeps its logs. */}
+          <div className="mc-output" hidden={!previewOpen}>
+            <PreviewPane
+              maximized={maximized}
+              onToggleMaximize={() => setMaximized((m) => !m)}
+              platform={isNative ? 'native' : 'web'}
+              isUserFile={isUserFile}
+              title={question.title}
+              dependencies={question.dependencies}
+            />
+            <SandpackConsoleDrawer onErrorCount={onConsoleErrors} />
+          </div>
         </div>
       </SandpackLayout>
     </SandpackProvider>
