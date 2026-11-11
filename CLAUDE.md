@@ -38,6 +38,13 @@ There is no lint script.
   browser (Playwright) rather than with component tests.
 - New logic gets tests; bug fixes get a test that fails before the fix.
 
+## URLs
+
+- Build and parse every app URL with `src/lib/routes.ts` (`questionUrl`, `groupUrl`, `quizUrl`,
+  `notesUrl`, `parseRoute`): questions are `/<track>/<name>` (`/dsa/two-sum`, `/react/data-table/native`),
+  topics `/<track>/topics/<topic>`. Old `/q/…` and `/topics/…` links redirect.
+  `test/repo/routeStrings.test.js` fails on a hand-written old-style path.
+
 ## Styling
 
 - Colours come only from the tokens in `src/index.css`, defined for both light and dark themes.
