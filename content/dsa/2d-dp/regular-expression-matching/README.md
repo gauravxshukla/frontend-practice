@@ -44,14 +44,11 @@ Explanation: ".*" matches any string.
 
 ## Notes
 
-- **Key insight:** treat `x*` as one unit. At any point it can match nothing (skip the two pattern characters) or eat one matching character of `s` and stay on the same unit.
-- **Recurrence:** with `match(i, j)` = `s[i..]` matched by `p[j..]` and `first = i < m && (p[j] === s[i] || p[j] === '.')`:
-  - if `p[j + 1] === '*'`: `match(i, j) = match(i, j + 2) || (first && match(i + 1, j))`
-  - else: `match(i, j) = first && match(i + 1, j + 1)`
-  - base: `match(m, n) = true`, `match(i < m, n) = false`. Note that `i = m` with pattern left can still be true (`"a*b*"` matches `""`).
-- **Bottom-up table:** fill `i` from `m` down to 0 and `j` from `n - 1` down. O(m · n) time and space.
-- **Space optimisation:** row `i` reads only rows `i` and `i + 1`, so two rows of length `n + 1` give O(n) space.
-- **Brute force:** the same recursion with plain backtracking. Exponential on patterns like `"a*a*a*a*c"` against `"aaaaaaaaab"`. Memoising `(i, j)` brings it to O(m · n).
-- Pitfall: checking `p[j] === '*'` at the current position instead of looking one ahead at `p[j + 1]`.
-- Pitfall: only handling `i < m`. The empty remaining string must still be tested against `x*` units.
-- Follow-up: Wildcard Matching (`?` and a standalone `*` for any run of characters) uses the same table with a different transition.
+- **Identify:** full-string match with "." and "x*" → 2-D DP over suffixes of s and p
+- **Key formula:** p[j + 1] = "*" → dp[i][j + 2] or (first matches and dp[i + 1][j]); else first matches and dp[i + 1][j + 1]
+- **Brute force:** plain recursion on both "*" choices, exponential on patterns like "a*a*a*…"
+- **Insight:** the result only depends on (i, j), the suffixes still to match, so fill a table from the end
+- **Steps:** dp[m][n] = true; for i from m down, j from n − 1 down, apply the formula; return dp[0][0]
+- **Complexity:** exponential → O(m·n) time, O(m·n) space
+- **Pitfall:** "x*" can match zero characters, so dp[i][j + 2] must be tried even when s is used up
+- **Related:** Design Add and Search Words Data Structure, Edit Distance, Interleaving String

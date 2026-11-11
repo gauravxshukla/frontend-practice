@@ -36,11 +36,11 @@ Output: 0
 
 ## Notes
 
-- **Key insight:** compare the last characters of the two prefixes. If they match, they can both be the last character of the LCS. If not, at least one of them is unused, so drop one and take the better result.
-- **Recurrence:** `lcs(i, 0) = lcs(0, j) = 0`; `lcs(i, j) = lcs(i - 1, j - 1) + 1` if `text1[i - 1] === text2[j - 1]`, else `max(lcs(i - 1, j), lcs(i, j - 1))`.
-- **2-D table:** O(m · n) time and space. The full table also lets you reconstruct the subsequence by walking back from `(m, n)`.
-- **Space optimisation:** row `i` reads only row `i - 1`, so keep two rows (or one row plus a saved diagonal). O(m · n) time, O(min(m, n)) space if you iterate over the shorter string in the inner loop.
-- **Brute force:** enumerate all 2ᵐ subsequences of one string and test each against the other. O(2ᵐ · n).
-- Pitfall: confusing subsequence with substring. Longest common **substring** resets to 0 on a mismatch instead of taking the max.
-- Edge cases: identical strings → their length; no shared letters → 0.
-- Follow-ups: Edit Distance and Shortest Common Supersequence (`m + n - lcs`) use the same table shape.
+- **Identify:** longest subsequence shared by two strings → 2-D DP over prefixes
+- **Key formula:** match → dp[i][j] = dp[i − 1][j − 1] + 1; else max(dp[i − 1][j], dp[i][j − 1])
+- **Brute force:** try all 2^m subsequences of one string against the other, O(2^m · n)
+- **Insight:** the answer for two prefixes depends only on shorter prefixes, so fill a table once
+- **Steps:** (m + 1) × (n + 1) table of zeros; fill row by row with the formula; return the bottom-right
+- **Complexity:** O(2^m · n) → O(m·n) time, O(m·n) space (one row is enough: O(n))
+- **Pitfall:** the extra zero row and column stand for empty prefixes, so index the strings at i − 1, j − 1
+- **Related:** Edit Distance, Distinct Subsequences, Longest Increasing Subsequence

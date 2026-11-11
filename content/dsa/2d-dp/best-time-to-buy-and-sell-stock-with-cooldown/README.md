@@ -33,11 +33,11 @@ Output: 0
 
 ## Notes
 
-- **Key insight:** model each day's end as one of three states. `hold` (own a share), `sold` (just sold today, so tomorrow is blocked), and `rest` (no share and allowed to buy).
-- **Recurrences:** `hold[i] = max(hold[i - 1], rest[i - 1] - p)`, `sold[i] = hold[i - 1] + p`, `rest[i] = max(rest[i - 1], sold[i - 1])`. Start with `hold = -∞`, `sold = rest = 0`. The answer is `max(sold, rest)` on the last day.
-- Equivalently with two states and an index: `buy(i) = max(buy(i - 1), sell(i - 2) - p)`. The `i - 2` is the cooldown.
-- **Space optimisation:** each day reads only the previous day, so three scalars suffice (save `sold` before overwriting it). O(n) time, O(1) space.
-- **Brute force:** recursion over `(day, holding)` trying buy/sell/skip without caching. O(2ⁿ). Memoising on `(day, holding)` gives O(n) states.
-- Pitfall: allowing `hold` to come from `sold` of the previous day. That is exactly the purchase the cooldown forbids.
-- Edge cases: one day → 0, strictly falling prices → 0, a sell-then-immediately-rebuy opportunity that must be skipped.
-- Follow-ups: the same state machine handles a transaction fee (subtract it on sell) or at most `k` transactions (add a count dimension).
+- **Identify:** unlimited trades with a one-day cooldown after selling → state-machine DP per day
+- **Brute force:** recurse on buy / sell / wait every day, O(3^n)
+- **Better:** memoise (day, holding) top-down, O(n) time, O(n) space
+- **Insight:** each day you're in one of three states: holding, just sold, or resting; three numbers carry all history
+- **Steps:** hold = max(hold, rest − price); sold = hold + price; rest = max(rest, sold); answer max(sold, rest)
+- **Complexity:** O(3^n) → O(n) time, O(1) space
+- **Pitfall:** compute the new states from yesterday's values, or a buy and sell can happen on one day
+- **Related:** Best Time to Buy and Sell Stock, House Robber, Coin Change II

@@ -33,12 +33,11 @@ Output: 5
 
 ## Notes
 
-- **Key insight:** focus on the last characters of the two prefixes. If they match, they cost nothing. If not, the final edit was a delete, an insert or a replace, and each leaves a smaller prefix pair.
-- **Recurrence:** `d(i, 0) = i`, `d(0, j) = j`; if `word1[i-1] === word2[j-1]` then `d(i, j) = d(i-1, j-1)`, else `d(i, j) = 1 + min(d(i-1, j) /* delete */, d(i, j-1) /* insert */, d(i-1, j-1) /* replace */)`.
-- **2-D table:** O(m · n) time and space. The full table supports reconstructing the edit script.
-- **Space optimisation:** each cell needs the one above, the one to the left, and the diagonal. One array plus a saved `diag` variable (the old value of `row[j - 1]` before it was overwritten) gives O(m · n) time and O(n) space.
-- **Brute force:** plain recursion on the three choices. O(3^(m+n)) in the worst case. Memoising `(i, j)` turns it into the table above.
-- Edge cases: either word empty → the other's length; identical words → 0.
-- Pitfall: forgetting to reset `row[0] = i` at the start of each row, or reading `diag` after it has been overwritten.
-- Pitfall: taking the match case as `1 + min(…)` with a 0-cost replace. It works, but the explicit match branch is clearer and faster.
-- Follow-ups: weighted costs per operation, or "One Edit Distance" (decide `d ≤ 1` in O(n) without DP).
+- **Identify:** fewest inserts, deletes and replaces to turn one word into another → 2-D DP over prefixes
+- **Key formula:** match → dp[i − 1][j − 1]; else 1 + min(delete dp[i − 1][j], insert dp[i][j − 1], replace dp[i − 1][j − 1])
+- **Brute force:** recurse over all three operations at every mismatch, O(3^(m+n))
+- **Insight:** the cost for two prefixes depends only on the three neighbouring smaller prefixes
+- **Steps:** dp[i][0] = i, dp[0][j] = j; fill the table with the formula; return dp[m][n]
+- **Complexity:** O(3^(m+n)) → O(m·n) time, O(m·n) space (one row is enough: O(n))
+- **Pitfall:** the base row and column are the cost of turning a prefix into an empty string (and back)
+- **Related:** Longest Common Subsequence, Distinct Subsequences, Interleaving String

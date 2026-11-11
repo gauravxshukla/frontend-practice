@@ -34,12 +34,10 @@ Explanation: 3 → 4 → 5 → 6.
 
 ## Notes
 
-- **Key insight:** because values must strictly increase, a path can never revisit a cell. The "can move to" relation is a DAG, so the longest path from a cell does not depend on how you got there, and it can be cached.
-- **Recurrence:** `best(r, c) = 1 + max(best(nr, nc))` over the 4 neighbours with `matrix[nr][nc] > matrix[r][c]`, or `1` if there are none. The answer is the max over all cells.
-- **Memoised DFS:** each cell is computed once and looks at 4 neighbours. O(m · n) time, O(m · n) space for the cache plus recursion depth up to `m · n` on a snake-shaped path.
-- No `visited` set is needed. The strict increase already prevents cycles.
-- **Alternative, topological peeling (Kahn):** start from cells with no larger neighbour (out-degree 0) and peel them layer by layer. The number of layers is the answer. This is iterative, so there is no deep recursion.
-- No meaningful space reduction exists. Every cell's value can be needed later, so the O(m · n) table stays.
-- **Brute force:** DFS from every cell without caching. Exponential on grids with many branching increasing paths.
-- Edge cases: a single cell → 1, all-equal values → 1, a fully sorted spiral → m · n.
-- Pitfall: using `>=` instead of `>` creates cycles between equal neighbours and infinite recursion.
+- **Identify:** longest strictly increasing path moving in 4 directions → DFS + memo (DAG longest path)
+- **Brute force:** DFS from every cell without memo, exponential in the worst case
+- **Insight:** strictly increasing moves can't cycle, so each cell's best path is fixed: compute once, cache it
+- **Steps:** best(r, c) = 1 + max best(neighbour) over larger neighbours; memoise; answer is max over cells
+- **Complexity:** exponential → O(m·n) time, O(m·n) space
+- **Pitfall:** equal neighbours don't count (strictly increasing), and no visited set is needed
+- **Related:** Longest Increasing Subsequence, Number of Islands, Pacific Atlantic Water Flow

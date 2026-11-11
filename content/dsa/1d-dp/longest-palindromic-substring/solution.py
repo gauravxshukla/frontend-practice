@@ -1,11 +1,18 @@
 class Solution:
     def longestPalindrome(self, s: str) -> str:
-        # Expand around every centre (odd and even lengths).
-        best = ""
+        start, length = 0, 0
+
+        # grow outward from a centre while both ends match
+        def expand(l: int, r: int) -> None:
+            nonlocal start, length
+            while l >= 0 and r < len(s) and s[l] == s[r]:
+                l -= 1
+                r += 1
+            # the loop overshot by one on each side
+            if r - l - 1 > length:
+                start, length = l + 1, r - l - 1
+
         for i in range(len(s)):
-            for lo, hi in ((i, i), (i, i + 1)):
-                while lo >= 0 and hi < len(s) and s[lo] == s[hi]:
-                    lo, hi = lo - 1, hi + 1
-                if hi - lo - 1 > len(best):
-                    best = s[lo + 1 : hi]
-        return best
+            expand(i, i)  # odd length: centred on a letter
+            expand(i, i + 1)  # even length: centred between two letters
+        return s[start : start + length]

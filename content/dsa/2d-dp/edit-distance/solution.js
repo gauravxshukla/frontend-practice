@@ -4,18 +4,19 @@
  * @return {number}
  */
 export default function minDistance(word1, word2) {
-  // d(i, j) = edits to turn word1[0..i) into word2[0..j).
-  // equal last chars → d(i-1, j-1); else 1 + min(d(i-1, j) delete, d(i, j-1) insert, d(i-1, j-1) replace)
+  const m = word1.length;
   const n = word2.length;
-  const row = Array.from({ length: n + 1 }, (_, j) => j); // d(0, j) = j inserts
-  for (let i = 1; i <= word1.length; i++) {
-    let diag = row[0]; // d(i - 1, j - 1)
-    row[0] = i; // d(i, 0) = i deletes
+  // dp[i][j] = edits to turn the first i chars of word1 into the first j chars of word2
+  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i; // delete everything
+  for (let j = 0; j <= n; j++) dp[0][j] = j; // insert everything
+  for (let i = 1; i <= m; i++) {
     for (let j = 1; j <= n; j++) {
-      const above = row[j]; // d(i - 1, j)
-      row[j] = word1[i - 1] === word2[j - 1] ? diag : 1 + Math.min(above, row[j - 1], diag);
-      diag = above;
+      // equal last characters cost nothing extra
+      if (word1[i - 1] === word2[j - 1]) dp[i][j] = dp[i - 1][j - 1];
+      // otherwise pay for one operation on top of the cheapest smaller problem
+      else dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]); // delete, insert, replace
     }
   }
-  return row[n];
+  return dp[m][n];
 }

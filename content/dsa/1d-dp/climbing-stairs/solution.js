@@ -3,13 +3,14 @@
  * @return {number}
  */
 export default function climbStairs(n) {
-  // ways(i) = ways(i - 1) + ways(i - 2): only the last two values are needed.
-  let oneBack = 1; // ways to reach step 1
-  let twoBack = 1; // ways to reach step 0 (stand still)
+  // ways to stand on the step two below and one below the current one
+  let twoBack = 1; // step 0: one way (do nothing)
+  let oneBack = 1; // step 1: one way
   for (let i = 2; i <= n; i++) {
-    const current = oneBack + twoBack;
+    // the last move was either a 1-step or a 2-step
+    const ways = oneBack + twoBack;
     twoBack = oneBack;
-    oneBack = current;
+    oneBack = ways;
   }
   return oneBack;
 }

@@ -34,11 +34,12 @@ Output: 1
 
 ## Notes
 
-- **Direct DP:** `ways(i, s)` = assignments of the first `i` numbers that sum to `s`. `ways(0, 0) = 1` and `ways(i, s) = ways(i - 1, s - nums[i-1]) + ways(i - 1, s + nums[i-1])`. Offset `s` by `total` to index an array. O(n · total) time, O(total) space with two rolling rows.
-- **Subset-sum reduction (optimal):** let `P` be the numbers with `+`. Then `sum(P) - (total - sum(P)) = target`, so `sum(P) = (total + target) / 2`. Count the subsets with that sum.
-- If `total + target` is odd, or `|target| > total`, the answer is 0.
-- **Subset-count recurrence:** `count(i, s) = count(i - 1, s) + count(i - 1, s - nums[i-1])`. Collapse to one array swept with `s` **downward** so each number is used once. O(n · goal) time, O(goal) space.
-- Zeros are handled automatically. Each `0` doubles the count, because `+0` and `-0` are different assignments.
-- **Brute force:** DFS over all 2ⁿ sign choices. With `n ≤ 20` that is about 10⁶ leaves, which is fine here but does not scale.
-- Pitfall: a memo key like `` `${i},${s}` `` in a `Map` is correct but much slower than an offset array.
-- Follow-up: list the actual sign assignments (backtracking guided by the count table).
+- **Identify:** assign + or − to reach a target → count subsets summing to (total + target) / 2
+- **Key formula:** positives − negatives = target and positives + negatives = total ⇒ positives = (total + target) / 2
+- **Brute force:** try both signs for every number, O(2^n)
+- **Better:** memoise (index, running sum), O(n · total) time and space
+- **Insight:** choosing the + numbers is a subset-sum count, which a 1-D array solves
+- **Steps:** if |target| > total or (total + target) is odd return 0; ways[0] = 1; for each num, for s downward: ways[s] += ways[s − num]
+- **Complexity:** O(2^n) → O(n · total) time, O(total) space
+- **Pitfall:** zeros double the count (±0), which the loop handles when s goes down to num inclusive
+- **Related:** Partition Equal Subset Sum, Coin Change II, Subsets

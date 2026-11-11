@@ -3,20 +3,20 @@
  * @return {number}
  */
 export default function maxCoins(nums) {
-  // Pad with virtual 1s, then best[l][r] = max coins from bursting every balloon strictly between l and r.
-  // Choose k as the LAST balloon burst in (l, r): its neighbours at that moment are exactly l and r.
-  // best[l][r] = max over l < k < r of best[l][k] + vals[l] * vals[k] * vals[r] + best[k][r]
+  // virtual balloons worth 1 on both ends act as the outer neighbours
   const vals = [1, ...nums, 1];
   const n = vals.length;
-  const best = Array.from({ length: n }, () => new Array(n).fill(0));
-  for (let gap = 2; gap < n; gap++) {
-    for (let l = 0; l + gap < n; l++) {
-      const r = l + gap;
+  // dp[l][r] = best coins from bursting every balloon strictly between l and r
+  const dp = Array.from({ length: n }, () => new Array(n).fill(0));
+  // solve shorter intervals first, since longer ones are built from them
+  for (let width = 2; width < n; width++) {
+    for (let l = 0; l + width < n; l++) {
+      const r = l + width;
+      // k is the last balloon burst between l and r, so its neighbours are l and r
       for (let k = l + 1; k < r; k++) {
-        const coins = best[l][k] + vals[l] * vals[k] * vals[r] + best[k][r];
-        if (coins > best[l][r]) best[l][r] = coins;
+        dp[l][r] = Math.max(dp[l][r], dp[l][k] + vals[l] * vals[k] * vals[r] + dp[k][r]);
       }
     }
   }
-  return best[0][n - 1];
+  return dp[0][n - 1];
 }

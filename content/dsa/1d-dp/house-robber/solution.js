@@ -3,13 +3,13 @@
  * @return {number}
  */
 export default function rob(nums) {
-  // best(i) = max(best(i - 1), best(i - 2) + nums[i]); keep only the last two values.
-  let skipPrev = 0; // best total up to house i - 2
-  let takePrev = 0; // best total up to house i - 1
-  for (const money of nums) {
-    const current = Math.max(takePrev, skipPrev + money);
-    skipPrev = takePrev;
-    takePrev = current;
+  let twoBack = 0; // best total up to the house before the previous one
+  let oneBack = 0; // best total up to the previous house
+  for (const house of nums) {
+    // skip this house (keep oneBack) or rob it on top of twoBack
+    const best = Math.max(oneBack, twoBack + house);
+    twoBack = oneBack;
+    oneBack = best;
   }
-  return takePrev;
+  return oneBack;
 }

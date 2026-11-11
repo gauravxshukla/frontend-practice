@@ -4,17 +4,17 @@
  */
 export default function canPartition(nums) {
   const total = nums.reduce((a, b) => a + b, 0);
+  // an odd total can't be split into two equal integer halves
   if (total % 2 !== 0) return false;
   const target = total / 2;
-  // reachable[s] = some subset of the numbers seen so far sums to s (0/1 knapsack, one row).
-  const reachable = new Array(target + 1).fill(false);
-  reachable[0] = true;
-  for (const n of nums) {
-    // Go downwards so each number is used at most once.
-    for (let s = target; s >= n; s--) {
-      if (reachable[s - n]) reachable[s] = true;
+  // can[s]: some subset of the numbers seen so far sums to s
+  const can = new Array(target + 1).fill(false);
+  can[0] = true;
+  for (const num of nums) {
+    // go downward so this num is used at most once per pass
+    for (let s = target; s >= num; s--) {
+      if (can[s - num]) can[s] = true;
     }
-    if (reachable[target]) return true;
   }
-  return reachable[target];
+  return can[target];
 }

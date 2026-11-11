@@ -37,11 +37,10 @@ Output: 3
 
 ## Notes
 
-- **Key insight:** in any valid plan, house `0` and house `n - 1` are not both robbed. So the answer is the better of two straight-line problems: houses `0..n-2` and houses `1..n-1`.
-- **Recurrence (per line):** `best(i) = max(best(i - 1), best(i - 2) + nums[i])`, exactly as in House Robber.
-- **Space optimisation:** each line pass uses two rolling variables, so the whole thing is O(n) time and O(1) space.
-- **Brute force:** enumerate subsets and reject any with adjacent indices, treating `0` and `n - 1` as adjacent. O(2ⁿ · n).
-- Edge case: `n = 1`. Both ranges would be empty, yet the single house can be robbed. Handle it before splitting.
-- Edge case: `n = 2`. You may rob only one of them, so the answer is the max.
-- Pitfall: running one linear pass on the whole array and "fixing" the ends afterwards. It double-counts when both ends looked attractive.
-- Follow-up: return which houses were robbed (store a choice per index and backtrack for the winning range).
+- **Identify:** House Robber on a circle (first and last are neighbours) → solve two straight lines
+- **Brute force:** try every non-adjacent subset that avoids taking both ends, O(2^n)
+- **Insight:** the first and last can't both be robbed, so take the better of houses [0..n−2] and [1..n−1]
+- **Steps:** run linear House Robber without the last house, then without the first; return the max
+- **Complexity:** O(2^n) → O(n) time, O(1) space
+- **Pitfall:** a single house can't be split into two ranges: return nums[0] directly
+- **Related:** House Robber, Climbing Stairs, Maximum Product Subarray

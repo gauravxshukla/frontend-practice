@@ -3,16 +3,20 @@
  * @return {number}
  */
 export default function countSubstrings(s) {
-  let count = 0;
-  // Every palindrome has an odd centre (a character) or an even centre (a gap).
-  for (let centre = 0; centre < 2 * s.length - 1; centre++) {
-    let left = Math.floor(centre / 2);
-    let right = left + (centre % 2);
-    while (left >= 0 && right < s.length && s[left] === s[right]) {
-      count++; // each successful expansion is one more palindrome
-      left--;
-      right++;
+  // palindromes centred at (l, r): each matching step outward is one more
+  const countFrom = (l, r) => {
+    let count = 0;
+    while (l >= 0 && r < s.length && s[l] === s[r]) {
+      count++;
+      l--;
+      r++;
     }
+    return count;
+  };
+  let total = 0;
+  for (let i = 0; i < s.length; i++) {
+    total += countFrom(i, i); // odd lengths, including the single letter
+    total += countFrom(i, i + 1); // even lengths
   }
-  return count;
+  return total;
 }

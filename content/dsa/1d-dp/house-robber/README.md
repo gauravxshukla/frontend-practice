@@ -34,11 +34,11 @@ Explanation: Rob houses 0, 2 and 4: 2 + 9 + 1 = 12.
 
 ## Notes
 
-- **Key insight:** for house `i` there are only two choices. Skip it and keep the best answer for the first `i - 1` houses, or rob it and add it to the best answer for the first `i - 2` houses.
-- **Recurrence:** `best(i) = max(best(i - 1), best(i - 2) + nums[i])`, with `best(-1) = best(-2) = 0`.
-- **Bottom-up table:** O(n) time, O(n) space.
-- **Space optimisation:** two rolling variables (`skipPrev`, `takePrev`). O(n) time, O(1) space.
-- **Brute force:** try every subset with no two adjacent indices. That is O(2ⁿ) (the number of valid subsets is itself Fibonacci-sized).
-- Greedy "take every other house" fails: `[2, 1, 1, 2]` is best robbed at indices 0 and 3 for 4.
-- Edge cases: a single house (rob it), all zeros, and one huge house next to two medium ones.
-- Follow-up: the houses form a circle (House Robber II), or a binary tree (House Robber III, DFS returning a `[rob, skip]` pair).
+- **Identify:** maximise a sum without taking two neighbours → DP: rob this house or skip it
+- **Key formula:** best(i) = max(best(i − 1), best(i − 2) + nums[i])
+- **Brute force:** try every non-adjacent subset, O(2^n)
+- **Insight:** each house only compares "skip it" with "rob it plus the best two houses back", so two variables suffice
+- **Steps:** prev2 = prev1 = 0; for each house: cur = max(prev1, prev2 + house); shift the pair
+- **Complexity:** O(2^n) → O(n) time, O(1) space
+- **Pitfall:** don't assume alternating houses is optimal ([2, 1, 1, 2] → 4)
+- **Related:** House Robber II, Climbing Stairs, Maximum Subarray

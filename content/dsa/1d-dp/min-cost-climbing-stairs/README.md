@@ -34,12 +34,11 @@ Explanation: Step on stairs 0, 2, 4, 6, 7, 9 and pay 1 each.
 
 ## Notes
 
-- **Key insight:** to stand on position `i` you came from `i - 1` (paying `cost[i - 1]`) or from `i - 2` (paying `cost[i - 2]`). Take the cheaper.
-- **Recurrence:** `best(i) = min(best(i - 1) + cost[i - 1], best(i - 2) + cost[i - 2])`, with `best(0) = best(1) = 0` because you may start on either for free. The answer is `best(n)`.
-- **Bottom-up table:** O(n) time, O(n) space.
-- **Space optimisation:** only `best(i - 1)` and `best(i - 2)` are read, so two variables are enough. O(n) time, O(1) space.
-- An equivalent formulation: `pay(i) = cost[i] + min(pay(i + 1), pay(i + 2))` filled right to left, answer `min(pay(0), pay(1))`.
-- **Brute force:** recursively try both moves from both starting stairs. O(2ⁿ).
-- Pitfall: the top is *past* the last stair, so the loop must run to `i = n`, not `n - 1`.
-- Pitfall: forgetting that starting on stair 1 is free, which would add `cost[0]` to every path.
-- Follow-up: also return the stairs you stepped on (keep a parent pointer per position and walk it back).
+- **Identify:** cheapest way to the top paying cost[i] to leave step i, moving 1 or 2 → DP on steps
+- **Key formula:** reach(i) = min(reach(i − 1) + cost[i − 1], reach(i − 2) + cost[i − 2])
+- **Brute force:** try every sequence of 1- and 2-steps, O(2^n)
+- **Insight:** the cheapest way to each step only needs the two steps below it, so keep two numbers
+- **Steps:** reach(0) = reach(1) = 0; roll forward to reach(n), the top beyond the last step
+- **Complexity:** O(2^n) → O(n) time, O(1) space
+- **Pitfall:** the top is one past the last index, and you may start on step 0 or 1 for free
+- **Related:** Climbing Stairs, House Robber, Coin Change
