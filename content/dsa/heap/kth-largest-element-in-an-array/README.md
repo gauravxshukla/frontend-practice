@@ -35,11 +35,10 @@ Explanation: sorted descending: 6,5,5,4,… so the 4th value is 4.
 
 ## Notes
 
-- **Key insight:** you don't need full order, only the boundary between the top k and the rest.
-- **Min-heap of size k:** push every value and pop whenever the size exceeds k. The heap root is the k-th largest. O(n log k) time, O(k) space.
-- **Quickselect:** partition like quicksort but only recurse into the side that contains index `n − k`. O(n) average time, O(1) extra space, O(n²) worst case (randomise the pivot to avoid it).
-- Brute force: sort descending and return `nums[k − 1]`. O(n log n), the baseline to state first.
-- Since values are bounded (±10⁴), a counting array also gives O(n + range).
-- Pitfall: `nums.sort()` without a comparator sorts as strings (`[10, 9, 2]` becomes `[10, 2, 9]`).
-- Pitfall: quickselect with Lomuto partition degrades badly on many duplicates. Use three-way partitioning.
-- Edge cases: k = 1, k = n, all values equal, negative values.
+- **Identify:** k-th largest in an unsorted array → min-heap of size k (or quickselect)
+- **Brute force:** sort descending and take index k − 1, O(n log n)
+- **Insight:** only the k largest matter; keep them in a min-heap so the smallest of them sits on top
+- **Steps:** push each number; pop when the heap exceeds k; the top is the k-th largest
+- **Complexity:** O(n log n) → O(n log k) time, O(k) space (quickselect: O(n) average, O(n²) worst)
+- **Pitfall:** duplicates count separately: [7, 7, 7], k = 2 is 7
+- **Related:** Kth Largest Element in a Stream, K Closest Points to Origin, Top K Frequent Elements

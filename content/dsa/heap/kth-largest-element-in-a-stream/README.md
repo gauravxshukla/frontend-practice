@@ -48,12 +48,10 @@ Output: [null,-3,-2,-2]
 
 ## Notes
 
-- **Key insight:** you only care about the top k values. Keep them in a **min-heap of size k**. Its root is the smallest of the top k, which is exactly the k-th largest.
-- On `add`: push the value, and if the heap grows past k, pop the minimum. Return the root.
-- Initialise by running the same logic over `nums`.
-- O(log k) per `add`, O(n log k) to build, O(k) space.
-- Brute force: keep a sorted array and insert with binary search. Insertion still shifts elements, so it's O(n) per add.
-- JS has no built-in heap, so write a small one (array-backed, sift up/down). Interviewers expect you to be able to.
-- Pitfall: using a max-heap of everything, then popping k times per query, which is O(k log n) per add.
-- Edge cases: empty initial `nums`, duplicates, negative values, k = 1.
-- Follow-up: support removals, or the k-th largest in a sliding window (needs two heaps or an ordered set with lazy deletion).
+- **Identify:** k-th largest as numbers keep arriving → min-heap holding only the k largest
+- **Brute force:** keep a sorted list and insert each new number in place, O(n) per add
+- **Insight:** the k-th largest is the smallest of the top k, so a size-k min-heap has it on top
+- **Steps:** push each number; if the heap holds more than k, pop the smallest; the top is the answer
+- **Complexity:** O(n) → O(log k) per add, O(k) space
+- **Pitfall:** the starting array can have fewer than k numbers, so only trim when size exceeds k
+- **Related:** Kth Largest Element in an Array, Last Stone Weight, Find Median from Data Stream

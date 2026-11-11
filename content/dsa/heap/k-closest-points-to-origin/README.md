@@ -35,11 +35,11 @@ Output: [[3,3],[-2,4]]
 
 ## Notes
 
-- **Key insight:** you never need the actual square root. Comparing `x² + y²` orders points the same way and stays exact in integers.
-- **Max-heap of size k:** push each point, and pop the farthest whenever the size exceeds k. What remains is the answer. O(n log k) time, O(k) space.
-- **Quickselect:** partition around a pivot distance until the first k slots hold the k smallest. O(n) average, O(n²) worst case, O(1) extra space. It's a good follow-up to mention.
-- Brute force: sort all points by distance and take the first k, O(n log n). That's fine to say first.
-- Pitfall: a min-heap of all n points, then popping k times, is O(n + k log n). That's acceptable but doesn't use the "size k" idea that matters for streaming input.
-- Pitfall: `Math.sqrt` introduces floats for no reason.
-- Edge cases: `k === points.length` (return everything), points at the origin, duplicate points.
-- Follow-up: points arrive as a stream that doesn't fit in memory, which is where the size-k heap wins.
+- **Identify:** k smallest by distance → max-heap of size k (keep the k closest so far)
+- **Key formula:** compare x² + y²; the square root doesn't change the order
+- **Brute force:** sort all points by distance and take the first k, O(n log n)
+- **Insight:** a size-k max-heap evicts the farthest of the current k whenever a closer point arrives
+- **Steps:** push each point by distance; if the heap holds more than k, pop the farthest; return the heap
+- **Complexity:** O(n log n) → O(n log k) time, O(k) space
+- **Pitfall:** use a max-heap for "k smallest"; a min-heap of all n points loses the size-k saving
+- **Related:** Kth Largest Element in an Array, Top K Frequent Elements, Last Stone Weight

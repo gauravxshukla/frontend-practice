@@ -39,11 +39,10 @@ Output: 1
 
 ## Notes
 
-- **Key insight:** every round needs the current two largest values, and the remainder goes back in. That's exactly what a **max-heap** gives you in O(log n).
-- Heapify the stones, then loop while the heap has 2+ items: pop `y`, pop `x`, push `y − x` if non-zero.
-- O(n log n) time, O(n) space.
-- Brute force: re-sort the array every round, O(n² log n). With n ≤ 30 it passes, but say why the heap is better.
-- In JS you can simulate a max-heap with a min-heap of negated values, or with a comparator as in the reference.
-- Pitfall: returning `undefined` instead of `0` when every stone is destroyed.
-- Edge cases: a single stone, two equal stones, all stones equal (even vs odd count).
-- Follow-up: Last Stone Weight II, where you choose any two stones. It becomes a partition / subset-sum DP.
+- **Identify:** repeatedly take the two heaviest items → max-heap
+- **Brute force:** sort the stones before every smash, O(n² log n)
+- **Insight:** a max-heap returns the two heaviest in O(log n) and takes the leftover back in O(log n)
+- **Steps:** heap all stones; while 2+ remain pop y and x; if they differ push y − x; return the last or 0
+- **Complexity:** O(n² log n) → O(n log n) time, O(n) space
+- **Pitfall:** return 0 when every stone is destroyed; Python's heapq is a min-heap, so store negatives
+- **Related:** Kth Largest Element in a Stream, K Closest Points to Origin, Task Scheduler
