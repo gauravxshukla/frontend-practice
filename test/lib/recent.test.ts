@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { readRecent, recordVisit } from './recent';
+import { readRecent, recordVisit } from '../../src/lib/recent';
 
 const store = new Map<string, string>();
 globalThis.localStorage = {

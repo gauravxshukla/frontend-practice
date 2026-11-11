@@ -3,7 +3,7 @@
 import { existsSync, globSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { execute, judge } from '../src/features/runner/core.js';
+import { execute, judge } from '../../src/features/runner/core.js';
 
 const only = process.env.DSA_ONLY; // e.g. DSA_ONLY=content/dsa/trees to verify one folder
 const specFiles = globSync('content/dsa/**/cases.json').filter((f) => !only || f.startsWith(only)).sort();

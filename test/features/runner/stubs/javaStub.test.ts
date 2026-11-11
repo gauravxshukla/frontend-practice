@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import type { DsaSpec } from '../../../lib/content/catalog';
-import { cleanCompilerOutput, JAVA_IMPORTS, prepareJavaRun } from '../java/prepare.js';
-import { javaStub } from './javaStub';
+import type { DsaSpec } from '../../../../src/lib/content/catalog';
+import { cleanCompilerOutput, JAVA_IMPORTS, prepareJavaRun } from '../../../../src/features/runner/java/prepare.js';
+import { javaStub } from '../../../../src/features/runner/stubs/javaStub';
 
 const fn = (over: Partial<DsaSpec>): DsaSpec => ({ fn: 'f', params: [], returns: 'number', cases: [], ...over });
 

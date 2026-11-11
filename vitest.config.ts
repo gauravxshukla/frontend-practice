@@ -10,10 +10,11 @@ const jsSuites = globSync('content/**/solution.test.js').filter((test) =>
 
 export default defineConfig({
   test: {
-    // DSA questions are data-driven (cases.json) and graded by scripts/verify-dsa.test.js.
-    // App unit tests live next to their code under src/.
-    include: [...jsSuites, 'scripts/verify-dsa.test.js', 'scripts/verify-js-minijest.test.js', 'scripts/verify-python.test.js', 'scripts/verify-java.test.js', 'src/**/*.test.{js,ts}'],
-    setupFiles: ['scripts/vitest-setup.js'],
+    // Every app test lives under test/, mirroring src/ (see CLAUDE.md). test/content/ verifies
+    // the question content: DSA cases.json, JS suites under mini-Jest, Python and Java.
+    // The content's own solution.test.js suites stay with their question (the app runs them).
+    include: [...jsSuites, 'test/**/*.test.{js,ts}'],
+    setupFiles: ['test/setup.js'],
     globals: true,
     environment: 'node',
   },

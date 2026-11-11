@@ -157,12 +157,7 @@
 .iv-number,
 .iv-bigint,
 .iv-boolean {
-  color: #2563eb;
-}
-:root[data-theme='dark'] .iv-number,
-:root[data-theme='dark'] .iv-bigint,
-:root[data-theme='dark'] .iv-boolean {
-  color: #93b4ff;
+  color: var(--syntax-number);
 }
 .iv-null,
 .iv-undefined,
@@ -173,11 +168,7 @@
 }
 .iv-symbol,
 .iv-dom {
-  color: #be185d;
-}
-:root[data-theme='dark'] .iv-symbol,
-:root[data-theme='dark'] .iv-dom {
-  color: #f472b6;
+  color: var(--syntax-symbol);
 }
 .iv-fn {
   font-style: italic;

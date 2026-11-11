@@ -46,7 +46,8 @@ src/
   features/workspace/             question page, code workspace, testcase/result panels, preview sandbox
   features/topic/ catalog/ quiz/ notes/
   lib/                            content loaders, progress, drafts, theme
-scripts/                          new-question, validate-content, verify-dsa.test.js
+scripts/                          new-question, validate-content
+test/                             every app test, mirroring src/; test/content/ verifies the questions (see CLAUDE.md)
 legacy/                           old experiments not part of the app
 ```
 
@@ -113,7 +114,7 @@ Both JS files `export default` the function (or the class, for design problems).
 
 ### JS: `starter.js`, `solution.js`, `solution.test.js`
 
-The suite imports `./solution.js` and uses Jest-style globals. In the app it runs in a worker with a small Jest-compatible runner (`src/features/runner/miniJest.js`). In `npm run verify` it runs twice: with Vitest, and with that same mini-Jest in Node (`scripts/verify-js-minijest.test.js`), where the reference must pass and the starter must fail.
+The suite imports `./solution.js` and uses Jest-style globals. In the app it runs in a worker with a small Jest-compatible runner (`src/features/runner/miniJest.js`). In `npm run verify` it runs twice: with Vitest, and with that same mini-Jest in Node (`test/content/verify-js-minijest.test.js`), where the reference must pass and the starter must fail.
 
 - **Run** executes tests whose name starts with `example` (or the first two). **Submit** runs them all.
 - **Available:**
@@ -146,7 +147,7 @@ Any markdown file in `content/quiz/` becomes a deck, so existing notes work as-i
 | `npm run validate` | Check frontmatter, topic registration and the `cases.json` schema |
 | `npm run verify` | `validate`, then grade every reference solution and check every starter fails (Vitest) |
 | `DSA_ONLY=content/dsa/trees npm run test:solutions` | Verify one DSA topic |
-| `JS_ONLY=content/js/dom npx vitest run content/js/dom scripts/verify-js-minijest.test.js` | Verify one JS topic under Vitest and mini-Jest |
+| `JS_ONLY=content/js/dom npx vitest run content/js/dom test/content/verify-js-minijest.test.js` | Verify one JS topic under Vitest and mini-Jest |
 
 ## Backlog
 

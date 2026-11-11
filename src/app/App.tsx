@@ -1,18 +1,21 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { createBrowserRouter, Link, Outlet, RouterProvider, useLocation } from 'react-router';
-import { Binary, Braces, House, LayoutGrid, ListChecks, Menu, Monitor, Moon, PanelLeft, Search, StickyNote, Sun } from 'lucide-react';
+import { Binary, Braces, House, Keyboard, LayoutGrid, ListChecks, Menu, Monitor, Moon, PanelLeft, Search, StickyNote, Sun } from 'lucide-react';
 import CatalogPage from '../features/catalog/CatalogPage';
 import QuizIndex from '../features/quiz/QuizIndex';
 import QuizDeckPage from '../features/quiz/QuizDeckPage';
 import NotesPage from '../features/notes/NotesPage';
 import TopicPage from '../features/topic/TopicPage';
 import CommandPalette from '../features/palette/CommandPalette';
+import KeyboardShortcuts from '../features/shortcuts/KeyboardShortcuts';
 import { buildIndex, type PaletteAction, type PaletteItem } from '../features/palette/paletteIndex';
 import { ConfirmProvider } from '../components/overlay/ConfirmProvider';
 import { ToastProvider } from '../components/overlay/ToastProvider';
 import TooltipLayer from '../components/overlay/TooltipLayer';
-import { isTyping, modKey } from '../lib/platform';
+import { getQuestion } from '../lib/content/catalog';
+import { isQuestionRoute, isTyping } from '../lib/platform';
 import { recordVisit } from '../lib/recent';
+import { keysFor, type ShortcutContext } from '../lib/shortcuts';
 import { setThemeMode } from '../lib/theme';
 import { usePersistentState } from '../lib/usePersistentState';
 import Sidebar from './Sidebar';
@@ -33,11 +36,24 @@ function jumpToItems(actions: PaletteAction[]): PaletteItem[] {
   ];
 }
 
+function shortcutContext(pathname: string): ShortcutContext {
+  if (!isQuestionRoute(pathname)) return 'browse';
+  const type = getQuestion(pathname.slice('/q/'.length))?.type;
+  return type === 'react' || type === 'vanilla' ? 'machine-coding' : 'code';
+}
+
 function Layout() {
   const { pathname } = useLocation();
-  const [collapsed, setCollapsed] = usePersistentState('fp:sidebar:collapsed', false);
+  // Question pages want room for the editor, so they keep their own sidebar
+  // preference (collapsed to the rail by default); browse pages keep theirs.
+  const inWorkspace = isQuestionRoute(pathname);
+  const [browseCollapsed, setBrowseCollapsed] = usePersistentState('fp:sidebar:collapsed', false);
+  const [workspaceCollapsed, setWorkspaceCollapsed] = usePersistentState('fp:sidebar:collapsedWorkspace', true);
+  const collapsed = inWorkspace ? workspaceCollapsed : browseCollapsed;
+  const setCollapsed = inWorkspace ? setWorkspaceCollapsed : setBrowseCollapsed;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
 
   // Close the drawer whenever the route changes.
   useEffect(() => setMobileOpen(false), [pathname]);
@@ -71,6 +87,11 @@ function Layout() {
       } else if (e.key === '/' && !mod && !e.altKey && !isTyping(e.target) && !document.querySelector('dialog[open]')) {
         e.preventDefault();
         openPalette();
+      } else if (e.key === '?' && !mod && !isTyping(e.target) && !document.querySelector('dialog[open]:not(.shortcuts)')) {
+        // Toggles: `?` again closes the sheet.
+        e.preventDefault();
+        setMobileOpen(false);
+        setShortcutsOpen((open) => !open);
       } else if (e.key === 'Escape') {
         setMobileOpen(false);
       }
@@ -89,9 +110,18 @@ function Layout() {
         kind: 'action',
         title: collapsed ? 'Expand sidebar' : 'Collapse sidebar',
         keywords: ['sidebar', 'toggle', 'collapse', 'expand'],
-        kbd: `${modKey} B`,
+        kbd: keysFor('sidebar'),
         icon: PanelLeft,
         run: toggleSidebar,
+      },
+      {
+        id: 'a:shortcuts',
+        kind: 'action',
+        title: 'Keyboard shortcuts',
+        keywords: ['keys', 'hotkeys', 'help'],
+        kbd: keysFor('shortcuts'),
+        icon: Keyboard,
+        run: () => setShortcutsOpen(true),
       },
       { id: 'a:theme-light', kind: 'action', title: 'Theme: Light', keywords: ['appearance', 'mode'], icon: Sun, run: () => setThemeMode('light') },
       { id: 'a:theme-dark', kind: 'action', title: 'Theme: Dark', keywords: ['appearance', 'mode'], icon: Moon, run: () => setThemeMode('dark') },
@@ -111,6 +141,10 @@ function Layout() {
             mobileOpen={mobileOpen}
             onCloseMobile={() => setMobileOpen(false)}
             onOpenSearch={openPalette}
+            onOpenShortcuts={() => {
+              setMobileOpen(false);
+              setShortcutsOpen(true);
+            }}
           />
           {mobileOpen && <div className="sidebar-backdrop" onClick={() => setMobileOpen(false)} aria-hidden />}
 
@@ -135,6 +169,7 @@ function Layout() {
           </div>
         </div>
         <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} actions={actions} jumpTo={jumpTo} />
+        <KeyboardShortcuts open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} context={shortcutContext(pathname)} />
         <TooltipLayer />
       </ConfirmProvider>
     </ToastProvider>

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { draftKey } from '../../../lib/drafts';
-import { defaultNativeStarter } from './defaultStarter';
-import { isWebOnlyFile, nativeSetup, NATIVE_RUNTIME_FILES, RN_WEB_VERSION, snackUrl } from './nativeSetup';
+import { draftKey } from '../../../../src/lib/drafts';
+import { defaultNativeStarter } from '../../../../src/features/workspace/native/defaultStarter';
+import { isWebOnlyFile, nativeSetup, NATIVE_RUNTIME_FILES, RN_WEB_VERSION, snackUrl } from '../../../../src/features/workspace/native/nativeSetup';
 
 describe('nativeSetup', () => {
   it('adds the hidden react-native shim and entry, and the react-native-web dependency', () => {

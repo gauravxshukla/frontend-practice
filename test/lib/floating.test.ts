@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { placeFloating } from './floating';
+import { placeFloating } from '../../src/lib/floating';
 
 const viewport = { width: 1000, height: 800 };
 const anchor = { left: 400, top: 300, width: 100, height: 40 };

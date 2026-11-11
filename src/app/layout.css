@@ -790,7 +790,7 @@ body.is-resizing iframe {
   height: calc(var(--screen-h) + var(--bezel) * 2);
   padding: var(--bezel);
   border-radius: 48px;
-  background: #18181b;
+  background: var(--device-bezel);
   box-shadow: var(--shadow-lg);
   /* Scale the frame, not the app, so the app lays out at true phone width. */
   transform: scale(var(--scale));
@@ -804,7 +804,7 @@ body.is-resizing iframe {
   height: 100%;
   overflow: hidden;
   border-radius: 36px;
-  background: #fff;
+  background: var(--device-screen);
 }
 
 .device-screen > .workspace-preview {
@@ -1158,11 +1158,7 @@ body.is-resizing-rows iframe {
 .btn-submit {
   border-color: var(--easy);
   background: var(--easy);
-  color: #fff;
-}
-
-:root[data-theme='dark'] .btn-submit {
-  color: #0d1f16;
+  color: var(--on-submit);
 }
 
 .btn-submit:hover:not(:disabled) {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MAX_DEPTH, MAX_ITEMS, serializeValue } from './serialize.js';
+import { MAX_DEPTH, MAX_ITEMS, serializeValue } from '../../../src/features/console/serialize.js';
 
 describe('serializeValue', () => {
   it('serializes primitives', () => {

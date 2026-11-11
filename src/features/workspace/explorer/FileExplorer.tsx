@@ -12,6 +12,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useToast } from '../../../components/overlay/ToastProvider';
+import { keysFor } from '../../../lib/shortcuts';
 import { buildTree, dirOf, joinPath, type TreeNode } from './buildTree';
 import { validateNewPath } from './validateNewPath';
 
@@ -370,7 +371,7 @@ export default function FileExplorer({ hidden, protectedPaths, readOnly = false,
                     type="button"
                     tabIndex={-1}
                     data-tooltip="Rename"
-                    data-tooltip-kbd="F2"
+                    data-tooltip-kbd={keysFor('tree-rename')}
                     aria-label={`Rename ${node.name}`}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -383,7 +384,7 @@ export default function FileExplorer({ hidden, protectedPaths, readOnly = false,
                     type="button"
                     tabIndex={-1}
                     data-tooltip="Delete"
-                    data-tooltip-kbd="Del"
+                    data-tooltip-kbd={keysFor('tree-delete')}
                     aria-label={`Delete ${node.name}`}
                     onClick={(e) => {
                       e.stopPropagation();
