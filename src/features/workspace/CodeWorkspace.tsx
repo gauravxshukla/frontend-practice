@@ -8,6 +8,8 @@ import { useTheme } from '../../lib/theme';
 import { usePersistentState } from '../../lib/usePersistentState';
 import { useRowResize } from '../../lib/useRowResize';
 import { Kbd } from '../../components/Kbd';
+import { useToast } from '../../components/overlay/ToastProvider';
+import { isMac, modKey } from '../../lib/platform';
 import { isLanguageId, languageInfo } from '../runner/languages/registry';
 import type { LanguageId } from '../runner/languages/types';
 import { useLanguageRuntime } from '../runner/languages/useLanguageRuntime';
@@ -24,7 +26,6 @@ import { sandpackThemes } from './sandpackThemes';
 import { useEditorLanguages } from './useEditorLanguages';
 
 const JEST_LIMIT_MS = 6000;
-const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
 
 interface Props {
   question: Question;
@@ -58,6 +59,7 @@ interface InnerProps extends Props {
 
 function Inner({ question, assets, onAccepted, language, multiLanguage, onLanguageChange, starters }: InnerProps) {
   const { sandpack } = useSandpack();
+  const toast = useToast();
   const info = languageInfo(language);
   const { runtime, status, error } = useLanguageRuntime(language);
   const editorLanguages = useEditorLanguages(language);
@@ -165,13 +167,22 @@ function Inner({ question, assets, onAccepted, language, multiLanguage, onLangua
     return () => window.removeEventListener('keydown', onKey, true);
   }, [execute]);
 
-  const mod = isMac ? '⌘' : 'Ctrl';
+  const mod = modKey;
+  const ariaMod = isMac ? 'Meta' : 'Control';
   const canRun = running === null && status === 'ready';
 
+  // No confirm: reset straight away and offer Undo.
   const resetCode = () => {
-    if (!window.confirm(`Discard your ${info.label} code and restore the starter?`)) return;
+    const { file, label } = info;
+    const previous = sandpack.files[file]?.code ?? '';
+    const starter = starters[file] ?? '';
+    if (previous === starter) return;
     // Only this language's file: the others keep their code.
-    sandpack.updateFile(info.file, starters[info.file] ?? '');
+    sandpack.updateFile(file, starter);
+    toast.show({
+      message: `Reset ${label} code to the starter`,
+      action: { label: 'Undo', done: `Restored your ${label} code`, run: () => sandpack.updateFile(file, previous) },
+    });
   };
 
   return (
@@ -195,7 +206,7 @@ function Inner({ question, assets, onAccepted, language, multiLanguage, onLangua
           type="button"
           className="btn btn-ghost btn-sm"
           onClick={resetCode}
-          title={`Discard your ${info.label} code and restore the starter`}
+          data-tooltip={`Reset your ${info.label} code to the starter (you can undo)`}
         >
           <RotateCcw size={13} aria-hidden /> Reset code
         </button>
@@ -241,7 +252,9 @@ function Inner({ question, assets, onAccepted, language, multiLanguage, onLangua
               className="btn btn-sm"
               onClick={() => execute('run')}
               disabled={!canRun}
-              title={`Run the visible testcases (${mod}')`}
+              data-tooltip="Run the visible testcases"
+              data-tooltip-kbd={`${mod} '`}
+              aria-keyshortcuts={`${ariaMod}+'`}
             >
               <Play size={13} aria-hidden /> Run <Kbd>{`${mod}'`}</Kbd>
             </button>
@@ -250,7 +263,9 @@ function Inner({ question, assets, onAccepted, language, multiLanguage, onLangua
               className="btn btn-sm btn-submit"
               onClick={() => execute('submit')}
               disabled={!canRun}
-              title={`Judge against every testcase, including hidden ones (${mod}↵)`}
+              data-tooltip="Judge against every testcase, including hidden ones"
+              data-tooltip-kbd={`${mod} ↵`}
+              aria-keyshortcuts={`${ariaMod}+Enter`}
             >
               <CloudUpload size={13} aria-hidden /> Submit <Kbd>{`${mod}↵`}</Kbd>
             </button>

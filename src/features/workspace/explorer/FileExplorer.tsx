@@ -11,6 +11,7 @@ import {
   Pencil,
   Trash2,
 } from 'lucide-react';
+import { useToast } from '../../../components/overlay/ToastProvider';
 import { buildTree, dirOf, joinPath, type TreeNode } from './buildTree';
 import { validateNewPath } from './validateNewPath';
 
@@ -116,6 +117,7 @@ export default function FileExplorer({ hidden, protectedPaths, readOnly = false,
   // New items go here: the folder last clicked, or the folder of the file last clicked.
   const [targetFolder, setTargetFolder] = useState('/');
   const treeRef = useRef<HTMLUListElement>(null);
+  const toast = useToast();
 
   const allPaths = useMemo(() => Object.keys(files), [files]);
   const paths = useMemo(() => {
@@ -217,22 +219,41 @@ export default function FileExplorer({ hidden, protectedPaths, readOnly = false,
     }
   };
 
+  // No confirm: delete straight away and offer Undo, which puts back the files
+  // (with their code), any empty folders, and the tabs that were open.
   const remove = (node: TreeNode) => {
-    if (node.kind === 'file') {
-      if (!window.confirm(`Delete ${node.name}?`)) return;
-      keepATabOpen([node.path]);
-      deleteFile(node.path);
-      return;
+    const isFolder = node.kind === 'folder';
+    const inFolder = (f: string) => f === node.path || f.startsWith(`${node.path}/`);
+    const removing = isFolder ? filesUnder(node.path) : [node.path];
+    const snapshot = {
+      files: Object.fromEntries(removing.map((p) => [p, files[p].code])),
+      folders: isFolder ? pendingFolders.filter(inFolder) : [],
+      // Reopen the tabs that were open, the active one last so it's active again.
+      tabs: [...visibleFiles.filter((p) => removing.includes(p) && p !== activeFile), ...(removing.includes(activeFile) ? [activeFile] : [])],
+    };
+
+    keepATabOpen(removing);
+    removing.forEach((p) => deleteFile(p));
+    if (isFolder) {
+      setPendingFolders((prev) => prev.filter((f) => !inFolder(f)));
+      if (inFolder(targetFolder)) setTargetFolder(dirOf(node.path));
     }
-    const inside = filesUnder(node.path);
-    const question = inside.length
-      ? `Delete folder ${node.name} and the ${inside.length} file${inside.length === 1 ? '' : 's'} in it?`
-      : `Delete folder ${node.name}?`;
-    if (!window.confirm(question)) return;
-    keepATabOpen(inside);
-    inside.forEach((p) => deleteFile(p));
-    setPendingFolders((prev) => prev.filter((f) => f !== node.path && !f.startsWith(`${node.path}/`)));
-    if (targetFolder === node.path || targetFolder.startsWith(`${node.path}/`)) setTargetFolder(dirOf(node.path));
+
+    const count = removing.length;
+    toast.show({
+      message: isFolder
+        ? `Deleted folder ${node.name}${count ? ` (${count} file${count === 1 ? '' : 's'})` : ''}`
+        : `Deleted ${node.name}`,
+      action: {
+        label: 'Undo',
+        done: `Restored ${node.name}`,
+        run: () => {
+          if (count) addFile(snapshot.files);
+          if (snapshot.folders.length) setPendingFolders((prev) => [...new Set([...prev, ...snapshot.folders])]);
+          snapshot.tabs.forEach((p) => openFile(p));
+        },
+      },
+    });
   };
 
   const validateIn = (parent: string, self?: string) => (name: string) =>
@@ -317,7 +338,8 @@ export default function FileExplorer({ hidden, protectedPaths, readOnly = false,
             <div
               className={`explorer-row${active ? ' active' : ''}`}
               style={levelStyle(level)}
-              title={node.path}
+              data-tooltip={node.path}
+              data-tooltip-side="right"
               onClick={() => activate(node)}
               onDoubleClick={() => editable && !isFolder && setEditing({ mode: 'rename', path: node.path, kind: node.kind })}
             >
@@ -347,7 +369,8 @@ export default function FileExplorer({ hidden, protectedPaths, readOnly = false,
                   <button
                     type="button"
                     tabIndex={-1}
-                    title="Rename (F2)"
+                    data-tooltip="Rename"
+                    data-tooltip-kbd="F2"
                     aria-label={`Rename ${node.name}`}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -359,7 +382,8 @@ export default function FileExplorer({ hidden, protectedPaths, readOnly = false,
                   <button
                     type="button"
                     tabIndex={-1}
-                    title="Delete"
+                    data-tooltip="Delete"
+                    data-tooltip-kbd="Del"
                     aria-label={`Delete ${node.name}`}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -385,15 +409,15 @@ export default function FileExplorer({ hidden, protectedPaths, readOnly = false,
         <div className="pane-actions">
           {!readOnly && (
             <>
-              <button type="button" className="icon-btn" title="New file" aria-label="New file" onClick={() => startCreate('new-file')}>
+              <button type="button" className="icon-btn" data-tooltip="New file" aria-label="New file" onClick={() => startCreate('new-file')}>
                 <FilePlus size={14} />
               </button>
-              <button type="button" className="icon-btn" title="New folder" aria-label="New folder" onClick={() => startCreate('new-folder')}>
+              <button type="button" className="icon-btn" data-tooltip="New folder" aria-label="New folder" onClick={() => startCreate('new-folder')}>
                 <FolderPlus size={14} />
               </button>
             </>
           )}
-          <button type="button" className="icon-btn" title="Hide files" aria-label="Hide files" onClick={onCollapse}>
+          <button type="button" className="icon-btn" data-tooltip="Hide files" aria-label="Hide files" onClick={onCollapse}>
             <PanelLeftClose size={14} />
           </button>
         </div>

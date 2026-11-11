@@ -64,7 +64,7 @@ export function DsaTestcasePanel({ spec, cases, selected, onSelect, onChange, on
           <div key={i} className={`case-chip${i === selected ? ' active' : ''}`}>
             <button type="button" role="tab" aria-selected={i === selected} onClick={() => onSelect(i)}>
               Case {i + 1}
-              {!c.original && <span className="edited-dot" title="Edited: expected output comes from the reference solution" />}
+              {!c.original && <span className="edited-dot" data-tooltip="Edited: expected output comes from the reference solution" />}
             </button>
             {cases.length > 1 && (
               <button
@@ -86,7 +86,7 @@ export function DsaTestcasePanel({ spec, cases, selected, onSelect, onChange, on
             type="button"
             className="icon-btn chip-add"
             aria-label="Add testcase"
-            title="Add a testcase (copies the current one)"
+            data-tooltip="Add a testcase (copies the current one)"
             onClick={() => {
               onChange([...cases, { fields: [...current.fields] }]);
               onSelect(cases.length);

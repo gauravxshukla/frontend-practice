@@ -29,7 +29,7 @@ function SnackLink({ isUserFile, title, dependencies }: Pick<PreviewPaneProps, '
     <button
       type="button"
       className="icon-btn"
-      title="Open in Expo Snack (snack.expo.dev) to run on a real device"
+      data-tooltip="Open in Expo Snack to run on a real device"
       aria-label="Open in Expo Snack"
       onClick={open}
     >
@@ -56,7 +56,7 @@ export default function PreviewPane({ maximized, onToggleMaximize, platform, isU
                 type="button"
                 className="icon-btn"
                 aria-pressed={framed}
-                title={framed ? 'Fill the pane' : 'Show in a phone frame'}
+                data-tooltip={framed ? 'Fill the pane' : 'Show in a phone frame'}
                 aria-label="Phone frame"
                 onClick={() => setFramed((f) => !f)}
               >
@@ -65,14 +65,14 @@ export default function PreviewPane({ maximized, onToggleMaximize, platform, isU
               <SnackLink isUserFile={isUserFile} title={title} dependencies={dependencies} />
             </>
           )}
-          <button type="button" className="icon-btn" title="Reload preview" aria-label="Reload preview" onClick={refresh}>
+          <button type="button" className="icon-btn" data-tooltip="Reload preview" aria-label="Reload preview" onClick={refresh}>
             <RotateCw size={14} />
           </button>
           <button
             type="button"
             className="icon-btn"
             aria-pressed={maximized}
-            title={maximized ? 'Restore layout' : 'Maximize preview and console'}
+            data-tooltip={maximized ? 'Restore layout' : 'Maximize preview and console'}
             aria-label={maximized ? 'Restore layout' : 'Maximize preview and console'}
             onClick={onToggleMaximize}
           >
