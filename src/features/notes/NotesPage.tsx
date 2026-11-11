@@ -1,13 +1,14 @@
 import { Link, useParams } from 'react-router';
 import Markdown from '../../components/Markdown';
 import { getNote, getNoteSection, noteSections, type NoteSection } from '../../lib/content/notes';
+import { notesUrl } from '../../lib/routes';
 
 function SectionList({ section }: { section: NoteSection }) {
   return (
     <ul className="question-list">
       {section.notes.map((n) => (
         <li key={n.slug}>
-          <Link to={`/notes/${n.slug}`} className="question-row">
+          <Link to={notesUrl(n.slug)} className="question-row">
             <span className="question-row-title">{n.title}</span>
           </Link>
         </li>
@@ -22,7 +23,7 @@ function NotesIndex({ only }: { only?: NoteSection }) {
       <header className="page-header">
         {only && (
           <p className="eyebrow">
-            <Link to="/notes">Notes</Link>
+            <Link to={notesUrl()}>Notes</Link>
           </p>
         )}
         <h1>{only ? only.label : 'Notes'}</h1>
@@ -50,7 +51,7 @@ export default function NotesPage() {
       <div className="page">
         <div className="empty-state">
           <h2>Note not found</h2>
-          <Link to="/notes">Back to notes</Link>
+          <Link to={notesUrl()}>Back to notes</Link>
         </div>
       </div>
     );
@@ -59,7 +60,7 @@ export default function NotesPage() {
   return (
     <div className="page">
       <p className="eyebrow">
-        <Link to="/notes">Notes</Link> / <Link to={`/notes/${note.sectionId}`}>{note.section}</Link>
+        <Link to={notesUrl()}>Notes</Link> / <Link to={notesUrl(note.sectionId)}>{note.section}</Link>
       </p>
       <article className="prose">
         <Markdown>{note.content}</Markdown>

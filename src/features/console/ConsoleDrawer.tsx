@@ -1,10 +1,11 @@
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Ban, ChevronRight, CircleX, Search, TriangleAlert } from 'lucide-react';
+import { Ban, ChevronRight, CircleX, ListFilter, Search, TriangleAlert } from 'lucide-react';
 import { usePersistentState } from '../../lib/usePersistentState';
 import { useRowResize } from '../../lib/useRowResize';
 import type { LogEntry } from './types';
 import { entryText } from './preview';
 import ConsoleView from './ConsoleView';
+import { Select } from '../../components/Select';
 
 type LevelFilter = 'all' | 'log' | 'warn' | 'error';
 
@@ -120,8 +121,9 @@ export default function ConsoleDrawer({ entries, onClear, onErrorCount }: Consol
           </button>
           {open && (
             <div className={`console-drawer-tools${searching || query ? ' searching' : ''}`}>
-              <select
-                className="console-filter-level"
+              <Select
+                className={`console-filter-level${filter === 'all' ? '' : ' filtered'}`}
+                icon={<ListFilter size={14} />}
                 aria-label="Filter by level"
                 value={filter}
                 onChange={(e) => setFilter(e.target.value as LevelFilter)}
@@ -131,7 +133,7 @@ export default function ConsoleDrawer({ entries, onClear, onErrorCount }: Consol
                     {f.label}
                   </option>
                 ))}
-              </select>
+              </Select>
               <button
                 type="button"
                 className="icon-btn console-search-toggle"

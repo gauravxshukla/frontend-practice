@@ -62,13 +62,15 @@ interface Props {
   actions: PaletteAction[];
   /** Shown before you type, after Continue and Recent. */
   jumpTo: PaletteItem[];
+  /** A new object starts the search with its query typed in. */
+  seed?: { query: string } | null;
 }
 
 /**
  * Spotlight-style launcher: find any question, topic, quiz deck or note, or
  * run an action (prefix `>`). Before you type it suggests what to pick up next.
  */
-export default function CommandPalette({ open, onClose, actions, jumpTo }: Props) {
+export default function CommandPalette({ open, onClose, actions, jumpTo, seed }: Props) {
   const navigate = useNavigate();
   const progress = useProgress();
   // Kept across open/close: reopening shows the last query, selected, like Spotlight.
@@ -94,6 +96,12 @@ export default function CommandPalette({ open, onClose, actions, jumpTo }: Props
 
   const rows = useMemo(() => sections.flatMap((s) => s.rows), [sections]);
   const activeIndex = Math.min(active, Math.max(rows.length - 1, 0));
+
+  useEffect(() => {
+    if (!seed) return;
+    setQuery(seed.query);
+    setActive(0);
+  }, [seed]);
 
   useEffect(() => {
     if (open) inputRef.current?.select();

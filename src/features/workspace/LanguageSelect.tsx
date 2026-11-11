@@ -1,3 +1,4 @@
+import { Select } from '../../components/Select';
 import { LANGUAGES } from '../runner/languages/registry';
 import type { LanguageId } from '../runner/languages/types';
 
@@ -7,10 +8,10 @@ interface LanguageSelectProps {
   disabled?: boolean;
 }
 
-/** Native select: keyboard and screen-reader behaviour for free. */
+/** The DSA language picker. */
 export default function LanguageSelect({ value, onChange, disabled }: LanguageSelectProps) {
   return (
-    <select
+    <Select
       className="language-select"
       aria-label="Language"
       value={value}
@@ -23,6 +24,6 @@ export default function LanguageSelect({ value, onChange, disabled }: LanguageSe
           {l.beta ? ' (beta)' : ''}
         </option>
       ))}
-    </select>
+    </Select>
   );
 }

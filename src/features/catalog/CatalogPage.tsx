@@ -11,6 +11,7 @@ import {
   type QuestionGroup,
 } from '../../lib/content/catalog';
 import { useProgress } from '../../lib/progress';
+import { groupUrl, questionUrl } from '../../lib/routes';
 
 const DIFFICULTIES: Difficulty[] = ['easy', 'medium', 'hard'];
 
@@ -38,7 +39,7 @@ function TrackCard({ group }: { group: QuestionGroup }) {
   const solved = items.filter((q) => progress[q.slug] === 'solved').length;
 
   return (
-    <Link to={`/topics/${group.id}`} className="track-card">
+    <Link to={groupUrl(group.id)} className="track-card">
       <span className="track-card-icon">
         <Icon size={18} aria-hidden />
       </span>
@@ -61,7 +62,7 @@ function TrackCard({ group }: { group: QuestionGroup }) {
 function QuestionRow({ q }: { q: Question }) {
   return (
     <li>
-      <Link to={`/q/${q.slug}`} className="question-row">
+      <Link to={questionUrl(q)} className="question-row">
         <span className="question-row-title">{q.title}</span>
         <span className="question-row-tags">
           {q.tags.slice(0, 3).map((tag) => (
@@ -165,7 +166,7 @@ export default function CatalogPage() {
                     const solved = items.filter((q) => progress[q.slug] === 'solved').length;
                     const pct = items.length ? Math.round((solved / items.length) * 100) : 0;
                     return (
-                      <Link key={child.id} to={`/topics/${child.id}`} className="topic-card">
+                      <Link key={child.id} to={groupUrl(child.id)} className="topic-card">
                         <span className="topic-card-title">{child.label}</span>
                         <span className="muted topic-card-count">
                           {solved ? `${solved} / ${items.length} solved` : `${items.length} questions`}

@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
-import { createBrowserRouter, Link, Outlet, RouterProvider, useLocation } from 'react-router';
+import { createBrowserRouter, Link, Navigate, Outlet, RouterProvider, useLocation } from 'react-router';
 import { Binary, Braces, House, Keyboard, LayoutGrid, ListChecks, Menu, Monitor, Moon, PanelLeft, Search, StickyNote, Sun } from 'lucide-react';
 import CatalogPage from '../features/catalog/CatalogPage';
 import QuizIndex from '../features/quiz/QuizIndex';
@@ -12,12 +12,13 @@ import { buildIndex, type PaletteAction, type PaletteItem } from '../features/pa
 import { ConfirmProvider } from '../components/overlay/ConfirmProvider';
 import { ToastProvider } from '../components/overlay/ToastProvider';
 import TooltipLayer from '../components/overlay/TooltipLayer';
-import { getQuestion } from '../lib/content/catalog';
-import { isQuestionRoute, isTyping } from '../lib/platform';
+import { isTyping } from '../lib/platform';
 import { recordVisit } from '../lib/recent';
+import { legacyRedirect, notesUrl, parseRoute, quizUrl } from '../lib/routes';
 import { keysFor, type ShortcutContext } from '../lib/shortcuts';
 import { setThemeMode } from '../lib/theme';
 import { usePersistentState } from '../lib/usePersistentState';
+import { OpenSearchContext } from './openSearch';
 import Sidebar from './Sidebar';
 import './layout.css';
 
@@ -37,22 +38,38 @@ function jumpToItems(actions: PaletteAction[]): PaletteItem[] {
 }
 
 function shortcutContext(pathname: string): ShortcutContext {
-  if (!isQuestionRoute(pathname)) return 'browse';
-  const type = getQuestion(pathname.slice('/q/'.length))?.type;
+  const route = parseRoute(pathname);
+  if (route.kind !== 'question') return 'browse';
+  const { type } = route.question;
   return type === 'react' || type === 'vanilla' ? 'machine-coding' : 'code';
+}
+
+/** Tracks, topics and questions: `/dsa`, `/dsa/topics/trees`, `/dsa/two-sum`, `/react/x/native`. */
+function ContentRoute() {
+  const route = parseRoute(useLocation().pathname);
+  if (route.kind === 'group') return <TopicPage group={route.group} />;
+  return <QuestionPage />;
+}
+
+/** Old `/q/…` and `/topics/…` links. */
+function LegacyRedirect() {
+  const { pathname, search } = useLocation();
+  return <Navigate to={legacyRedirect(pathname, search) ?? '/'} replace />;
 }
 
 function Layout() {
   const { pathname } = useLocation();
   // Question pages want room for the editor, so they keep their own sidebar
   // preference (collapsed to the rail by default); browse pages keep theirs.
-  const inWorkspace = isQuestionRoute(pathname);
+  const inWorkspace = parseRoute(pathname).kind === 'question';
   const [browseCollapsed, setBrowseCollapsed] = usePersistentState('fp:sidebar:collapsed', false);
   const [workspaceCollapsed, setWorkspaceCollapsed] = usePersistentState('fp:sidebar:collapsedWorkspace', true);
   const collapsed = inWorkspace ? workspaceCollapsed : browseCollapsed;
   const setCollapsed = inWorkspace ? setWorkspaceCollapsed : setBrowseCollapsed;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  // Text to start a search with (e.g. the name of a question that wasn't found).
+  const [paletteSeed, setPaletteSeed] = useState<{ query: string } | null>(null);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
 
   // Close the drawer whenever the route changes.
@@ -64,8 +81,9 @@ function Layout() {
     else setCollapsed((c) => !c);
   }, [setCollapsed]);
 
-  const openPalette = useCallback(() => {
+  const openPalette = useCallback((query?: string) => {
     setMobileOpen(false);
+    if (query !== undefined) setPaletteSeed({ query });
     setPaletteOpen(true);
   }, []);
 
@@ -103,8 +121,8 @@ function Layout() {
   const actions = useMemo(
     (): PaletteAction[] => [
       { id: 'a:go-home', kind: 'action', title: 'Go to Home', keywords: ['dashboard', 'practice'], href: '/', icon: House },
-      { id: 'a:go-quiz', kind: 'action', title: 'Quiz', subtitle: 'Flashcard decks', keywords: ['flashcards'], href: '/quiz', icon: ListChecks },
-      { id: 'a:go-notes', kind: 'action', title: 'Notes', subtitle: 'Reference material', keywords: ['reading'], href: '/notes', icon: StickyNote },
+      { id: 'a:go-quiz', kind: 'action', title: 'Quiz', subtitle: 'Flashcard decks', keywords: ['flashcards'], href: quizUrl(), icon: ListChecks },
+      { id: 'a:go-notes', kind: 'action', title: 'Notes', subtitle: 'Reference material', keywords: ['reading'], href: notesUrl(), icon: StickyNote },
       {
         id: 'a:toggle-sidebar',
         kind: 'action',
@@ -140,7 +158,7 @@ function Layout() {
             onToggleCollapsed={() => setCollapsed((c) => !c)}
             mobileOpen={mobileOpen}
             onCloseMobile={() => setMobileOpen(false)}
-            onOpenSearch={openPalette}
+            onOpenSearch={() => openPalette()}
             onOpenShortcuts={() => {
               setMobileOpen(false);
               setShortcutsOpen(true);
@@ -159,16 +177,24 @@ function Layout() {
                 </span>
                 Frontend Practice
               </Link>
-              <button type="button" className="icon-btn" onClick={openPalette} aria-label="Search">
+              <button type="button" className="icon-btn" onClick={() => openPalette()} aria-label="Search">
                 <Search size={18} />
               </button>
             </header>
-            <Suspense fallback={<div className="page-loading" aria-busy="true" />}>
-              <Outlet />
-            </Suspense>
+            <OpenSearchContext.Provider value={openPalette}>
+              <Suspense fallback={<div className="page-loading" aria-busy="true" />}>
+                <Outlet />
+              </Suspense>
+            </OpenSearchContext.Provider>
           </div>
         </div>
-        <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} actions={actions} jumpTo={jumpTo} />
+        <CommandPalette
+          open={paletteOpen}
+          onClose={() => setPaletteOpen(false)}
+          actions={actions}
+          jumpTo={jumpTo}
+          seed={paletteSeed}
+        />
         <KeyboardShortcuts open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} context={shortcutContext(pathname)} />
         <TooltipLayer />
       </ConfirmProvider>
@@ -182,8 +208,9 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <CatalogPage /> },
-      { path: 'topics/*', element: <TopicPage /> },
-      { path: 'q/*', element: <QuestionPage /> },
+      ...['js', 'dsa', 'react', 'vanilla', 'machine-coding'].map((track) => ({ path: `${track}/*`, element: <ContentRoute /> })),
+      { path: 'q/*', element: <LegacyRedirect /> },
+      { path: 'topics/*', element: <LegacyRedirect /> },
       { path: 'quiz', element: <QuizIndex /> },
       { path: 'quiz/:deck', element: <QuizDeckPage /> },
       { path: 'notes/*', element: <NotesPage /> },

@@ -28,6 +28,11 @@ describe('recent', () => {
     expect(readRecent()[0]).toBe('/q/11');
   });
 
+  it('maps visits saved under the old URLs to the new ones', () => {
+    store.set('fp:recent', JSON.stringify(['/q/dsa/arrays-hashing/two-sum', '/dsa/two-sum', '/topics/dsa/trees']));
+    expect(readRecent()).toEqual(['/dsa/two-sum', '/dsa/topics/trees']);
+  });
+
   it('treats corrupt storage as empty', () => {
     store.set('fp:recent', '{nope');
     expect(readRecent()).toEqual([]);

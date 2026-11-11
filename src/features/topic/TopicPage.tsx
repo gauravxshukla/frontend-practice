@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link } from 'react-router';
 import { CheckCircle2, Circle, CircleDot } from 'lucide-react';
 import { DifficultyBadge, Tag } from '../../components/Badges';
-import { findGroup, groupPath, questionsIn, type Difficulty, type QuestionGroup } from '../../lib/content/catalog';
+import { groupPath, questionsIn, type Difficulty, type QuestionGroup } from '../../lib/content/catalog';
 import { useProgress, type Status } from '../../lib/progress';
+import { groupUrl, questionUrl } from '../../lib/routes';
 
 const DIFFICULTIES: Difficulty[] = ['easy', 'medium', 'hard'];
 type StatusFilter = 'all' | 'todo' | 'solved';
@@ -37,7 +38,7 @@ function GroupOverview({ group }: { group: QuestionGroup }) {
         const items = questionsIn(child);
         const solved = items.filter((q) => progress[q.slug] === 'solved').length;
         return (
-          <Link key={child.id} to={`/topics/${child.id}`} className="topic-card">
+          <Link key={child.id} to={groupUrl(child.id)} className="topic-card">
             <span className="topic-card-title">{child.label}</span>
             <span className="muted topic-card-count">{items.length} questions</span>
             <ProgressBar solved={solved} total={items.length} />
@@ -48,33 +49,21 @@ function GroupOverview({ group }: { group: QuestionGroup }) {
   );
 }
 
-export default function TopicPage() {
-  const id = useParams()['*'] ?? '';
-  const group = findGroup(id);
+/** A track or topic, resolved from the URL by the router (see src/lib/routes.ts). */
+export default function TopicPage({ group }: { group: QuestionGroup }) {
   const progress = useProgress();
   const [difficulty, setDifficulty] = useState<Difficulty | ''>('');
   const [status, setStatus] = useState<StatusFilter>('all');
 
-  if (!group) {
-    return (
-      <div className="page">
-        <div className="empty-state">
-          <h2>Topic not found</h2>
-          <Link to="/">Back to practice</Link>
-        </div>
-      </div>
-    );
-  }
-
   const items = questionsIn(group);
   const solved = items.filter((q) => progress[q.slug] === 'solved').length;
-  const parents = groupPath(id).slice(0, -1);
+  const parents = groupPath(group.id).slice(0, -1);
   const visible = items.filter(
     (q) =>
       (!difficulty || q.difficulty === difficulty) &&
       (status === 'all' || (status === 'solved') === (progress[q.slug] === 'solved')),
   );
-  const isDsa = id.startsWith('dsa/');
+  const isDsa = group.id.startsWith('dsa/');
 
   return (
     <div className="page page-wide">
@@ -109,7 +98,7 @@ export default function TopicPage() {
             <ol className="question-list topic-list">
               {visible.map((q) => (
                 <li key={q.slug}>
-                  <Link to={`/q/${q.slug}`} className="question-row">
+                  <Link to={questionUrl(q)} className="question-row">
                     <StatusIcon status={progress[q.slug]} />
                     {isDsa && q.order !== undefined && <span className="row-order">{q.order}</span>}
                     <span className="question-row-title">{q.title}</span>

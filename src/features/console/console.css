@@ -292,7 +292,7 @@
   min-width: 0;
 }
 
-.console-filter-level,
+.console-filter-level select,
 .console-filter-text {
   height: 26px;
   border: 1px solid var(--border);
@@ -303,9 +303,6 @@
   font-size: 12px;
 }
 
-.console-filter-level {
-  padding: 0 4px;
-}
 
 .console-filter-text {
   width: 120px;
@@ -319,8 +316,46 @@
 
 /* Narrow pane: the level menu shrinks and the text filter folds into a search button. */
 @container console (max-width: 380px) {
-  .console-filter-level {
-    max-width: 84px;
+  /* The level menu becomes a filter icon (the native menu still opens). */
+  .console-filter-level select {
+    width: 26px;
+    padding: 0;
+    border-color: transparent;
+    background: transparent;
+    color: transparent;
+  }
+
+  .console-filter-level select:hover {
+    background: var(--surface-3);
+  }
+
+  .console-filter-level select option {
+    color: var(--text);
+  }
+
+  .console-filter-level .select-chevron {
+    display: none;
+  }
+
+  .console-filter-level .select-icon {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  /* A filter is on: mark the icon. */
+  .console-filter-level.filtered .select-icon::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
   }
 
   .console-search-toggle {
