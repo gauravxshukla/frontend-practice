@@ -35,11 +35,10 @@ Output: [10]
 
 ## Notes
 
-- **Key insight:** once a piece contains a letter, it must stretch at least to that letter's **last** occurrence.
-- First pass: record `last[c]`, the final index of each letter.
-- Second pass: keep `end = max(end, last[s[i]])`. When `i === end`, every letter seen so far is finished, so close the piece and push `end − start + 1`.
-- O(n) time, O(1) extra space (26 letters).
-- Brute force: test every cut position by comparing the letter sets on each side, O(n²) or O(26·n) with prefix counts.
-- Pitfall: returning the pieces themselves instead of their lengths.
-- Pitfall: closing a piece as soon as the *current* letter ends, while an earlier letter in the same piece still appears later.
-- Follow-up: the related "merge intervals" view, where each letter is the interval [first, last] and the pieces are the merged intervals.
+- **Identify:** split a string so each letter is in one part, as many parts as possible → last-occurrence greedy
+- **Brute force:** for each cut, check that no letter appears on both sides, O(n²)
+- **Insight:** a part must extend to the last occurrence of every letter inside it; close it when i reaches that end
+- **Steps:** record each letter's last index; scan, end = max(end, last[ch]); when i == end, cut and start a new part
+- **Complexity:** O(n²) → O(n) time, O(26) space
+- **Pitfall:** the end can grow while scanning, so cut only when i reaches the current end
+- **Related:** Merge Intervals, Hand of Straights, Merge Triplets to Form Target Triplet

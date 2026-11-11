@@ -38,13 +38,10 @@ Explanation: q=19 lies in no interval, so -1.
 
 ## Notes
 
-- **Key insight:** answer the queries **offline**, in increasing order. Then intervals only ever *become* relevant (once `left ≤ q`) and only ever *stop* being relevant (once `right < q`), which is exactly what a heap handles.
-- Sort intervals by `left`. Sort query indices by value.
-- For each query `q` in order: push every interval with `left ≤ q` onto a min-heap keyed by `(size, right)`. Then pop from the top while its `right < q`, since it can never cover this or any later query.
-- The heap top (if any) is the smallest interval covering `q`. Write its size to `answer[originalIndex]`, or `-1`.
-- O((n + m) log n + m log m) time, O(n + m) space.
-- Brute force: scan every interval for every query, O(n · m), too slow at 10⁵ × 10⁵.
-- Pitfall: forgetting to restore the original query order, or not handling duplicate query values.
-- Pitfall: size is `right − left + 1` (inclusive), not `right − left`.
-- JavaScript has no built-in heap, so write a small binary heap class.
-- Follow-up: answer queries online. A segment tree over compressed coordinates with "range chmin" works.
+- **Identify:** smallest interval containing each query point → sort both, sweep with a min-heap by size
+- **Brute force:** for each query, scan all intervals for the smallest containing it, O(n·q)
+- **Insight:** process queries in increasing order: add intervals that have started, drop ones that have ended, read the heap top
+- **Steps:** sort intervals by start and queries (keep indices); push (size, end) as starts ≤ q; pop ends < q; top size or −1
+- **Complexity:** O(n·q) → O((n + q) log n) time, O(n + q) space
+- **Pitfall:** answer in the original query order, and size counts both ends: right − left + 1
+- **Related:** Meeting Rooms II, Merge Intervals, Kth Largest Element in a Stream

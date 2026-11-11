@@ -39,11 +39,10 @@ Output: 0
 
 ## Notes
 
-- **Key insight:** removing the fewest is the same as *keeping* the most. To keep the most, always keep the interval that **ends earliest**, since it leaves the most room for everything after it.
-- Sort by end. Keep `prevEnd`. For each interval, if `start ≥ prevEnd` keep it (`prevEnd = end`). Otherwise count a removal.
-- Equivalent: sort by start, and on overlap remove the one with the larger end (`prevEnd = min(prevEnd, end)`).
-- O(n log n) time for the sort, O(1) extra space.
-- Brute force: DP for the longest chain of compatible intervals, O(n²). Trying every subset is O(2ⁿ).
-- Pitfall: using `>` instead of `≥` makes touching intervals count as overlapping.
-- Pitfall: sorting by start and always dropping the *current* interval. Drop whichever ends later.
-- Follow-up: this is the classic activity-selection problem. "Minimum Number of Arrows to Burst Balloons" is the same greedy with closed intervals.
+- **Identify:** fewest removals so nothing overlaps → keep the most intervals: greedy by earliest end
+- **Brute force:** try every subset of intervals to keep, O(2^n)
+- **Insight:** keeping the interval that ends first leaves the most room for the rest (activity selection)
+- **Steps:** sort by end; keep the first; for each next, if start ≥ last kept end keep it, else remove it
+- **Complexity:** O(2^n) → O(n log n) time, O(1) extra space
+- **Pitfall:** touching intervals ([1, 2] and [2, 3]) don't overlap here, so use ≥
+- **Related:** Merge Intervals, Meeting Rooms, Minimum Interval to Include Each Query

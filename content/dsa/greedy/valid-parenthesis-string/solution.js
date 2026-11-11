@@ -1,12 +1,11 @@
 /**
- * @param {string} s
+ * @param {string} s '(', ')' and '*'
  * @return {boolean}
  */
 export default function checkValidString(s) {
-  // [lo, hi] = range of possible counts of unmatched '('.
+  // fewest and most unmatched '(' possible after reading each prefix
   let lo = 0;
   let hi = 0;
-
   for (const ch of s) {
     if (ch === '(') {
       lo++;
@@ -15,11 +14,14 @@ export default function checkValidString(s) {
       lo--;
       hi--;
     } else {
-      lo--; // '*' as ')'
-      hi++; // '*' as '('
+      lo--; // '*' read as ')'
+      hi++; // '*' read as '('
     }
-    if (hi < 0) return false; // too many ')' no matter what
-    lo = Math.max(lo, 0); // a negative count is never a real option
+    // even treating every '*' as '(' can't cover the ')'s seen
+    if (hi < 0) return false;
+    // a negative count isn't a real option: those '*' would have been empty instead
+    lo = Math.max(lo, 0);
   }
+  // some choice of '*'s closes every '('
   return lo === 0;
 }

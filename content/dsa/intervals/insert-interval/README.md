@@ -18,8 +18,10 @@ insert([[1, 2], [3, 5], [6, 7], [8, 10], [12, 16]], [4, 8]); // [[1, 2], [3, 10]
 
 ## Notes
 
-- Three phases in one pass, with no sort needed since the input is already sorted:
-  1. Push every interval that ends **before** `newInterval` starts.
-  2. Merge every interval that overlaps: `start = min`, `end = max`. Then push the merged one.
-  3. Push the rest.
-- O(n) time. Using merge-intervals after appending (O(n log n)) is a valid fallback, but it doesn't use the sorted input.
+- **Identify:** add one interval to a sorted, non-overlapping list → three phases: before, overlap, after
+- **Brute force:** append it, sort everything again, then run Merge Intervals, O(n log n)
+- **Insight:** the list is already sorted, so one pass can copy, merge and copy without sorting
+- **Steps:** copy intervals ending before new starts; merge every interval that overlaps into new; add it; copy the rest
+- **Complexity:** O(n log n) → O(n) time, O(n) space for the output
+- **Pitfall:** touching intervals ([1, 5] and [5, 7]) overlap and must merge (use ≤ / ≥)
+- **Related:** Merge Intervals, Non-overlapping Intervals, Meeting Rooms

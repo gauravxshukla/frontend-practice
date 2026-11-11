@@ -36,11 +36,11 @@ Explanation: Every path lands on index 3, whose value is 0, so index 4 is unreac
 
 ## Notes
 
-- **Key insight:** you never need to know *which* path you took, only the furthest index reachable so far.
-- Sweep left to right keeping `reach`. If `i > reach`, index `i` is unreachable and so is everything after it: return `false`. Otherwise `reach = max(reach, i + nums[i])`.
-- Equivalent backwards greedy: keep a `goal` starting at the last index, and move it to `i` whenever `i + nums[i] ≥ goal`. Answer is `goal === 0`.
-- O(n) time, O(1) space.
-- Brute force: DP marking each reachable index and fanning out up to `nums[i]` steps, O(n · max(nums)). Plain recursion without memo is exponential.
-- Edge cases: a single element is already at the end (`[0]` → true). A zero is only fatal if you can't jump over it.
-- You can return early once `reach ≥ n − 1`.
-- Follow-up: Jump Game II asks for the minimum number of jumps.
+- **Identify:** can you reach the last index with jumps up to nums[i] → track the farthest reachable index
+- **Brute force:** try every jump length from every index recursively, exponential
+- **Better:** DP: good[i] if some j > i within reach is good, O(n²)
+- **Insight:** you never need the exact path; only the farthest index reachable so far matters
+- **Steps:** reach = 0; for each i: if i > reach return false; reach = max(reach, i + nums[i])
+- **Complexity:** exponential → O(n) time, O(1) space
+- **Pitfall:** a 0 is only a trap if nothing earlier jumps past it ([2, 0, 0] is true)
+- **Related:** Jump Game II, Gas Station, Maximum Subarray
