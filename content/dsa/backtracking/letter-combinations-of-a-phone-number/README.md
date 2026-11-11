@@ -35,10 +35,10 @@ Output: ["a","b","c"]
 
 ## Notes
 
-- **Key insight:** this is a Cartesian product. Each position independently picks one letter from its digit's group.
-- **Backtracking:** `backtrack(i, prefix)` loops over the letters for `digits[i]` and recurses with `prefix + letter`. Record the prefix when `i === digits.length`. O(4ⁿ · n) time, O(n) depth.
-- **Iterative:** start with `['']`, and for each digit replace the list with every existing string extended by each of its letters.
-- Strings are immutable in JS, so `prefix + ch` needs no explicit "undo" step. With an array path you would push and pop.
-- Pitfall: returning `['']` for empty input. The expected answer is `[]`.
-- Pitfall: forgetting that 7 and 9 have **four** letters.
-- Follow-up: T9-style lookup. Given a dictionary, return only the combinations that are real words (a trie prunes early).
+- **Identify:** every string from choosing one letter per digit → backtracking over digit positions
+- **Brute force:** iteratively build the cartesian product level by level, same O(4^n · n) with more copying
+- **Insight:** each digit is one decision level; recurse through the digits, one letter at a time
+- **Steps:** map digits to letters; dfs(i, path): at i = n save path; else for each letter of digits[i], recurse with it
+- **Complexity:** O(4^n · n) time, O(n) recursion depth
+- **Pitfall:** empty input returns [], not [""]
+- **Related:** Generate Parentheses, Subsets, Permutations

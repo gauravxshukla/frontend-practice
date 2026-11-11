@@ -36,11 +36,10 @@ Output: []
 
 ## Notes
 
-- **Key insight:** build each combination in a fixed order (only candidates at index ≥ the last one used). Then each multiset is generated exactly once.
-- **Backtracking:** `backtrack(start, remaining)`. At 0, record a copy. Otherwise loop `i` from `start`, push `candidates[i]`, and recurse with `(i, remaining - candidates[i])`. Passing `i` again is what allows reuse.
-- **Pruning:** sort the candidates first and `break` once `candidates[i] > remaining`, since every later candidate is bigger too.
-- Complexity: exponential. A loose bound is O(n^(t/m)), where t is the target and m is the smallest candidate. Recursion depth is at most t/m.
-- **Alternative brute force:** for each candidate, try every count from 0 up to `remaining / c`.
-- Pitfall: looping from 0 at every level, which produces `[2,2,3]`, `[2,3,2]` and `[3,2,2]` as separate answers.
-- Pitfall: recursing with `i + 1`, which forbids reuse (that's Combination Sum II).
-- Follow-up: count the combinations instead of listing them. That's the Coin Change II DP, O(n · target).
+- **Identify:** combinations summing to target, numbers reusable → backtracking with a start index
+- **Brute force:** generate every multiset of candidates up to target and keep the matches
+- **Insight:** pass a start index so each combination is built in one order, and stay at i to reuse it
+- **Steps:** dfs(start, remaining): 0 → save path; for i from start: if candidates[i] ≤ remaining, add it and recurse at i
+- **Complexity:** O(n^(target/min)) time in the worst case, O(target/min) recursion depth
+- **Pitfall:** recursing from 0 instead of i produces the same combination in different orders
+- **Related:** Combination Sum II, Subsets, Coin Change II

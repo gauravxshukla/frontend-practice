@@ -32,11 +32,10 @@ Output: [["a"]]
 
 ## Notes
 
-- **Key insight:** choose the first piece, which must be a palindrome prefix, then partition the rest the same way.
-- **Backtracking:** `backtrack(start)` tries every `end ≥ start`. If `s[start..end]` is a palindrome, push it, recurse on `end + 1`, then pop. At `start === n`, record a copy.
-- **Palindrome table:** precompute `isPal[i][j] = s[i] === s[j] && (j - i < 2 || isPal[i+1][j-1])` in O(n²), so every check during the search is O(1).
-- Complexity: O(n · 2ⁿ) worst case (for example `"aaaa…"`, where every split is valid), plus O(n²) for the table.
-- **Brute force:** try all 2ⁿ⁻¹ ways to cut the string and keep those where every piece is a palindrome.
-- Pitfall: checking palindromes with `reverse()` inside the search. It works, but adds an O(n) factor to every check.
-- Pitfall: comparing partitions as unordered sets. `["a","ab"]` and `["ab","a"]` are different strings.
-- Follow-up: Palindrome Partitioning II, the **minimum** number of cuts, which is an O(n²) DP with no enumeration.
+- **Identify:** every way to cut a string into palindromes → backtracking over cut positions
+- **Brute force:** try all 2^(n−1) cut patterns, then check every piece afterwards
+- **Insight:** only cut off a prefix that is already a palindrome, so invalid branches die immediately
+- **Steps:** dfs(start): at the end save the path; for each end ≥ start, if s[start..end] is a palindrome, add it and recurse at end + 1
+- **Complexity:** O(n·2^n) time, O(n) recursion depth
+- **Pitfall:** a single character is always a palindrome, so every string has at least one partition
+- **Related:** Palindromic Substrings, Longest Palindromic Substring, Subsets

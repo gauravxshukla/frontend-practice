@@ -36,11 +36,10 @@ Output: [[1]]
 
 ## Notes
 
-- **Key insight:** fill positions one at a time. Each position can take any number not already used, which gives n · (n−1) · … · 1 = n! leaves.
-- **Backtracking with a `used` array:** loop over all indices, skip used ones, then mark, push, recurse, pop and unmark. Record a copy when the path has length n. O(n · n!) time, O(n) extra space.
-- **Swap-based:** at depth `d`, swap each `j ≥ d` into position `d`, recurse on `d + 1`, and swap back. This avoids the `used` array.
-- **Insertion (iterative):** start from `[[]]`, and for each number, insert it at every position of every existing permutation.
-- Pitfall: using `path.includes(x)` to check membership. It works for distinct values but costs O(n) per check, and it breaks when values repeat.
-- Pitfall: forgetting to copy `path` when recording, or forgetting to un-mark `used[i]` on the way back.
-- Follow-up: Permutations II, with duplicates. Sort, then skip `nums[i]` if it equals `nums[i-1]` and `nums[i-1]` isn't currently used.
-- Follow-up: Next Permutation, which finds the next ordering in O(n) without generating all of them.
+- **Identify:** every ordering of distinct numbers → backtracking with a "used" marker
+- **Brute force:** generate all n^n sequences and keep those with no repeats
+- **Insight:** fill one position at a time with any number not yet used on this path
+- **Steps:** dfs(): if path has n items save it; else for each unused num: mark, add, recurse, remove, unmark
+- **Complexity:** O(n^n) → O(n·n!) time, O(n) space besides the output
+- **Pitfall:** unmark after recursing, or later branches think the number is still taken
+- **Related:** Subsets, Combination Sum, N-Queens

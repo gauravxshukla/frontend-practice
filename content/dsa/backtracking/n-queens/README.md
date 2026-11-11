@@ -32,12 +32,11 @@ Output: [["Q"]]
 
 ## Notes
 
-- **Key insight:** exactly one queen goes in each row. Place them row by row, and only check columns and the two diagonal directions.
-- **Constant-time conflict checks:** on a `\` diagonal, `r - c` is constant. On a `/` diagonal, `r + c` is constant. Keep three sets (`cols`, `diag`, `anti`) and check them in O(1).
-- **Backtracking:** in row `r`, try each column that isn't attacked. Add it to the three sets, recurse on `r + 1`, then remove it. At `r === n`, build the board strings.
-- Complexity: O(n!) placements in the worst case, and much less in practice thanks to pruning. O(n) extra space plus the output.
-- **Brute force:** try every permutation of columns (one per row, so columns are already distinct) and keep those with no shared diagonal. That's O(n! · n²).
-- Pitfall: only checking the main diagonal direction, or comparing `r - c` across both directions.
-- n = 2 and n = 3 have no solutions, so return `[]`.
-- Bitmask optimisation: store the three sets as integers and get the free columns with `~(cols | diag | anti) & ((1 << n) - 1)`.
-- Follow-up: N-Queens II, where you only count the solutions. The same search runs without building strings.
+- **Identify:** place n queens so none attack → backtracking row by row with attack sets
+- **Key formula:** same "\" diagonal ⇔ equal r − c; same "/" diagonal ⇔ equal r + c
+- **Brute force:** try every placement of n queens on n² squares and check each board
+- **Insight:** one queen per row; sets of used columns and diagonals make each safety check O(1)
+- **Steps:** dfs(r): for each column c not attacked, place the queen, mark col / r − c / r + c, recurse r + 1, unmark
+- **Complexity:** O(C(n², n)) → O(n!) time, O(n) space besides the output
+- **Pitfall:** n = 2 and n = 3 have no solutions: return an empty list
+- **Related:** Permutations, Word Search, Valid Sudoku
