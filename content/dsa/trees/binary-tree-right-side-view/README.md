@@ -37,10 +37,10 @@ Output: []
 
 ## Notes
 
-- **Key insight:** you want the last node of each level in BFS order, and that node isn't always a right child.
-- **BFS:** process level by level and record the last node of each level. O(n) time, O(w) space.
-- **DFS:** visit right before left with a `depth` argument. The first node you reach at each new depth is the visible one. O(n) time, O(h) stack.
-- Pitfall: following only `.right` pointers. In `[1,2,3,4]`, the deepest visible node is 4, which is a left descendant.
-- Pitfall: in the DFS version, recording a value at every visit instead of only the first time a depth is reached (or else visiting left first and overwriting).
-- An empty tree returns `[]`.
-- Follow-up: the left side view, or the "top view" and "bottom view" by horizontal distance.
+- **Identify:** the node you'd see from the right on each level → BFS, take each level's last node
+- **Brute force:** collect every level in full, then keep the last value of each, extra lists per level
+- **Insight:** the rightmost node of a level is simply the last one processed in that BFS round
+- **Steps:** level-order BFS; after building each level, record the value of its last node
+- **Complexity:** O(n) time, O(w) space for the widest level
+- **Pitfall:** a left node is visible when the right side is shorter, so don't just follow right pointers
+- **Related:** Binary Tree Level Order Traversal, Maximum Depth of Binary Tree, Count Good Nodes in Binary Tree

@@ -1,18 +1,25 @@
 class Solution:
     def reorderList(self, head: Optional[ListNode]) -> None:
-        """
-        Do not return anything, modify head in-place instead.
-        """
         if not head:
             return
-        # Find the middle, reverse the second half, then weave the halves.
+        # 1. find the end of the first half (slow stops at the middle)
         slow, fast = head, head.next
         while fast and fast.next:
-            slow, fast = slow.next, fast.next.next
-        second, slow.next = slow.next, None
+            slow = slow.next
+            fast = fast.next.next
+        # 2. cut the halves apart, then reverse the second half
+        second = slow.next
+        slow.next = None
         prev = None
         while second:
-            second.next, prev, second = prev, second, second.next
+            nxt = second.next
+            second.next = prev
+            prev = second
+            second = nxt
+        # 3. weave: one node from the front half, one from the reversed back half
         first, second = head, prev
         while second:
-            first.next, second.next, first, second = second, first.next, first.next, second.next
+            first_next, second_next = first.next, second.next
+            first.next = second
+            second.next = first_next
+            first, second = first_next, second_next

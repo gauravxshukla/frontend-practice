@@ -38,10 +38,10 @@ Output: false
 
 ## Notes
 
-- **Key insight:** two trees are equal when their roots match and both pairs of subtrees are equal.
-- **Recursive:** both null → `true`; exactly one null or different values → `false`; otherwise recurse on `(p.left, q.left)` and `(p.right, q.right)`. O(min(n, m)) time, O(h) stack.
-- **Iterative:** a queue (or stack) of node pairs, checked the same way. This avoids deep recursion.
-- **Brute force:** serialize both trees, including null markers, and compare the strings. Still O(n), but it uses more memory and is easy to get wrong if you leave out the nulls.
-- Pitfall: comparing only the values in traversal order. `[1,2]` and `[1,null,2]` have the same pre-order values but different shapes.
-- Pitfall: reading `p.val` before checking that `p` exists.
-- Follow-up: Symmetric Tree, which compares a tree with its own mirror (`left.left` with `right.right`).
+- **Identify:** same shape and same values → compare both trees node by node (DFS)
+- **Brute force:** serialise both trees with null markers and compare the strings, O(n) extra space
+- **Insight:** two trees match if the roots match and both pairs of subtrees match
+- **Steps:** both null → true; one null or values differ → false; else recurse on left pair and right pair
+- **Complexity:** O(n) → O(n) time, O(n) → O(h) space
+- **Pitfall:** check the null cases before reading .val
+- **Related:** Subtree of Another Tree, Invert Binary Tree, Maximum Depth of Binary Tree

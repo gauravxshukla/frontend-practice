@@ -1,20 +1,18 @@
 /**
  * @typedef {{ val: number, next: ListNode | null }} ListNode
  * @param {ListNode | null} head
- * @return {void} rearrange the nodes in place
+ * @return {void} reorders the list in place
  */
 export default function reorderList(head) {
-  if (!head || !head.next) return;
-
-  // 1. Find the middle (slow ends at the last node of the first half).
+  if (!head) return;
+  // 1. find the end of the first half (slow stops at the middle)
   let slow = head;
-  let fast = head;
-  while (fast.next && fast.next.next) {
+  let fast = head.next;
+  while (fast && fast.next) {
     slow = slow.next;
     fast = fast.next.next;
   }
-
-  // 2. Cut the list and reverse the second half.
+  // 2. cut the halves apart, then reverse the second half
   let second = slow.next;
   slow.next = null;
   let prev = null;
@@ -24,8 +22,7 @@ export default function reorderList(head) {
     prev = second;
     second = next;
   }
-
-  // 3. Weave the two halves together.
+  // 3. weave: one node from the front half, one from the reversed back half
   let first = head;
   second = prev;
   while (second) {

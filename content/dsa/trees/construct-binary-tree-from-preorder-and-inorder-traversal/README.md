@@ -35,11 +35,11 @@ Output: [-1]
 
 ## Notes
 
-- **Key insight:** `preorder[0]` is the root. Its position in `inorder` splits the in-order array into the left subtree (before it) and the right subtree (after it), and the left part's length tells you how many pre-order entries belong to the left subtree.
-- **Optimal:** build a value → index map for `inorder`. Recurse on in-order ranges `[lo, hi]`, taking the next root from a shared pre-order pointer, and build the **left** subtree first. O(n) time, O(n) space.
-- **Brute force:** `inorder.indexOf(root)` plus `slice` at each step. That's O(n²) time and copies arrays all over the place, but it's a fine first version.
-- Pitfall: building the right subtree before the left one when using a shared pre-order pointer. Pre-order is root, left, right.
-- Pitfall: off-by-one in range bounds. Write down `lo..mid-1` and `mid+1..hi` explicitly.
-- Unique values matter. With duplicates the tree isn't uniquely determined.
-- Follow-up: rebuild from in-order + post-order (take roots from the end and build the right subtree first).
-- Follow-up: pre-order + post-order alone doesn't determine a unique tree in general.
+- **Identify:** rebuild a tree from preorder + inorder → preorder gives roots, inorder splits left/right
+- **Key formula:** left subtree size = inorder index of root − inorder start
+- **Brute force:** search inorder for each root and slice new arrays every call, O(n²)
+- **Insight:** a value → inorder index map finds each split in O(1), and a preorder pointer avoids slicing
+- **Steps:** build(lo, hi): root = preorder[p++]; mid = index[root]; left = build(lo, mid − 1); right = build(mid + 1, hi)
+- **Complexity:** O(n²) → O(n) time, O(n) space
+- **Pitfall:** build the left subtree before the right, because preorder lists left nodes first
+- **Related:** Serialize and Deserialize Binary Tree, Maximum Depth of Binary Tree, Validate Binary Search Tree

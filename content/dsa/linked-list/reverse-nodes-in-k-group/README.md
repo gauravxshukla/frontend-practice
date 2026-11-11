@@ -35,12 +35,10 @@ Output: [3,2,1,4,5]
 
 ## Notes
 
-- **Key insight:** it's the plain "reverse a list" loop applied to one window at a time. The real work is reconnecting each reversed window to what comes before and after it.
-- Keep `groupPrev` (the node before the window, starting at a dummy). Walk `k` steps to find `kth`. If you fall off the end, stop: the tail stays as is.
-- Reverse the window with `prev` initialised to `kth.next`, so the old first node ends up pointing at the rest of the list.
-- Then `groupPrev.next = kth`, and advance `groupPrev` to the old first node (now the window's tail).
-- O(n) time, O(1) extra space.
-- Baseline: copy values into an array, reverse each full chunk, and write them back. O(n) space, and it swaps values rather than nodes, which the problem forbids.
-- Recursive version: reverse the first k nodes, then `oldFirst.next = reverseKGroup(rest, k)`. Cleaner, but O(n/k) stack.
-- Edge cases: `k = 1` (no change), `k = n` (reverse everything), `n` an exact multiple of `k`, a single node.
-- Follow-up: reverse the leftover partial group too, or reverse alternate groups only.
+- **Identify:** reverse every block of k nodes, leave a short tail alone → reverse sublists in place
+- **Brute force:** copy values into an array, reverse each k-chunk, rebuild, O(n) extra space
+- **Insight:** treat each k-block like Reverse Linked List, then reconnect it between the previous block and the next
+- **Steps:** from groupPrev, check k nodes exist; reverse them; link groupPrev to the new front; advance groupPrev
+- **Complexity:** O(n) → O(n) time, O(n) → O(1) space
+- **Pitfall:** stop when fewer than k nodes remain; that tail stays in its original order
+- **Related:** Reverse Linked List, Reorder List, Remove Nth Node From End of List

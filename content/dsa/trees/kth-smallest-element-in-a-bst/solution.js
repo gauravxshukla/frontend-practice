@@ -1,22 +1,27 @@
 /**
  * @typedef {{ val: number, left: TreeNode | null, right: TreeNode | null }} TreeNode
- * @param {TreeNode} root
- * @param {number} k
+ */
+
+/**
+ * @param {TreeNode | null} root
+ * @param {number} k 1-indexed
  * @return {number}
  */
 export default function kthSmallest(root, k) {
-  // Iterative in-order traversal visits values in ascending order; stop at the k-th.
-  const stack = [];
-  let node = root;
-  while (node || stack.length) {
-    while (node) {
-      stack.push(node);
-      node = node.left;
+  let remaining = k; // nodes still to visit before the answer
+  let answer = null;
+  // in-order (left, node, right) visits a BST's values smallest first
+  const visit = (node) => {
+    if (!node || answer !== null) return;
+    visit(node.left);
+    if (answer !== null) return; // found on the left: stop early
+    remaining--;
+    if (remaining === 0) {
+      answer = node.val;
+      return;
     }
-    node = stack.pop();
-    k -= 1;
-    if (k === 0) return node.val;
-    node = node.right;
-  }
-  return -1;
+    visit(node.right);
+  };
+  visit(root);
+  return answer;
 }

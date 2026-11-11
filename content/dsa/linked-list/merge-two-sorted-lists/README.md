@@ -17,6 +17,10 @@ Given the heads of two **sorted** linked lists (`{ val, next }` nodes), splice t
 
 ## Notes
 
-- A dummy head node removes the "which list starts the result?" special case.
-- Walk both lists and attach the smaller node. When one list runs out, attach the remainder of the other in one step.
-- O(n + m) time, O(1) extra space (nodes are reused, not copied).
+- **Identify:** merge two sorted lists into one sorted list → two pointers + dummy head
+- **Brute force:** collect all values, sort them, build a new list, O((m + n) log(m + n))
+- **Insight:** the smaller of the two current heads is always next, so splice nodes directly
+- **Steps:** dummy tail; attach the smaller head and advance that list; attach whatever list remains
+- **Complexity:** O((m + n) log(m + n)) → O(m + n) time, O(1) extra space
+- **Pitfall:** a dummy head avoids special-casing the first node and empty inputs
+- **Related:** Merge k Sorted Lists, Add Two Numbers, Reverse Linked List

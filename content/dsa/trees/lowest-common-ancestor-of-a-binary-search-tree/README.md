@@ -39,11 +39,10 @@ Output: 2
 
 ## Notes
 
-- **Key insight:** in a BST, the LCA is the first node on the way down where `p` and `q` stop being on the same side.
-- **Optimal:** start at the root. If both values are smaller, go left. If both are larger, go right. Otherwise this node splits them (or equals one of them), so return it. O(h) time, O(1) space iteratively.
-- **Brute force (works for any binary tree):** record the root-to-node path for `p` and for `q`, then return the last node the two paths share. O(n) time and space.
-- The general binary-tree LCA uses post-order DFS: return the node if it is `p` or `q`, and the node where both sides return non-null is the answer.
-- Pitfall: using `<=`/`>=` in the "go left/right" tests, which walks past the split when one target equals the current node.
-- Pitfall: comparing node objects with values. Use `p.val`, not `p`.
-- With h = O(log n) for a balanced tree, this is very fast. A skewed BST degrades to O(n).
-- Follow-up: LCA in a general binary tree, or when `p`/`q` might be missing.
+- **Identify:** lowest common ancestor in a BST → BST ordering says which way both nodes lie
+- **Brute force:** record the root-to-node path for p and q, then find their last shared node, O(n)
+- **Insight:** while p and q are on the same side of a node, go that way; the first split point is the LCA
+- **Steps:** both smaller → go left; both larger → go right; otherwise (split or equal) return this node
+- **Complexity:** O(n) → O(h) time, O(h) → O(1) space
+- **Pitfall:** a node can be its own ancestor: if p or q equals the current node, it's the answer
+- **Related:** Validate Binary Search Tree, Kth Smallest Element in a BST, Binary Search

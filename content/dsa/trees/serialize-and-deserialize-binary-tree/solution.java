@@ -1,32 +1,38 @@
 class Codec {
-    // Preorder with "#" for empty children.
     public String serialize(TreeNode root) {
-        StringBuilder sb = new StringBuilder();
-        write(root, sb);
-        return sb.toString();
+        StringBuilder out = new StringBuilder();
+        write(root, out);
+        return out.toString();
     }
 
-    private void write(TreeNode node, StringBuilder sb) {
-        if (sb.length() > 0) sb.append(',');
+    // preorder: node, then left, then right; "#" marks a missing child
+    private void write(TreeNode node, StringBuilder out) {
+        if (out.length() > 0) out.append(',');
         if (node == null) {
-            sb.append('#');
+            out.append('#');
             return;
         }
-        sb.append(node.val);
-        write(node.left, sb);
-        write(node.right, sb);
+        out.append(node.val);
+        write(node.left, out);
+        write(node.right, out);
     }
+
+    private String[] tokens;
+    private int i;
 
     public TreeNode deserialize(String data) {
-        return build(new ArrayDeque<>(Arrays.asList(data.split(","))));
+        tokens = data.split(",");
+        i = 0;
+        return read();
     }
 
-    private TreeNode build(Deque<String> tokens) {
-        String token = tokens.poll();
-        if (token == null || token.equals("#")) return null;
+    // read tokens back in the same preorder they were written
+    private TreeNode read() {
+        String token = tokens[i++];
+        if (token.equals("#")) return null;
         TreeNode node = new TreeNode(Integer.parseInt(token));
-        node.left = build(tokens);
-        node.right = build(tokens);
+        node.left = read();
+        node.right = read();
         return node;
     }
 }

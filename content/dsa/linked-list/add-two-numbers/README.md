@@ -37,11 +37,10 @@ Output: [8,9,9,9,0,0,0,1]
 
 ## Notes
 
-- **Key insight:** the digits are already in the order you add them by hand (ones first), so walk both lists together and carry like grade-school addition.
-- Each step: `sum = (l1?.val ?? 0) + (l2?.val ?? 0) + carry`, append `sum % 10`, set `carry = Math.floor(sum / 10)`.
-- Loop while **either** list has nodes **or** `carry` is non-zero, and a dummy head keeps the append logic uniform.
-- O(max(m, n)) time, O(max(m, n)) space for the output.
-- Pitfall: forgetting the final carry (`[5] + [5]` must give `[0,1]`).
-- Pitfall: converting to a JS number (or even `BigInt` without saying why) loses precision past 2⁵³. Lists of 100 digits overflow a double.
-- Edge cases: lists of different lengths, `[0] + [0]`, carries that ripple through many nines.
-- Follow-up: digits stored most-significant first (LeetCode 445). Use two stacks, or reverse both lists first.
+- **Identify:** numbers stored as reversed digit lists → add digit by digit with a carry, like on paper
+- **Brute force:** convert both lists to integers, add, convert back; overflows for long lists
+- **Insight:** least significant digit comes first, so add as you walk and carry into the next node
+- **Steps:** while either list or a carry remains: sum the digits + carry, append sum % 10, carry = sum / 10
+- **Complexity:** O(m + n) time either way, but only the digit-wise version avoids overflow; O(1) extra space
+- **Pitfall:** a final carry needs one more node (5 + 5 = 0 → 1)
+- **Related:** Merge Two Sorted Lists, Multiply Strings, Plus One

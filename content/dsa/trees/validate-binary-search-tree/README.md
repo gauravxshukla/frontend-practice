@@ -35,11 +35,11 @@ Explanation: 4 is in the right subtree of 5 but is smaller than 5.
 
 ## Notes
 
-- **Key insight:** comparing each node only with its children isn't enough. Every node must fit inside a `(low, high)` window inherited from all its ancestors.
-- **Optimal (bounds):** recurse with `(node, low, high)`. Fail if `node.val <= low || node.val >= high`. Go left with `(low, node.val)` and right with `(node.val, high)`. O(n) time, O(h) stack.
-- **Alternative (in-order):** an in-order traversal of a valid BST is strictly increasing, so track the previous value and fail on `prev >= cur`.
-- **Brute force:** for every node, scan its whole left and right subtrees for the max and min. That's O(n²) on skewed trees.
-- Pitfall: `[5,4,6,null,null,3,7]` passes every parent/child check, but 3 sits in the right subtree of 5.
-- Pitfall: starting the bounds at a fixed `±2³¹` breaks on values at those limits. Use `±Infinity` (or `null` for "no bound").
-- Pitfall: allowing equal values. `[2,2,2]` and `[1,1]` are invalid.
-- Follow-up: Recover Binary Search Tree, where exactly two nodes were swapped. Find them with one in-order pass.
+- **Identify:** every node must sit inside the range its ancestors allow → DFS with (low, high) bounds
+- **Brute force:** for each node, check it against every node in both subtrees, O(n²)
+- **Better:** in-order traversal must be strictly increasing, O(n) with a list or a prev pointer
+- **Insight:** instead of comparing with children only, pass down the open interval the node must fit in
+- **Steps:** valid(node, low, high): low < val < high, then left gets (low, val) and right gets (val, high)
+- **Complexity:** O(n²) → O(n) time, O(h) space
+- **Pitfall:** checking only parent vs child misses a deep node violating an ancestor; duplicates are invalid
+- **Related:** Kth Smallest Element in a BST, Lowest Common Ancestor of a Binary Search Tree, Count Good Nodes in Binary Tree

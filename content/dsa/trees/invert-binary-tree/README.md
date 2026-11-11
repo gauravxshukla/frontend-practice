@@ -39,7 +39,10 @@ Trees are written in level order, and `null` marks a missing child.
 
 ## Notes
 
-- **Recursive DFS:** swap `left` and `right`, then invert both subtrees. Return the node. O(n) time, O(h) stack (h = height, which is O(n) for a skewed tree).
-- **Iterative BFS:** a queue of nodes, swap the children of each one you dequeue. This avoids deep recursion on skewed trees.
-- Pitfall: `root.left = invertTree(root.right); root.right = invertTree(root.left)` reads `root.left` *after* overwriting it. Swap first, or capture both results in variables.
-- Follow-up: check whether a tree is symmetric (a mirror of itself) without building the inverted copy.
+- **Identify:** mirror a tree → swap children at every node (DFS)
+- **Brute force:** build a new mirrored tree node by node, O(n) extra space
+- **Insight:** mirroring a tree = swap the two children, then mirror each child; do it in place
+- **Steps:** if the node is null return null; invert both subtrees; swap left and right; return the node
+- **Complexity:** O(n) → O(n) time, O(h) recursion space instead of a copy
+- **Pitfall:** save one subtree before overwriting it, or both sides end up the same
+- **Related:** Maximum Depth of Binary Tree, Same Tree, Subtree of Another Tree

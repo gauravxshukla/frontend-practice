@@ -35,11 +35,10 @@ Output: 2
 
 ## Notes
 
-- **Key insight:** the depth of a tree is 1 plus the larger depth of its two subtrees. An empty subtree contributes 0.
-- **Recursive DFS:** `return root ? 1 + Math.max(maxDepth(root.left), maxDepth(root.right)) : 0`. O(n) time, O(h) call stack, where h is the height.
-- **Iterative BFS:** process the tree one level at a time and count the levels. O(n) time, O(w) space for the widest level, and no recursion limit to worry about.
-- **Iterative DFS:** push `[node, depth]` pairs onto a stack and track the maximum depth seen.
-- There's no real brute force here: every node has to be visited once, so O(n) is optimal.
-- Pitfalls: returning 1 for an empty tree; counting edges instead of nodes (that's the "height" convention some textbooks use).
-- A skewed tree (a linked list in disguise) makes h = n, which can overflow the stack in recursive versions for very deep inputs.
-- Follow-up: minimum depth, where you must stop at the first **leaf** (a node with no children). A node with only one child is not a leaf.
+- **Identify:** longest root-to-leaf path length → depth = 1 + deeper child (DFS)
+- **Brute force:** list every root-to-leaf path and take the longest, O(n·h)
+- **Insight:** a node's depth only needs its children's depths, so return them up the recursion
+- **Steps:** null → 0; otherwise 1 + max(depth(left), depth(right))
+- **Complexity:** O(n·h) → O(n) time, O(h) space
+- **Pitfall:** an empty tree has depth 0, a single node has depth 1
+- **Related:** Diameter of Binary Tree, Balanced Binary Tree, Invert Binary Tree

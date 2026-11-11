@@ -40,12 +40,10 @@ Output: [1,5,2,4,3]
 
 ## Notes
 
-- **Key insight:** the result interleaves the first half with the *reversed* second half. Break it into three classic steps.
-- Step 1: find the middle with slow/fast pointers (stop when `fast.next` or `fast.next.next` is null so `slow` ends at the end of the first half).
-- Step 2: cut after `slow` (`slow.next = null`) and reverse the second half in place.
-- Step 3: merge by alternating one node from each half until the second half runs out.
-- O(n) time, O(1) extra space.
-- Brute force: copy the nodes into an array, then relink them with two indices from both ends. O(n) time but O(n) space.
-- Pitfall: forgetting to cut the first half, which leaves a cycle after the merge.
-- Edge cases: one or two nodes (nothing changes), odd vs even length.
-- Follow-up: do it recursively, or explain why the array version is acceptable when memory isn't tight.
+- **Identify:** interleave first and last nodes (L0, Ln, L1, Ln−1…) in place → middle + reverse + merge
+- **Brute force:** copy nodes into an array and relink them with two indices, O(n) extra space
+- **Insight:** the back half, reversed, is exactly the order to weave in, so no array is needed
+- **Steps:** find the middle with slow/fast; cut and reverse the second half; alternate nodes from both halves
+- **Complexity:** O(n) → O(n) time, O(n) → O(1) space
+- **Pitfall:** cut the list at the middle (slow.next = null), or the weave creates a cycle
+- **Related:** Reverse Linked List, Linked List Cycle, Merge Two Sorted Lists

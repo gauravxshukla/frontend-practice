@@ -8,9 +8,9 @@ export default function addTwoNumbers(l1, l2) {
   const dummy = { val: 0, next: null };
   let tail = dummy;
   let carry = 0;
-
-  // Keep going while either list has digits or a carry is left over.
+  // keep going while either list has digits or a carry is left over
   while (l1 || l2 || carry) {
+    // a finished list contributes 0
     const sum = (l1 ? l1.val : 0) + (l2 ? l2.val : 0) + carry;
     carry = Math.floor(sum / 10);
     tail.next = { val: sum % 10, next: null };

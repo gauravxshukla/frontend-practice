@@ -37,10 +37,10 @@ Output: []
 
 ## Notes
 
-- **Key insight:** BFS visits nodes in exactly this order. You only need to know where one level ends and the next begins.
-- **Optimal:** keep the current level in an array (or note the queue length before processing a level). Record its values, then collect all their non-null children as the next level. O(n) time, O(w) extra space, where w is the widest level.
-- **DFS alternative:** recurse with a `depth` argument and push each value into `result[depth]`. Pre-order (left before right) keeps each level ordered left to right.
-- Pitfall: `queue.shift()` is O(n) in JS arrays. For large trees, use a head index or swap level arrays as shown in the reference.
-- Pitfall: pushing `null` children into the queue and then reading `.val` on them.
-- Return `[]` for an empty tree, not `[[]]`.
-- Follow-ups: zigzag order (reverse every other level), bottom-up order, per-level averages or maximums, and right side view.
+- **Identify:** values grouped level by level → BFS with a queue
+- **Brute force:** DFS that passes the depth and appends to result[depth], also O(n) but less direct
+- **Insight:** the queue's length at the start of a round is exactly the size of the current level
+- **Steps:** queue = [root]; each round, pop "size" nodes into one list, pushing their children
+- **Complexity:** O(n) time, O(n) space (the widest level)
+- **Pitfall:** read the level size before the loop; the queue grows while you process it
+- **Related:** Binary Tree Right Side View, Maximum Depth of Binary Tree, Rotting Oranges

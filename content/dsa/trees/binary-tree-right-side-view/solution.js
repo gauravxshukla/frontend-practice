@@ -1,14 +1,18 @@
 /**
  * @typedef {{ val: number, left: TreeNode | null, right: TreeNode | null }} TreeNode
+ */
+
+/**
  * @param {TreeNode | null} root
  * @return {number[]}
  */
 export default function rightSideView(root) {
-  const view = [];
-  let level = root ? [root] : [];
+  const result = [];
+  if (!root) return result;
+  let level = [root]; // every node on the current level, left to right
   while (level.length) {
-    // The last node of each level is the one visible from the right.
-    view.push(level[level.length - 1].val);
+    // the last node of a level is the one visible from the right
+    result.push(level[level.length - 1].val);
     const next = [];
     for (const node of level) {
       if (node.left) next.push(node.left);
@@ -16,5 +20,5 @@ export default function rightSideView(root) {
     }
     level = next;
   }
-  return view;
+  return result;
 }

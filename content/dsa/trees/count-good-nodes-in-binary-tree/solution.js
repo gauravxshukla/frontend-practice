@@ -1,16 +1,19 @@
 /**
  * @typedef {{ val: number, left: TreeNode | null, right: TreeNode | null }} TreeNode
+ */
+
+/**
  * @param {TreeNode | null} root
  * @return {number}
  */
 export default function goodNodes(root) {
-  // Carry the largest value seen on the path from the root down.
-  function dfs(node, maxSoFar) {
+  // count good nodes below, given the largest value on the path from the root
+  const count = (node, maxSoFar) => {
     if (!node) return 0;
+    // nothing above is bigger (ties are allowed), so this node is good
     const good = node.val >= maxSoFar ? 1 : 0;
     const max = Math.max(maxSoFar, node.val);
-    return good + dfs(node.left, max) + dfs(node.right, max);
-  }
-
-  return dfs(root, -Infinity);
+    return good + count(node.left, max) + count(node.right, max);
+  };
+  return count(root, -Infinity);
 }

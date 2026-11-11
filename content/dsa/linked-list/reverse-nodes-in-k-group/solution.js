@@ -1,21 +1,19 @@
 /**
  * @typedef {{ val: number, next: ListNode | null }} ListNode
  * @param {ListNode | null} head
- * @param {number} k group size
+ * @param {number} k
  * @return {ListNode | null}
  */
 export default function reverseKGroup(head, k) {
   const dummy = { val: 0, next: head };
-  let groupPrev = dummy; // node just before the current group
-
+  let groupPrev = dummy; // the node just before the block being reversed
   while (true) {
-    // Find the k-th node of this group. If the group is short, leave it as is.
+    // find the k-th node of this block; fewer than k left means we're done
     let kth = groupPrev;
     for (let i = 0; i < k && kth; i++) kth = kth.next;
     if (!kth) break;
     const groupNext = kth.next;
-
-    // Reverse the group, pointing its old first node at groupNext.
+    // reverse the block, pointing its first node at whatever follows the block
     let prev = groupNext;
     let curr = groupPrev.next;
     while (curr !== groupNext) {
@@ -24,11 +22,10 @@ export default function reverseKGroup(head, k) {
       prev = curr;
       curr = next;
     }
-
-    // Reconnect: the old first node is now the group's tail.
-    const oldFirst = groupPrev.next;
+    // the old first node is now the block's last node, before the next block
+    const first = groupPrev.next;
     groupPrev.next = kth;
-    groupPrev = oldFirst;
+    groupPrev = first;
   }
   return dummy.next;
 }

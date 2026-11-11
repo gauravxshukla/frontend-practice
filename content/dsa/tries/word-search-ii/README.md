@@ -42,11 +42,10 @@ Explanation: "abcb" would need to reuse the "b" cell.
 
 ## Notes
 
-- **Key insight:** running Word Search I once per word repeats the same board walks again and again. Put all words in a **trie** and do one DFS from each cell that follows trie edges, so every word sharing a prefix is checked together.
-- Store the full word on its end node (`node.word`). When the DFS reaches a node with a word, record it and clear it so it isn't reported twice.
-- DFS from `(r, c)` with a trie node: stop if the board letter isn't a child, otherwise mark the cell (e.g. `'#'`), recurse in 4 directions, and restore the letter.
-- **Pruning:** after exploring, delete a child that has no children and no word left. This turns repeated dead-end walks into instant misses and matters a lot on big inputs.
-- Time: O(m · n · 4 · 3^(L−1)) in the worst case (L = longest word), but the trie and pruning make it far faster in practice. Space: O(total letters in words) for the trie plus O(L) recursion.
-- Brute force: run single-word search for every word, O(W · m · n · 3^L), which times out on large word lists.
-- Pitfall: forgetting to restore the cell after backtracking, or returning duplicates when a word can be traced in several ways.
-- Edge cases: a 1×1 board, words longer than the cell count, words that are prefixes of other words (both must be found).
+- **Identify:** find many words on a letter grid → trie of the words + backtracking DFS from each cell
+- **Brute force:** run Word Search separately for every word, O(words · cells · 4^L)
+- **Insight:** build one trie of all words; a single DFS per cell follows the trie and finds every word at once
+- **Steps:** insert words (store the word at its end node); DFS cells along trie children; record and clear found words
+- **Complexity:** O(words · cells · 4^L) → O(cells · 4^L) time, O(total word length) space
+- **Pitfall:** mark cells visited during a path and restore them after; clear a found word so it's added once
+- **Related:** Word Search, Implement Trie (Prefix Tree), Design Add and Search Words Data Structure
