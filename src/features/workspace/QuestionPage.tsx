@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type CSSProperties,
@@ -19,7 +20,7 @@ import {
   getQuestion,
   loadQuestionFiles,
   loadRunnerAssets,
-  loadSolutionSource,
+  loadSolutionSources,
   type FileMap,
   type Question,
   type RunnerAssets,
@@ -28,9 +29,12 @@ import { applyDraft, clearDraft, loadDraft } from '../../lib/drafts';
 import { useProgress } from '../../lib/progress';
 import { useTheme } from '../../lib/theme';
 import { usePersistentState } from '../../lib/usePersistentState';
+import { LANGUAGES, languageInfo } from '../runner/languages/registry';
+import type { LanguageId } from '../runner/languages/types';
 import CodeWorkspace from './CodeWorkspace';
 import Workspace from './Workspace';
 import { sandpackThemes } from './sandpackThemes';
+import { useEditorLanguages } from './useEditorLanguages';
 
 const MIN_PROMPT = 300;
 const MAX_PROMPT_RATIO = 0.6;
@@ -83,20 +87,51 @@ function useResizablePrompt(containerRef: RefObject<HTMLDivElement | null>) {
   return { width, onPointerDown, onKeyDown };
 }
 
+type SolutionSources = Partial<Record<LanguageId, string>>;
+
+/** Read-only reference solution(s): JS always, Python where a solution.py exists. */
 function SolutionCode({ question }: { question: Question }) {
   const { resolved } = useTheme();
-  const [code, setCode] = useState<string | null>(null);
+  const [sources, setSources] = useState<SolutionSources | null>(null);
+  // The language picked in the editor (only read here); a tab click overrides it.
+  const [preferred] = usePersistentState<LanguageId>('fp:dsaLanguage', 'javascript');
+  const [picked, setPicked] = useState<LanguageId | null>(null);
   useEffect(() => {
-    loadSolutionSource(question).then((src) => setCode(src ?? ''));
+    loadSolutionSources(question).then(setSources);
   }, [question]);
 
-  if (code === null) return <WorkspaceSkeleton />;
+  const current: LanguageId = picked ?? (sources?.[preferred] !== undefined ? preferred : 'javascript');
+  const editorLanguages = useEditorLanguages(current);
+  const file = languageInfo(current).file;
+  const files = useMemo(() => ({ [file]: sources?.[current] ?? '' }), [file, sources, current]);
+  const options = useMemo(() => ({ activeFile: file }), [file]);
+
+  if (sources === null) return <WorkspaceSkeleton />;
+  const available = LANGUAGES.filter((l) => sources[l.id] !== undefined);
+  const missingPreferred = question.type === 'dsa' && picked === null && current !== preferred;
+
   return (
-    <SandpackProvider files={{ '/solution.js': code }} theme={sandpackThemes[resolved]} options={{ activeFile: '/solution.js' }}>
-      <div className="solution-viewer">
-        <SandpackCodeViewer showLineNumbers wrapContent />
-      </div>
-    </SandpackProvider>
+    <>
+      {available.length > 1 && (
+        <div className="solution-langs" role="tablist" aria-label="Solution language">
+          {available.map((l) => (
+            <button key={l.id} type="button" role="tab" aria-selected={l.id === current} onClick={() => setPicked(l.id)}>
+              {l.label}
+            </button>
+          ))}
+        </div>
+      )}
+      {missingPreferred && (
+        <p className="solution-note">
+          Reference shown in {languageInfo(current).label}: this question has no {languageInfo(preferred).label} reference yet.
+        </p>
+      )}
+      <SandpackProvider key={current} files={files} theme={sandpackThemes[resolved]} options={options}>
+        <div className="solution-viewer">
+          <SandpackCodeViewer key={editorLanguages.length} showLineNumbers wrapContent additionalLanguages={editorLanguages} />
+        </div>
+      </SandpackProvider>
+    </>
   );
 }
 

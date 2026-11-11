@@ -149,6 +149,12 @@ export interface DsaSpec {
   params?: { name: string; type: string; of?: number }[];
   returns?: string;
   compare?: string;
+  /** `returns: "void"` questions: index of the param the solution modifies in place. */
+  mutates?: number;
+  /** Codec questions: [encodeName, decodeName]. */
+  methods?: string[];
+  /** Output must not reuse the input's nodes (clone problems). */
+  freshNodes?: boolean;
   cases: DsaCase[];
 }
 
@@ -161,23 +167,35 @@ export interface RunnerAssets {
   /** DSA questions: data-driven cases. */
   spec?: DsaSpec;
   checker?: string;
+  /** DSA questions: hand-written Python starter overriding the generated one. */
+  pyStarter?: string;
 }
 
 export async function loadRunnerAssets(q: Question): Promise<RunnerAssets> {
   const folder = folderOf(q.slug);
-  const [starter, solution, tests, cases, checker] = await Promise.all([
+  const [starter, solution, tests, cases, checker, pyStarter] = await Promise.all([
     loadFile(`${folder}/starter.js`),
     loadFile(`${folder}/solution.js`),
     loadFile(`${folder}/solution.test.js`),
     loadFile(`${folder}/cases.json`),
     loadFile(`${folder}/checker.js`),
+    loadFile(`${folder}/starter.py`),
   ]);
-  return { starter: starter ?? '', solution, tests, spec: cases ? (JSON.parse(cases) as DsaSpec) : undefined, checker };
+  return {
+    starter: starter ?? '',
+    solution,
+    tests,
+    spec: cases ? (JSON.parse(cases) as DsaSpec) : undefined,
+    checker,
+    pyStarter,
+  };
 }
 
-/** Just the reference solution source, for the read-only Solution tab. */
-export function loadSolutionSource(q: Question) {
-  return loadFile(`${folderOf(q.slug)}/solution.js`);
+/** Reference solutions for the read-only Solution tab: JS always, Python where one exists. */
+export async function loadSolutionSources(q: Question): Promise<{ javascript?: string; python?: string }> {
+  const folder = folderOf(q.slug);
+  const [javascript, python] = await Promise.all([loadFile(`${folder}/solution.js`), loadFile(`${folder}/solution.py`)]);
+  return { javascript, python };
 }
 
 export interface QuestionGroup {

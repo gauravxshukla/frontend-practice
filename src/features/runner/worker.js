@@ -1,6 +1,6 @@
 // Runs user code off the main thread. The main thread kills this worker on a
 // timeout, which is how infinite loops become "Time Limit Exceeded".
-import { errorLine, execute, formatInput, judge } from './core.js';
+import { errorLine, execute, expectedFor, formatInput, gradeOutputs, judge } from './core.js';
 import { createJest } from './miniJest.js';
 import { installDom } from './dom.js';
 import { serializeValue } from '../console/serialize.js';
@@ -36,6 +36,13 @@ function describeError(error, url) {
 
 /* ------------------------------------------------------------------- DSA jobs */
 
+/** The JS reference (for custom testcases' expected values) and the checker, if any. */
+async function loadJudging(refCode, checkerCode) {
+  const reference = refCode ? (await importSource(refCode)).module.default : undefined;
+  const checker = checkerCode ? (await importSource(checkerCode)).module.default : undefined;
+  return { reference, checker };
+}
+
 async function runDsa({ userCode, refCode, checkerCode, spec, cases }) {
   let user;
   try {
@@ -43,24 +50,13 @@ async function runDsa({ userCode, refCode, checkerCode, spec, cases }) {
   } catch (error) {
     return { type: 'compile-error', message: `${error.name}: ${error.message}` };
   }
-  const ref = refCode ? (await importSource(refCode)).module : null;
-  const checker = checkerCode ? (await importSource(checkerCode)).module.default : undefined;
+  const { reference, checker } = await loadJudging(refCode, checkerCode);
   const isChecker = spec.compare === 'checker';
 
   const results = [];
   const started = performance.now();
   for (const [index, kase] of cases.entries()) {
-    let expected = kase.expected;
-    let hasExpected = 'expected' in kase;
-    // Custom testcases have no expected value: ask the reference solution.
-    if (!hasExpected && ref && !isChecker) {
-      try {
-        expected = await execute(spec, ref.default, kase.input);
-        hasExpected = true;
-      } catch {
-        // Invalid custom input for the reference too; just show the output.
-      }
-    }
+    const { hasExpected, expected } = await expectedFor(spec, kase, reference);
 
     logs = [];
     const result = { index, hidden: Boolean(kase.hidden), input: formatInput(spec, kase.input), logs: [] };
@@ -77,6 +73,13 @@ async function runDsa({ userCode, refCode, checkerCode, spec, cases }) {
     results.push(result);
   }
   return { type: 'done', results, runtimeMs: Math.round(performance.now() - started) };
+}
+
+/** Judges outputs from another language's runtime (Python…) with the same core. */
+async function runDsaJudge({ spec, cases, outputs, runtimeMs, refCode, checkerCode }) {
+  const { reference, checker } = await loadJudging(refCode, checkerCode);
+  const results = await gradeOutputs({ spec, cases, outputs, reference, checker });
+  return { type: 'done', results, runtimeMs };
 }
 
 /* -------------------------------------------------------------------- JS jobs */
@@ -140,6 +143,7 @@ async function collectJest({ userCode, testCode, env }) {
 self.onmessage = async ({ data }) => {
   try {
     if (data.type === 'dsa') self.postMessage(await runDsa(data));
+    else if (data.type === 'dsa-judge') self.postMessage(await runDsaJudge(data));
     else if (data.type === 'jest') self.postMessage(await runJest(data));
     else if (data.type === 'jest-collect') self.postMessage(await collectJest(data));
   } catch (error) {

@@ -315,6 +315,53 @@ export async function execute(spec, exported, input) {
   return fromOutput(spec.returns, result);
 }
 
+/**
+ * Expected value for a case: its own `expected`, or (custom testcases) whatever
+ * the JS reference returns. Checker questions have no single expected value.
+ * @param {Function} [reference] the reference solution's default export
+ */
+export async function expectedFor(spec, kase, reference) {
+  if ('expected' in kase) return { hasExpected: true, expected: kase.expected };
+  if (reference && spec.compare !== 'checker') {
+    try {
+      return { hasExpected: true, expected: await execute(spec, reference, kase.input) };
+    } catch {
+      // Invalid custom input for the reference too; just show the output.
+    }
+  }
+  return { hasExpected: false, expected: undefined };
+}
+
+/**
+ * Judges outputs another language's runtime produced (see languages/types.ts
+ * ExecOutput) exactly like JS outputs: same expected values, same comparison.
+ * @returns {Promise<object[]>} CaseResults
+ */
+export async function gradeOutputs({ spec, cases, outputs, reference, checker }) {
+  const isChecker = spec.compare === 'checker';
+  const results = [];
+  for (const [index, kase] of cases.entries()) {
+    const out = outputs[index] ?? { error: { message: 'No output was produced for this testcase.', line: null }, logs: [] };
+    const { hasExpected, expected } = await expectedFor(spec, kase, reference);
+    const result = { index, hidden: Boolean(kase.hidden), input: formatInput(spec, kase.input), logs: out.logs ?? [] };
+    if (out.error) {
+      result.error = out.error;
+      result.passed = false;
+    } else {
+      result.output = JSON.stringify(out.output);
+      try {
+        result.passed = hasExpected || isChecker ? judge(spec, out.output, expected, kase.input, checker) : null;
+      } catch (error) {
+        result.error = { message: `${error?.name ?? 'Error'}: ${error?.message ?? error}`, line: null };
+        result.passed = false;
+      }
+    }
+    result.expected = hasExpected ? JSON.stringify(expected) : undefined;
+    results.push(result);
+  }
+  return results;
+}
+
 /** Display helper: `nums = [2,7,11,15]` per param (design: ops + args). */
 export function formatInput(spec, input) {
   if ((spec.kind ?? 'function') === 'design') {
