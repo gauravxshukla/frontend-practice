@@ -1,23 +1,23 @@
 /**
- * @param {number[]} nums
+ * @param {number[]} nums distinct values
  * @return {number[][]}
  */
 export default function subsets(nums) {
   const result = [];
-  const path = [];
-
-  // At each index, branch on "skip nums[i]" vs "take nums[i]".
-  function backtrack(i) {
+  const path = []; // the subset being built
+  const dfs = (i) => {
+    // every element has been decided: record this subset (as a copy)
     if (i === nums.length) {
       result.push([...path]);
       return;
     }
-    backtrack(i + 1);
+    // choice 1: include nums[i]
     path.push(nums[i]);
-    backtrack(i + 1);
-    path.pop();
-  }
-
-  backtrack(0);
+    dfs(i + 1);
+    path.pop(); // undo before the other choice
+    // choice 2: skip nums[i]
+    dfs(i + 1);
+  };
+  dfs(0);
   return result;
 }

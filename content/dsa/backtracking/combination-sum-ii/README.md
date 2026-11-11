@@ -33,11 +33,10 @@ Output: [[1,2,2],[5]]
 
 ## Notes
 
-- **Key insight:** sort first. Then, **at the same depth** of the recursion, skip a value equal to the one just tried. Each distinct value is chosen at most once per position, so duplicate combinations never appear.
-- **Backtracking:** loop `i` from `start`. Skip when `i > start && c[i] === c[i - 1]`, stop when `c[i] > remaining`, and otherwise push and recurse with `(i + 1, remaining - c[i])`.
-- The `i > start` part matters: it still lets you use two equal values *in the same combination* (`[1,1,6]`), and only blocks starting a new branch with the same value again.
-- **Brute force:** generate all 2ⁿ subsets, keep those with the right sum, and dedupe by sorted key. Correct, but hopeless for inputs like thirty 1s, where it explores about 10⁹ subsets.
-- **Alternative:** group equal values with counts, then choose how many copies (0..count) of each distinct value to use.
-- Complexity: O(2ⁿ · n) worst case, but pruning and the sorted break keep it much smaller in practice.
-- Pitfall: deduping afterwards with a Set of strings. It works, but it still does all the exponential duplicate work.
-- Follow-up: compare with Subsets II, which uses the same "skip equal values at the same depth" trick.
+- **Identify:** combinations summing to target, each number used once, input has duplicates → sort + backtrack + skip repeats
+- **Brute force:** generate every subset, keep those summing to target, dedupe with a set, O(n·2^n)
+- **Insight:** after sorting, equal values are adjacent; at one depth, try each distinct value only once
+- **Steps:** sort; dfs(start, remaining): for i from start, skip i > start with candidates[i] == candidates[i − 1]; recurse at i + 1
+- **Complexity:** O(n·2^n) time worst case, O(n) recursion depth
+- **Pitfall:** skip duplicates only at the same depth (i > start), not along a path, or [1, 1, 6] is lost
+- **Related:** Combination Sum, Subsets II, Permutations

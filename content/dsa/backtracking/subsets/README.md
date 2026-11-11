@@ -33,11 +33,10 @@ Output: [[],[0]]
 
 ## Notes
 
-- **Key insight:** each element is either in a subset or not, so there are exactly 2ⁿ subsets, and a binary decision tree of depth n produces all of them.
-- **Backtracking:** `backtrack(i)` first skips `nums[i]` and then takes it (push, recurse, pop). At `i === n`, record a **copy** of the current path. O(n · 2ⁿ) time (2ⁿ subsets, each up to n long to copy), O(n) recursion depth.
-- **"For-loop" form:** record the path at every call, then loop `j` from `start` to `n - 1` and recurse with `j + 1`. This is the template that extends to Subsets II and Combination Sum.
-- **Iterative:** start with `[[]]` and, for each number, add a copy of every existing subset with that number appended.
-- **Bitmask:** for `mask` from 0 to 2ⁿ − 1, take the elements whose bits are set.
-- Pitfall: pushing `path` itself instead of `[...path]`. Every entry ends up pointing to the same (eventually empty) array.
-- The output size is already exponential, so no algorithm can beat O(n · 2ⁿ).
-- Follow-up: Subsets II, where `nums` has duplicates and duplicate subsets must be skipped.
+- **Identify:** every subset of distinct numbers → backtracking: include or skip each element
+- **Brute force:** loop over all 2^n bitmasks and build each subset, same O(n·2^n) but less general
+- **Insight:** each element is a yes/no choice; recurse on both, sharing one path array
+- **Steps:** dfs(i): at i = n save a copy of the path; else include nums[i] and recurse, pop, then recurse without it
+- **Complexity:** O(n·2^n) time, O(n) recursion space besides the output
+- **Pitfall:** save a copy of the path, not the path itself, since it keeps changing
+- **Related:** Subsets II, Combination Sum, Permutations

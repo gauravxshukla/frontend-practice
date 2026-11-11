@@ -39,12 +39,10 @@ Explanation: the second B would need to reuse the B cell.
 
 ## Notes
 
-- **Key insight:** a DFS from each cell, matching one letter per step. Mark a cell as used while it's on the current path, and un-mark it when you backtrack.
-- **Backtracking:** `dfs(r, c, i)` fails if the cell is out of bounds or doesn't equal `word[i]`. Otherwise temporarily overwrite the cell (e.g. with `#`), try the 4 neighbours with `i + 1`, then restore it. Succeed when `i === word.length`.
-- Complexity: O(R · C · 3^L) time, since after the first step each cell has at most 3 unvisited neighbours. O(L) recursion depth.
-- **Pruning 1:** if the board doesn't contain enough of each letter in `word`, return `false` right away.
-- **Pruning 2:** if the word's last letter is rarer on the board than its first letter, search for the reversed word instead. Inputs like a grid of `A`s with the word `AAAA…B` otherwise explode.
-- Pitfall: forgetting to restore the cell, which corrupts later searches from other starting cells.
-- Pitfall: a shared `visited` set that is never cleared between starting cells.
-- If you mutate `board`, say so in an interview or restore it, since callers may not expect changes.
-- Follow-up: Word Search II (many words at once), which uses a trie to share prefixes across all searches.
+- **Identify:** word as a path of adjacent cells, no reuse → DFS backtracking from each cell
+- **Brute force:** enumerate every path of length L from every cell, then compare with the word
+- **Insight:** prune as you go: stop a path the moment a letter doesn't match
+- **Steps:** for each cell, dfs(r, c, i): bounds and letter must match; mark the cell; try 4 neighbours for i + 1; unmark
+- **Complexity:** O(m·n·4^L) worst case (3^L after the first step), O(L) recursion depth
+- **Pitfall:** restore the cell after exploring, or other starting points see a damaged board
+- **Related:** Word Search II, Number of Islands, Palindrome Partitioning

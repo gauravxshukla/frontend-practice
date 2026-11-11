@@ -32,11 +32,10 @@ Output: [[],[0]]
 
 ## Notes
 
-- **Key insight:** sort so equal values sit next to each other. Then, at any depth, start a branch with a given value only once.
-- **Backtracking:** record a copy of the path at every call. Loop `i` from `start`, `continue` when `i > start && nums[i] === nums[i - 1]`, otherwise push, recurse on `i + 1`, and pop. O(n · 2ⁿ) time worst case.
-- **Iterative alternative:** like Subsets, but when the current number equals the previous one, only extend the subsets created in the previous round.
-- **Count-based alternative:** group into `(value, count)` pairs and choose 0..count copies of each value.
-- **Brute force:** generate all 2ⁿ subsets, sort each one, and dedupe through a Set of keys. Correct, but it repeats work and allocates heavily.
-- Pitfall: forgetting to sort first. The skip check only works on adjacent duplicates.
-- Pitfall: skipping with `i > 0` instead of `i > start`, which wrongly blocks `[2,2]`.
-- Follow-up: Combination Sum II uses exactly the same dedupe rule.
+- **Identify:** every subset when the input has duplicates → sort + backtrack + skip repeats at a depth
+- **Brute force:** generate all 2^n subsets of the sorted input and dedupe with a set
+- **Insight:** record the path at every node; at one depth, start a branch with each distinct value only once
+- **Steps:** sort; dfs(start): save path; for i from start, skip i > start with nums[i] == nums[i − 1]; add, recurse at i + 1, pop
+- **Complexity:** O(n·2^n) time, O(n) recursion depth
+- **Pitfall:** sort first, or equal values aren't adjacent and the skip misses them
+- **Related:** Subsets, Combination Sum II, Permutations
