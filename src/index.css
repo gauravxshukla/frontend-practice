@@ -37,10 +37,10 @@
   --text: #18181b;
   --text-muted: #63636e;
   --text-faint: #8f8f99;
-  --accent: #5b5bd6;
-  --accent-hover: #4a4ac4;
-  --accent-soft: #eeeefc;
-  --accent-text: #4343b8;
+  --accent: #5e6ad2;
+  --accent-hover: #4f5bc4;
+  --accent-soft: #eef0fc;
+  --accent-text: #4b55c0;
   --on-accent: #ffffff;
   --easy: #18794e;
   --easy-soft: #e9f6ef;
@@ -51,7 +51,7 @@
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.05);
   --shadow: 0 1px 3px rgb(0 0 0 / 0.08), 0 4px 12px rgb(0 0 0 / 0.04);
   --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.14);
-  --focus: 0 0 0 2px var(--bg), 0 0 0 4px #8d8dec;
+  --focus: 0 0 0 2px var(--bg), 0 0 0 4px #9aa2ea;
   /* Floating surfaces (toasts, tooltips): an elevated card in the current theme. */
   --overlay-bg: #ffffff;
   --overlay-border: #e4e4e7;
@@ -65,9 +65,9 @@
   /* The phone frame around a React Native preview looks the same in both themes. */
   --device-bezel: #18181b;
   --device-screen: #ffffff;
-  /* The logo tile: indigo into violet, with a white "F" and full stop (the stop has its own token, so it can be tinted). */
-  --brand-from: #5b5bd6;
-  --brand-to: #9b4fd6;
+  /* The logo tile: Linear indigo, slightly brighter at the corner, with a white "F" and full stop (the stop has its own token, so it can be tinted). */
+  --brand-from: #5e6ad2;
+  --brand-to: #7170ff;
   --brand-ink: #ffffff;
   --brand-dot: #ffffff;
 }
@@ -83,10 +83,10 @@
   --text: #ececef;
   --text-muted: #a0a0ab;
   --text-faint: #6f6f7a;
-  --accent: #7c7cf0;
-  --accent-hover: #9191f5;
-  --accent-soft: #23234a;
-  --accent-text: #b1b1fb;
+  --accent: #7170ff;
+  --accent-hover: #828fff;
+  --accent-soft: #22244c;
+  --accent-text: #a9afff;
   --on-accent: #111113;
   --easy: #3dd68c;
   --easy-soft: #11291e;
@@ -97,7 +97,7 @@
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
   --shadow: 0 1px 3px rgb(0 0 0 / 0.5), 0 4px 12px rgb(0 0 0 / 0.3);
   --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.5);
-  --focus: 0 0 0 2px var(--bg), 0 0 0 4px #6262d8;
+  --focus: 0 0 0 2px var(--bg), 0 0 0 4px #5e6ad2;
   --overlay-bg: #232328;
   --overlay-border: #3a3a42;
   --overlay-shadow: 0 10px 32px rgb(0 0 0 / 0.55), 0 1px 3px rgb(0 0 0 / 0.4);
@@ -109,8 +109,8 @@
   --syntax-symbol: #f472b6;
   --device-bezel: #18181b;
   --device-screen: #ffffff;
-  --brand-from: #6c6ce8;
-  --brand-to: #a35ee6;
+  --brand-from: #5e6ad2;
+  --brand-to: #7170ff;
   --brand-ink: #ffffff;
   --brand-dot: #ffffff;
 }
