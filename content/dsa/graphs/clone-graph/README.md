@@ -42,12 +42,10 @@ Explanation: the graph is empty, so the input node is null.
 
 ## Notes
 
-- **Key insight:** keep a map from original node to its clone. It does double duty: it is the visited set, and it lets you wire edges to clones that already exist (which is what makes cycles work).
-- BFS: clone the start node, enqueue it. For each dequeued node, for each neighbour, create its clone on first sight and enqueue it, then push the neighbour's clone onto the current clone's `neighbors`.
-- DFS version: `clone(n)` returns the map entry if present; otherwise creates the copy, stores it **before** recursing, then fills its neighbours.
-- O(V + E) time and O(V) space for the map and queue.
-- Pitfall: storing the clone in the map only after visiting neighbours causes infinite recursion on any cycle.
-- Pitfall: returning the original node, or copying `neighbors` by reference (`copy.neighbors = node.neighbors`), shares nodes with the input; the judge rejects that.
-- Pitfall: keying the map by `val` works here because values are unique, but keying by node identity is the general solution.
-- Edge cases: `null` input, a single node with no neighbours.
-- Follow-up: copy a list with random pointers (same map-of-clones idea), or clone a graph that may be disconnected given a list of all nodes.
+- **Identify:** deep copy of a connected graph with cycles → DFS + map from original to clone
+- **Brute force:** copy nodes without remembering clones; cycles recurse forever or duplicate nodes
+- **Insight:** register each clone in the map before visiting neighbours, so cycles reuse it
+- **Steps:** clone(node): if mapped, return the clone; else create it, map it, clone each neighbour into its list
+- **Complexity:** O(V + E) time, O(V) space for the map and recursion
+- **Pitfall:** put the clone in the map before recursing, or a cycle loops forever; null input returns null
+- **Related:** Copy List with Random Pointer, Course Schedule, Number of Islands

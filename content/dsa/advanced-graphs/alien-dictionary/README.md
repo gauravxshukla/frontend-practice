@@ -39,13 +39,10 @@ Explanation: z must come before x and x before z, which is impossible.
 
 ## Notes
 
-- **Key insight:** comparing two **adjacent** words gives at most one rule: at their first differing position, the letter in the earlier word comes first. These rules form a directed graph, and the answer is a topological sort of it.
-- Add every letter that appears as a node, even ones that never take part in a rule; they still belong in the output.
-- For each adjacent pair, find the first index where they differ and add the edge. If there is no difference and the first word is **longer** (like `"abc"` before `"ab"`), the input is invalid, so return `""`.
-- Run Kahn's algorithm (or DFS with three colours). If not every letter gets placed, there is a cycle, so return `""`.
-- O(C) time, where C is the total number of characters across all words, plus O(U + E) for the sort (at most 26 letters). O(U + E) space.
-- Pitfall: comparing every pair of words instead of adjacent ones is unnecessary; adjacent pairs already imply the rest by transitivity.
-- Pitfall: only the **first** differing letter gives information; later letters say nothing.
-- Pitfall: adding the same edge twice inflates in-degrees unless you deduplicate (or decrement once per copy).
-- Follow-up: decide whether the order is **unique** (Kahn's queue must never hold more than one letter).
-- Grading: any consistent order is accepted. The checker rebuilds the rules from `words` and confirms your string has exactly the letters that appear in `words`, each once, and respects every rule; or that it is `""` when the list is contradictory.
+- **Identify:** letter order from a sorted alien word list → build "a before b" edges, then topological sort
+- **Brute force:** try every permutation of the letters and check the list is sorted under it, O(k!·total)
+- **Insight:** only the first differing letter of each adjacent word pair gives an ordering rule
+- **Steps:** add every letter; for each adjacent pair, add an edge at the first difference; Kahn's BFS; cycle → ""
+- **Complexity:** O(k!·total) → O(total characters + 26²) time, O(26²) space
+- **Pitfall:** a word followed by its own prefix ("abc", "ab") is invalid: return ""
+- **Related:** Course Schedule II, Course Schedule, Reconstruct Itinerary

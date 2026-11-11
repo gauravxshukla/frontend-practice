@@ -36,11 +36,10 @@ Explanation: the cycle is 1-2-3-4-1. Any of its four edges could go, and [1,4] i
 
 ## Notes
 
-- **Key insight:** process edges in order with union-find. The first edge whose two endpoints are **already connected** closes the only cycle, so it is the answer.
-- Why it is also the *last* valid edge: all other edges on the cycle were added before it (otherwise its endpoints would not yet be connected), so it is the latest cycle edge in the input.
-- O(n · α(n)) time and O(n) space.
-- Brute-force baseline: try removing edges from last to first; after each removal, check with DFS whether the rest is connected. The first success is the answer. O(n²).
-- DFS alternative: before adding each edge, DFS to see if `a` can already reach `b`; that is also O(n²).
-- Pitfall: returning the first cycle edge found by a DFS of the full graph, which is not necessarily the last one in the input.
-- Pitfall: nodes are 1-indexed, so size the parent array `n + 1`.
-- Follow-up: "Redundant Connection II", the directed version, where one node may end up with two parents.
+- **Identify:** a tree plus one extra edge, find the edge to remove → union-find, first edge joining an existing group
+- **Brute force:** remove each edge in turn and check the rest is a tree, O(E·(V + E))
+- **Insight:** process edges in order; the first one whose endpoints already share a root closes the cycle
+- **Steps:** parent[i] = i (1-indexed nodes); for each edge, if find(a) == find(b) return it; else union
+- **Complexity:** O(E·(V + E)) → O(E·α(n)) time, O(n) space
+- **Pitfall:** nodes are labelled 1..n, so size the parent array n + 1
+- **Related:** Graph Valid Tree, Number of Connected Components in an Undirected Graph, Course Schedule

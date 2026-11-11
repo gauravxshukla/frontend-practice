@@ -41,13 +41,10 @@ Explanation: "cog" is not in the dictionary, so it can never be reached.
 
 ## Notes
 
-- **Key insight:** words are nodes and one-letter changes are edges, all with weight 1, so the shortest sequence is a **BFS** from `beginWord`.
-- Generating neighbours efficiently: bucket every dictionary word under each of its wildcard patterns (`"hot"` goes into `"*ot"`, `"h*t"`, `"ho*"`). A word's neighbours are everything in its buckets.
-- BFS level by level, counting words. Return the level as soon as `endWord` is generated; return `0` if the queue empties.
-- O(N · L²) time, where N is the dictionary size and L the word length (building each pattern string costs L). O(N · L²) space for the buckets.
-- Alternative neighbour generation: try all 26 letters at each position and look the result up in a `Set`; O(N · 26 · L²).
-- Brute-force baseline: compare every pair of words to build edges, O(N² · L), too slow for 5000 words.
-- Optimization: once a bucket has been expanded, delete it; every word inside is already visited.
-- Optimization: bidirectional BFS from both ends, always expanding the smaller frontier, cuts the search dramatically.
-- Pitfalls: returning the number of *steps* instead of the number of *words* (off by one); forgetting the `endWord`-not-in-list check.
-- Follow-up: "Word Ladder II", which returns every shortest sequence (BFS to build a parent DAG, then backtrack).
+- **Identify:** fewest one-letter changes from begin to end → BFS over words (unweighted shortest path)
+- **Brute force:** compare every pair of words to build the graph first, O(n²·L), then BFS
+- **Insight:** instead of comparing pairs, try all 26 letters at each position and look the result up in a set
+- **Steps:** BFS from beginWord with level 1; for each word, generate neighbours in the set; remove them when queued
+- **Complexity:** O(n²·L) → O(n·L·26) time (plus L for each string), O(n·L) space
+- **Pitfall:** endWord missing from the list means 0; remove words when queued so none is visited twice
+- **Related:** Rotting Oranges, Walls and Gates, Network Delay Time

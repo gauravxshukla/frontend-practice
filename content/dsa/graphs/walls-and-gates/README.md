@@ -50,12 +50,10 @@ Output: [[0, 1], [1, 2]]
 
 ## Notes
 
-- **Key insight:** run one BFS that starts from **all gates at once** (multi-source BFS). The first time the wave reaches a room is its shortest distance to any gate.
-- Push every gate into the first frontier. Expand level by level; for each neighbour still equal to `INF`, write the current level and add it to the next frontier.
-- The `INF` check doubles as the visited test, so no extra set is needed.
-- O(rows · cols) time, since each cell is written at most once. O(rows · cols) space for the queue in the worst case.
-- Brute-force baseline: BFS from each empty room until a gate is found, or BFS from each gate separately and keep minimums. Both are O((rows · cols)²) in the worst case.
-- Pitfall: DFS from each gate with "update if smaller" works but can revisit cells many times; BFS is the clean answer.
-- Pitfall: `Array.shift()` on a big queue is O(n); use level arrays or a head index.
-- Edge cases: no gates (nothing changes), rooms walled off from every gate (stay `INF`), a grid of only walls.
-- Follow-up: return the distance to the nearest gate for a list of query cells; or allow different move costs (switch to Dijkstra).
+- **Identify:** distance from every room to its nearest gate → multi-source BFS from all gates at once
+- **Brute force:** BFS from every empty room to find its nearest gate, O((m·n)²)
+- **Insight:** start BFS from every gate together; the first time a room is reached is its shortest distance
+- **Steps:** queue all gates; pop a cell; for each empty neighbour (INF), set distance + 1 and enqueue it
+- **Complexity:** O((m·n)²) → O(m·n) time, O(m·n) space
+- **Pitfall:** only fill rooms still at INF; walls (−1) and rooms already set are skipped
+- **Related:** Rotting Oranges, Pacific Atlantic Water Flow, Number of Islands

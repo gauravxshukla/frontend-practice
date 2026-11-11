@@ -1,9 +1,11 @@
 /**
- * @param {number[][]} edges  undirected edges on nodes 1..n (a tree plus one extra edge)
- * @return {number[]} the edge to remove (the last such edge in the input)
+ * @param {number[][]} edges nodes labelled 1..n
+ * @return {number[]}
  */
 export default function findRedundantConnection(edges) {
+  // nodes are 1-indexed, so slot 0 goes unused
   const parent = Array.from({ length: edges.length + 1 }, (_, i) => i);
+  // root of x's set, pointing nodes closer to the root as we go (path halving)
   const find = (x) => {
     while (parent[x] !== x) {
       parent[x] = parent[parent[x]];
@@ -11,14 +13,12 @@ export default function findRedundantConnection(edges) {
     }
     return x;
   };
-
-  // The first edge whose endpoints are already connected closes the only cycle.
-  // Every other cycle edge appears earlier, so it is also the last removable edge.
   for (const [a, b] of edges) {
     const ra = find(a);
     const rb = find(b);
+    // already connected without this edge: it's the one that makes the cycle
     if (ra === rb) return [a, b];
     parent[ra] = rb;
   }
-  return [];
+  return []; // unreachable: the input always has one extra edge
 }

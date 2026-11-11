@@ -1,19 +1,18 @@
 /**
- * Captures every "O" region that doesn't touch the border, in place.
- * @param {string[][]} board  cells are "X" or "O"
- * @return {void}
+ * @param {string[][]} board
+ * @return {void} captures surrounded regions in place
  */
 export default function solve(board) {
   const rows = board.length;
-  const cols = rows ? board[0].length : 0;
-
-  // 1. Mark every "O" connected to the border as safe ("S").
-  const stack = [];
+  const cols = board[0].length;
+  // an 'O' connected to the border can't be surrounded: mark it safe ('S')
   const markSafe = (r, c) => {
-    if (board[r][c] === 'O') {
-      board[r][c] = 'S';
-      stack.push([r, c]);
-    }
+    if (r < 0 || r >= rows || c < 0 || c >= cols || board[r][c] !== 'O') return;
+    board[r][c] = 'S';
+    markSafe(r + 1, c);
+    markSafe(r - 1, c);
+    markSafe(r, c + 1);
+    markSafe(r, c - 1);
   };
   for (let r = 0; r < rows; r++) {
     markSafe(r, 0);
@@ -23,16 +22,7 @@ export default function solve(board) {
     markSafe(0, c);
     markSafe(rows - 1, c);
   }
-  while (stack.length) {
-    const [r, c] = stack.pop();
-    for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-      const nr = r + dr;
-      const nc = c + dc;
-      if (nr >= 0 && nc >= 0 && nr < rows && nc < cols) markSafe(nr, nc);
-    }
-  }
-
-  // 2. Remaining "O"s are surrounded: flip them. Restore the safe ones.
+  // unmarked 'O's are enclosed, so capture them; safe cells go back to 'O'
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       if (board[r][c] === 'O') board[r][c] = 'X';

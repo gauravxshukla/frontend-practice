@@ -37,12 +37,10 @@ Explanation: each course requires the other, so neither can be started.
 
 ## Notes
 
-- **Key insight:** courses are nodes and prerequisites are directed edges `b → a`. All courses can be finished exactly when the graph has **no cycle**.
-- Kahn's algorithm (BFS): count each course's incoming edges. Queue every course with in-degree 0, pop one, "take" it, and decrement the in-degree of everything it unlocks, queueing those that hit 0. If you took all `numCourses`, there was no cycle.
-- DFS alternative: three colours (unvisited, on the current path, finished). Reaching a node that is on the current path means a cycle.
-- O(V + E) time and space either way.
-- Brute-force baseline: repeatedly scan for any course whose prerequisites are all done until nothing changes; O(V · E).
-- Pitfall: a self-loop like `[0,0]` is a cycle by itself.
-- Pitfall: duplicate pairs must be counted consistently (Kahn's handles them if every copy adds to the in-degree and every copy is decremented).
-- Pitfall: recursive DFS on a 2000-node chain can be deep; Kahn's is iterative.
-- Follow-up: return an actual order (Course Schedule II), or the minimum number of semesters when you can take any number of available courses per semester (BFS levels).
+- **Identify:** can all courses be taken given prerequisites → cycle detection in a directed graph (topological sort)
+- **Brute force:** for each course, DFS its prerequisites and look for a path back to itself, O(V·(V + E))
+- **Insight:** repeatedly take courses with no remaining prerequisites (Kahn's BFS); a cycle leaves some never ready
+- **Steps:** build edges pre → course and in-degrees; queue in-degree 0; pop, count, decrement neighbours; done if count == n
+- **Complexity:** O(V·(V + E)) → O(V + E) time, O(V + E) space
+- **Pitfall:** a self-loop [0, 0] is a cycle; edges go prerequisite → course, not the reverse
+- **Related:** Course Schedule II, Graph Valid Tree, Alien Dictionary

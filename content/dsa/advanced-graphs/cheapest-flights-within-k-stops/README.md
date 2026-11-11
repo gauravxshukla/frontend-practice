@@ -41,12 +41,10 @@ Output: 500
 
 ## Notes
 
-- **Key insight:** the stop limit breaks plain Dijkstra (a cheaper route with more stops can block a pricier one with fewer). Bounding the number of **edges** is exactly what Bellman-Ford's rounds do.
-- Bellman-Ford with `k + 1` rounds: `prices[src] = 0`, everything else `Infinity`. Each round, copy `prices` to `next` and relax every flight **reading from `prices`** and writing into `next`. After round `i`, `prices[v]` is the cheapest cost using at most `i` flights.
-- O(k · E) time, O(n) space.
-- Why the copy matters: relaxing in place lets one round chain several flights, quietly breaking the stop limit.
-- Alternative: BFS level by level (one level per flight) with pruning when a cheaper cost to a city is already known for that level.
-- Alternative: Dijkstra over states `(city, flightsUsed)`; correct because the state includes the stop count. O(E · k · log(E · k)).
-- Pitfall: confusing stops with flights (`k` stops means `k + 1` flights).
-- Edge cases: no flights at all, `dst` unreachable, `k = 0` (only direct flights).
-- Follow-up: also return the route, or minimize stops first and price second.
+- **Identify:** cheapest path using at most k + 1 edges → Bellman-Ford limited to k + 1 rounds
+- **Brute force:** DFS every route up to k stops and keep the cheapest, exponential
+- **Insight:** round i of Bellman-Ford finds the cheapest cost using at most i flights; stop after k + 1 rounds
+- **Steps:** prices[src] = 0; repeat k + 1 times: copy prices, relax every flight from the old copy into the new one
+- **Complexity:** exponential → O(k·E) time, O(n) space
+- **Pitfall:** relax from the previous round's copy, or one round can chain several flights and exceed k stops
+- **Related:** Network Delay Time, Swim in Rising Water, Min Cost to Connect All Points

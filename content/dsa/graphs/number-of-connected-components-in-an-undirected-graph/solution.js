@@ -1,11 +1,11 @@
 /**
- * @param {number} n  nodes are labelled 0..n-1
- * @param {number[][]} edges  undirected edges
+ * @param {number} n
+ * @param {number[][]} edges
  * @return {number}
  */
 export default function countComponents(n, edges) {
   const parent = Array.from({ length: n }, (_, i) => i);
-  const rank = new Array(n).fill(0);
+  // root of x's set, pointing nodes closer to the root as we go (path halving)
   const find = (x) => {
     while (parent[x] !== x) {
       parent[x] = parent[parent[x]];
@@ -13,17 +13,15 @@ export default function countComponents(n, edges) {
     }
     return x;
   };
-
-  // Start with n singletons; every successful union merges two components.
-  let components = n;
+  let components = n; // every node starts on its own
   for (const [a, b] of edges) {
-    let ra = find(a);
-    let rb = find(b);
-    if (ra === rb) continue;
-    if (rank[ra] < rank[rb]) [ra, rb] = [rb, ra];
-    parent[rb] = ra;
-    if (rank[ra] === rank[rb]) rank[ra]++;
-    components--;
+    const ra = find(a);
+    const rb = find(b);
+    // joining two different groups leaves one fewer; same group changes nothing
+    if (ra !== rb) {
+      parent[ra] = rb;
+      components--;
+    }
   }
   return components;
 }

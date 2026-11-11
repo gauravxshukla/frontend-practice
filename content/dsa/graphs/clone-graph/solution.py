@@ -1,14 +1,16 @@
 class Solution:
-    def cloneGraph(self, node: Optional['Node']) -> Optional['Node']:
-        if not node:
-            return None
-        copies = {node: Node(node.val)}
-        queue = deque([node])
-        while queue:
-            cur = queue.popleft()
-            for nb in cur.neighbors:
-                if nb not in copies:
-                    copies[nb] = Node(nb.val)
-                    queue.append(nb)
-                copies[cur].neighbors.append(copies[nb])
-        return copies[node]
+    def cloneGraph(self, node: Optional["Node"]) -> Optional["Node"]:
+        copies = {}  # original node -> its clone
+
+        def clone(original: "Node") -> "Node":
+            # already cloned (we came back around a cycle): reuse it
+            if original in copies:
+                return copies[original]
+            copy = Node(original.val)
+            # register before visiting neighbours so cycles find this clone
+            copies[original] = copy
+            for nb in original.neighbors:
+                copy.neighbors.append(clone(nb))
+            return copy
+
+        return clone(node) if node else None

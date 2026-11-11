@@ -36,12 +36,10 @@ Explanation: ["JFK","SFO","ATL","JFK","ATL","SFO"] also uses every ticket, but i
 
 ## Notes
 
-- **Key insight:** using every edge exactly once is an **Eulerian path**. Hierholzer's algorithm finds one in linear time, and visiting destinations in sorted order makes it the lexically smallest.
-- Build `from → [destinations]`, sorted. Keep a stack starting with `"JFK"`. While the stack is non-empty: if the top airport still has unused tickets, push its smallest destination (removing that ticket); otherwise pop it onto the route. Reverse the route at the end.
-- Why it works: an airport is appended only once it is a dead end, so any detour that greedy choice got stuck in is spliced in at the right place.
-- O(E log E) time (sorting dominates), O(E) space.
-- Brute-force baseline: backtracking DFS that tries destinations in sorted order, undoes on a dead end, and stops at the first route that uses all tickets. Correct, but exponential in the worst case.
-- Pitfall: plain greedy (always take the smallest destination, append as you go) fails on `[["JFK","KUL"],["JFK","NRT"],["NRT","JFK"]]`; it gets stuck at `KUL` early.
-- Pitfall: duplicate tickets are separate edges; don't store destinations in a `Set`.
-- Tip: sort each list in **reverse** so `pop()` removes the smallest in O(1).
-- Follow-up: detect whether any Eulerian path exists (in/out-degree conditions plus connectivity).
+- **Identify:** use every ticket exactly once from JFK, smallest lexical order → Eulerian path (Hierholzer)
+- **Brute force:** backtracking over sorted destinations, undoing dead ends, exponential worst case
+- **Insight:** DFS greedily by smallest destination; append an airport only when it has no tickets left, then reverse
+- **Steps:** sort each airport's destinations; visit(a): while a has tickets, visit(next smallest); then add a; reverse
+- **Complexity:** exponential → O(E log E) time, O(E) space
+- **Pitfall:** adding airports on the way in (pre-order) fails when a smaller branch is a dead end
+- **Related:** Course Schedule II, Alien Dictionary, Word Ladder

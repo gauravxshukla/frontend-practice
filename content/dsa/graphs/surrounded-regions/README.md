@@ -45,12 +45,10 @@ Output: [["X"]]
 
 ## Notes
 
-- **Key insight:** it is easier to find the regions that **escape** than the ones that are trapped. Anything connected to the border is safe; everything else is captured.
-- Pass 1: from every border `"O"`, flood-fill and mark its whole region with a temporary marker such as `"S"`.
-- Pass 2: scan the board. Any `"O"` left is surrounded, so flip it to `"X"`. Turn every `"S"` back into `"O"`.
-- O(rows · cols) time; O(rows · cols) worst-case space for the flood-fill stack.
-- Brute-force baseline: flood-fill each region from inside, record whether it touched the border, then flip it if not. Also O(rows · cols), but more bookkeeping.
-- Pitfall: flipping cells during the first scan before you know whether their region reaches the edge.
-- Pitfall: diagonal connections do not count, so an `"O"` touching a border `"O"` only diagonally is still captured.
-- Edge cases: a 1xN or Nx1 board (everything is on the border), a board of only `"O"`.
-- Follow-up: union-find variant, joining every border `"O"` to a virtual "outside" node.
+- **Identify:** capture "O" regions not touching the border → mark border-connected "O"s first (DFS)
+- **Brute force:** for every "O" region, explore it to see if it touches the border, re-exploring shared cells
+- **Insight:** instead of testing each region, DFS from border "O"s to mark the safe ones; everything else flips
+- **Steps:** DFS from every border "O" marking it "S"; then flip remaining "O" → "X" and "S" → "O"
+- **Complexity:** O((m·n)²) → O(m·n) time, O(m·n) recursion depth worst case
+- **Pitfall:** do both passes after marking; flipping during the scan captures cells that are actually safe
+- **Related:** Pacific Atlantic Water Flow, Number of Islands, Walls and Gates

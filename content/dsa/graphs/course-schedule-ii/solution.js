@@ -1,23 +1,27 @@
 /**
  * @param {number} numCourses
- * @param {number[][]} prerequisites  [course, prereq] pairs: take prereq before course
- * @return {number[]} a valid order of all courses, or [] if none exists
+ * @param {number[][]} prerequisites [course, prerequisite] pairs
+ * @return {number[]} a valid order, or [] if there's a cycle
  */
 export default function findOrder(numCourses, prerequisites) {
-  const indegree = new Array(numCourses).fill(0);
+  // prerequisite -> courses it unlocks, and how many prerequisites each course still needs
   const unlocks = Array.from({ length: numCourses }, () => []);
-  for (const [course, prereq] of prerequisites) {
-    unlocks[prereq].push(course);
-    indegree[course]++;
+  const needs = new Array(numCourses).fill(0);
+  for (const [course, pre] of prerequisites) {
+    unlocks[pre].push(course);
+    needs[course]++;
   }
-
-  // Kahn's algorithm; the queue itself is the topological order.
+  // courses with nothing left to wait for can be taken now
+  const ready = [];
+  for (let c = 0; c < numCourses; c++) if (needs[c] === 0) ready.push(c);
   const order = [];
-  for (let i = 0; i < numCourses; i++) if (indegree[i] === 0) order.push(i);
-  for (let head = 0; head < order.length; head++) {
-    for (const next of unlocks[order[head]]) {
-      if (--indegree[next] === 0) order.push(next);
+  while (ready.length) {
+    const course = ready.pop();
+    order.push(course); // every prerequisite of this course is already in the order
+    for (const next of unlocks[course]) {
+      if (--needs[next] === 0) ready.push(next);
     }
   }
+  // a cycle leaves some courses out, and then no order exists
   return order.length === numCourses ? order : [];
 }

@@ -40,13 +40,10 @@ Explanation: links are one-way, so node 1 is unreachable from node 2.
 
 ## Notes
 
-- **Key insight:** the time for node `v` to hear the signal is its shortest-path distance from `k`. The answer is the **largest** of those distances, or `-1` if any is infinite.
-- Weights are non-negative, so use **Dijkstra**: a min-heap of `[distance, node]`, starting with `[0, k]`. Pop the closest node; skip it if the entry is stale; otherwise relax its outgoing links and push improved distances.
-- Nodes settle in non-decreasing distance order, so the distance of the last settled node is the answer if all `n` were settled.
-- O(E log E) time with a binary heap, O(V + E) space.
-- Bellman-Ford alternative: relax every edge `n - 1` times; O(V · E), simple, and works with negative weights.
-- For tiny dense graphs, O(V²) Dijkstra without a heap (scan for the closest unsettled node) is competitive.
-- Pitfall: treating the links as undirected.
-- Pitfall: zero-weight links are allowed; make sure the "stale entry" check uses `>`, not `>=`.
-- Pitfall: JavaScript has no built-in priority queue; write a small binary heap rather than sorting the queue on every push.
-- Follow-up: return the actual path to the slowest node (track predecessors), or handle negative weights (Bellman-Ford).
+- **Identify:** time for a signal to reach every node, non-negative weights → Dijkstra's shortest paths
+- **Brute force:** Bellman-Ford relaxing every edge n − 1 times, O(V·E)
+- **Insight:** always settle the closest unsettled node next; with non-negative weights its distance is final
+- **Steps:** min-heap of (time, node) from k; pop; skip if settled; settle and push neighbours with time + w
+- **Complexity:** O(V·E) → O(E log E) time, O(V + E) space
+- **Pitfall:** the answer is the largest settled time, or −1 if any node was never reached
+- **Related:** Cheapest Flights Within K Stops, Swim in Rising Water, Min Cost to Connect All Points

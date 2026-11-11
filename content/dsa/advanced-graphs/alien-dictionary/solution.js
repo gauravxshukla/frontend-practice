@@ -1,45 +1,46 @@
 /**
- * @param {string[]} words  sorted in the alien language's order
- * @return {string} the letters in a consistent order, or "" if none exists
+ * @param {string[]} words sorted in the alien order
+ * @return {string} one valid letter order, or "" if none exists
  */
 export default function alienOrder(words) {
-  // Every letter that appears is a node, even if it has no edges.
-  const edges = new Map();
-  const indegree = new Map();
-  for (const word of words) {
-    for (const ch of word) {
-      if (!edges.has(ch)) {
-        edges.set(ch, new Set());
-        indegree.set(ch, 0);
+  // every letter that appears must be in the answer, even with no rules
+  const after = new Map(); // letter -> letters that must come after it
+  const needs = new Map(); // letter -> how many letters must come before it
+  for (const w of words) {
+    for (const ch of w) {
+      if (!after.has(ch)) {
+        after.set(ch, new Set());
+        needs.set(ch, 0);
       }
     }
   }
-
-  // Adjacent words give at most one rule: their first differing letters.
   for (let i = 0; i + 1 < words.length; i++) {
     const a = words[i];
     const b = words[i + 1];
-    const len = Math.min(a.length, b.length);
-    let j = 0;
-    while (j < len && a[j] === b[j]) j++;
-    if (j === len) {
-      if (a.length > b.length) return ''; // "abc" before "ab" is impossible
-      continue;
-    }
-    if (!edges.get(a[j]).has(b[j])) {
-      edges.get(a[j]).add(b[j]);
-      indegree.set(b[j], indegree.get(b[j]) + 1);
-    }
-  }
-
-  // Kahn's topological sort; leftover letters mean a cycle.
-  const order = [];
-  for (const [ch, d] of indegree) if (d === 0) order.push(ch);
-  for (let head = 0; head < order.length; head++) {
-    for (const next of edges.get(order[head])) {
-      indegree.set(next, indegree.get(next) - 1);
-      if (indegree.get(next) === 0) order.push(next);
+    // a longer word before its own prefix can't be sorted by any order
+    if (a.length > b.length && a.startsWith(b)) return '';
+    // only the first differing letter tells us anything
+    for (let j = 0; j < Math.min(a.length, b.length); j++) {
+      if (a[j] !== b[j]) {
+        if (!after.get(a[j]).has(b[j])) {
+          after.get(a[j]).add(b[j]);
+          needs.set(b[j], needs.get(b[j]) + 1);
+        }
+        break;
+      }
     }
   }
-  return order.length === edges.size ? order.join('') : '';
+  // Kahn's topological sort: emit letters once nothing must precede them
+  const ready = [...needs.keys()].filter((ch) => needs.get(ch) === 0);
+  let order = '';
+  while (ready.length) {
+    const ch = ready.pop();
+    order += ch;
+    for (const next of after.get(ch)) {
+      needs.set(next, needs.get(next) - 1);
+      if (needs.get(next) === 0) ready.push(next);
+    }
+  }
+  // letters left out are on a cycle of contradictory rules
+  return order.length === after.size ? order : '';
 }

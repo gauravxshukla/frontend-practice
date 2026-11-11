@@ -45,12 +45,10 @@ Explanation: a 2x2 block top-left, a single cell in the middle, and a pair botto
 
 ## Notes
 
-- **Key insight:** each island is a connected component of land cells, so count how many times you have to start a fresh flood fill.
-- Scan every cell. When you hit an unvisited `"1"`, increment the count and flood-fill (DFS or BFS) the whole island, marking each cell visited (overwriting it with `"0"` is the cheapest marker).
-- O(rows · cols) time: every cell is visited a constant number of times. O(rows · cols) worst-case space for the stack/queue (a grid that is all land).
-- Recursive DFS can blow the call stack on a 300x300 all-land grid; an explicit stack or BFS queue avoids that.
-- Mark a cell visited **when you push it**, not when you pop it, or the same cell can enter the stack many times.
-- Alternative: union-find over land cells, unioning each cell with its right and down neighbours; the answer is the number of distinct roots. Same complexity, handy when cells arrive one at a time.
-- Pitfalls: comparing against the number `1` instead of the string `"1"`; counting diagonal neighbours; forgetting a 1x1 grid.
-- Follow-up: "Number of Islands II", where land is added one cell at a time and you report the count after each addition (union-find shines here).
-- Follow-up: count distinct island **shapes** by recording a normalized path signature of each flood fill.
+- **Identify:** count connected groups of "1" cells on a grid → flood fill (DFS) from each unvisited land cell
+- **Brute force:** for every land cell, BFS with a fresh visited set and dedupe islands, O((m·n)²)
+- **Insight:** each new land cell found by the scan starts an island; sink it all so it's never counted again
+- **Steps:** scan cells; on a "1", count++ and DFS turning connected "1"s to "0"
+- **Complexity:** O((m·n)²) → O(m·n) time, O(m·n) recursion depth worst case
+- **Pitfall:** only 4-directional neighbours count; diagonal land is a separate island
+- **Related:** Max Area of Island, Surrounded Regions, Rotting Oranges

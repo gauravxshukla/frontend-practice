@@ -23,6 +23,8 @@ const CONVERTED = new Set([
   'tries',
   'heap',
   'backtracking',
+  'graphs',
+  'advanced-graphs',
 ]);
 const topicOf = (dir) => dir.split('/')[2];
 const frontmatter = (raw) => Object.fromEntries(

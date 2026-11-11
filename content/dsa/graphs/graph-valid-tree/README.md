@@ -36,11 +36,11 @@ Explanation: 1-2-3-1 is a cycle.
 
 ## Notes
 
-- **Key insight:** a graph on `n` nodes is a tree exactly when it has `n - 1` edges **and** is acyclic (equivalently, `n - 1` edges and connected). Checking the edge count first rules out most bad inputs in O(1).
-- Union-find: for each edge, find both roots. If they are already equal, the edge closes a cycle, so return `false`. Otherwise union them. With exactly `n - 1` edges and no cycle, the graph must be connected.
-- DFS/BFS alternative: build adjacency lists, traverse from node 0 while skipping the edge you came in on, fail if you reach a visited node, and finally check that all `n` nodes were visited.
-- Union-find with path compression is O(E · α(n)); DFS is O(V + E). Both use O(V + E) space at most.
-- Pitfall: a single node with no edges is a valid tree (`n = 1`), but two nodes with no edges is not (disconnected).
-- Pitfall: a duplicate edge `[0,1],[0,1]` is a 2-cycle in an undirected graph; in DFS you must skip the *edge* you came from, not the parent *node*, to catch it.
-- Pitfall: a self-loop `[3,3]` is a cycle.
-- Follow-up: find the edge to remove to make it a tree (Redundant Connection), or count components (the next problem).
+- **Identify:** are n nodes and these edges one tree → exactly n − 1 edges and no cycle (union-find)
+- **Key formula:** a tree on n nodes has exactly n − 1 edges
+- **Brute force:** DFS from node 0 tracking parents to find cycles, then check all nodes were reached
+- **Insight:** with n − 1 edges, "no cycle" alone proves connected; union-find spots a cycle when both ends share a root
+- **Steps:** if edges ≠ n − 1 return false; for each edge, find both roots; same root → cycle → false; else union
+- **Complexity:** O(V + E) either way; union-find is O(E·α(n)) with O(n) space
+- **Pitfall:** n = 1 with no edges is a valid tree; a duplicate edge is a cycle
+- **Related:** Number of Connected Components in an Undirected Graph, Redundant Connection, Course Schedule

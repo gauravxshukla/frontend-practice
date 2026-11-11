@@ -1,38 +1,28 @@
-const INF = 2147483647;
-
 /**
- * Fills every empty room (INF) with its distance to the nearest gate (0), in place.
- * -1 is a wall.
- * @param {number[][]} rooms
- * @return {void}
+ * @param {number[][]} rooms -1 wall, 0 gate, 2147483647 empty
+ * @return {void} fills each empty room with its distance to the nearest gate
  */
 export default function wallsAndGates(rooms) {
+  const EMPTY = 2147483647;
   const rows = rooms.length;
-  const cols = rows ? rooms[0].length : 0;
-
-  // Multi-source BFS: start from every gate at once.
-  let frontier = [];
+  const cols = rooms[0].length;
+  // every gate starts the BFS together, so rooms are reached by their nearest gate first
+  let queue = [];
   for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      if (rooms[r][c] === 0) frontier.push([r, c]);
-    }
+    for (let c = 0; c < cols; c++) if (rooms[r][c] === 0) queue.push([r, c]);
   }
-
-  let distance = 0;
-  while (frontier.length) {
-    distance++;
+  while (queue.length) {
     const next = [];
-    for (const [r, c] of frontier) {
+    for (const [r, c] of queue) {
       for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
         const nr = r + dr;
         const nc = c + dc;
-        // Only unvisited empty rooms; the first visit is the shortest distance.
-        if (nr >= 0 && nc >= 0 && nr < rows && nc < cols && rooms[nr][nc] === INF) {
-          rooms[nr][nc] = distance;
-          next.push([nr, nc]);
-        }
+        // only unvisited empty rooms; walls and already-filled rooms stay as they are
+        if (nr < 0 || nr >= rows || nc < 0 || nc >= cols || rooms[nr][nc] !== EMPTY) continue;
+        rooms[nr][nc] = rooms[r][c] + 1;
+        next.push([nr, nc]);
       }
     }
-    frontier = next;
+    queue = next;
   }
 }

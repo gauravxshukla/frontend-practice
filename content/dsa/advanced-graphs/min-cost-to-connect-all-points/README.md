@@ -36,11 +36,11 @@ Explanation: connect [-4,1]–[-2,5] for 6 and [-2,5]–[3,12] for 12.
 
 ## Notes
 
-- **Key insight:** this is a **minimum spanning tree** on a complete graph where every pair of points is an edge.
-- Prim's algorithm, dense version: keep `best[i]` = cheapest edge from the growing tree to point `i`. Repeatedly add the cheapest point not yet in the tree, add its cost, and update `best` for every other point. No heap and no edge list needed.
-- That is O(n²) time and O(n) space, which is optimal for a complete graph with n² edges.
-- Kruskal alternative: list all n(n−1)/2 edges, sort, and union-find them in order. O(n² log n) time and O(n²) memory, so it is heavier here.
-- Prim with a heap is O(n² log n) on a dense graph; the array version is simpler and faster.
-- Pitfall: a single point costs `0`.
-- Pitfall: Euclidean distance is wrong; use Manhattan.
-- Follow-up: for very large n, only the nearest neighbour in each of 8 octants matters, which shrinks the edge list to O(n) and gives O(n log n).
+- **Identify:** connect all points with minimum total edge cost → minimum spanning tree (Prim's)
+- **Key formula:** cost between points = |x1 − x2| + |y1 − y2| (Manhattan distance)
+- **Brute force:** Kruskal on all n² edges: sort them, then union-find, O(n² log n)
+- **Insight:** the graph is complete, so array-based Prim (cheapest link into the tree per point) avoids sorting n² edges
+- **Steps:** best[i] = cheapest edge from the tree to i; repeatedly add the cheapest outside point and update best
+- **Complexity:** O(n² log n) → O(n²) time, O(n) space
+- **Pitfall:** mark points as in the tree, or a point is added twice; a single point costs 0
+- **Related:** Network Delay Time, Redundant Connection, Swim in Rising Water

@@ -40,13 +40,10 @@ Explanation: the two courses depend on each other.
 
 ## Notes
 
-- **Key insight:** a valid order is a **topological sort** of the graph with edges `b → a`; one exists exactly when the graph has no cycle.
-- Kahn's algorithm: build adjacency lists and in-degrees, seed a queue with every in-degree-0 course, and repeatedly pop a course, append it to the order, and decrement its dependents. The queue itself is the answer.
-- If the order ends up shorter than `numCourses`, some courses sit on or behind a cycle, so return `[]`.
-- DFS alternative: post-order DFS with three colours, then reverse the post-order. A back edge (a node still on the stack) means a cycle.
-- O(V + E) time and space.
-- Pitfall: returning a partial order instead of `[]` when there is a cycle.
-- Pitfall: courses with no prerequisites and no dependents must still appear in the result.
-- Pitfall: in the DFS version, forgetting to reverse gives dependents before prerequisites.
-- Follow-up: return the lexicographically smallest valid order (swap the queue for a min-heap).
-- Grading: any valid order is accepted. The checker confirms your array is a permutation of all courses that respects every prerequisite, or that it is `[]` when no order exists.
+- **Identify:** an order to take all courses, or [] if impossible → topological sort (Kahn's BFS)
+- **Brute force:** try orderings and check each against the prerequisites, O(n!·E)
+- **Insight:** the order in which Kahn's algorithm frees courses is itself a valid order
+- **Steps:** build edges and in-degrees; queue in-degree 0; pop into the order, decrement neighbours; [] if order is short
+- **Complexity:** O(n!·E) → O(V + E) time, O(V + E) space
+- **Pitfall:** a cycle leaves the order shorter than numCourses; return [] then, not a partial order
+- **Related:** Course Schedule, Alien Dictionary, Graph Valid Tree

@@ -36,12 +36,10 @@ Output: 1
 
 ## Notes
 
-- **Key insight:** start with `n` separate components. Every edge that joins two *different* components reduces the count by one.
-- Union-find: `parent[i] = i` initially; for each edge, find both roots; if they differ, union them (by rank or size) and decrement the count.
-- DFS/BFS alternative: build adjacency lists and count how many times you launch a traversal from an unvisited node.
-- Union-find: O(E · α(n)) time, O(n) space. DFS: O(n + E) time and space.
-- Pitfall: forgetting isolated nodes (they never appear in `edges` but still count).
-- Pitfall: decrementing on edges inside the same component (duplicates or cycles) over-counts merges.
-- Pitfall: union-find without path compression or rank can degrade to O(n) per find on long chains.
-- Follow-up: edges arrive as a stream and you report the count after each one (union-find handles this online).
-- Follow-up: return the size of the largest component (track sizes on union).
+- **Identify:** count separate groups of connected nodes → union-find (or DFS from each unvisited node)
+- **Brute force:** BFS from every node with a fresh visited set and dedupe the groups, O(V·(V + E))
+- **Insight:** start with n components; every edge joining two different roots merges two into one
+- **Steps:** count = n; for each edge, find both roots; if different, union them and count−−
+- **Complexity:** O(V·(V + E)) → O(V + E·α(n)) time, O(n) space
+- **Pitfall:** duplicate edges and edges inside a component must not decrement the count
+- **Related:** Graph Valid Tree, Redundant Connection, Number of Islands
