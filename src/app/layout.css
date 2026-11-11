@@ -723,9 +723,78 @@ body.is-resizing iframe {
   flex-direction: column;
 }
 
-/* Maximize: the output column takes the whole workspace. */
-.mc-workspace.is-maximized > :not(.mc-output) {
+/* Editor | preview, split by a draggable handle (--split is the editor's share). */
+.mc-split {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+}
+
+.mc-split > .mc-editor {
+  flex: 0 0 var(--split, 50%);
+  border-right: 0;
+}
+
+.mc-split.preview-hidden > .mc-editor {
+  flex: 1 1 0;
+}
+
+/* `hidden`, not unmounted: the preview keeps running while it's out of view. */
+.mc-output[hidden] {
   display: none;
+}
+
+/* Maximize: the output column takes the whole workspace. */
+.mc-workspace.is-maximized > :not(.mc-split),
+.mc-workspace.is-maximized .mc-split > :not(.mc-output) {
+  display: none;
+}
+
+/* ---------- Panel toggles (question header) ---------- */
+.layout-toggles {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.layout-toggle {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+}
+
+.layout-toggle.on {
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+.layout-toggle-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid var(--surface-2);
+  border-radius: 50%;
+  background: var(--hard);
+}
+
+/* What's left of the problem panel while it's hidden. */
+.prompt-strip {
+  flex: 0 0 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-top: 8px;
+  border-right: 1px solid var(--border);
+  background: var(--surface-1);
 }
 
 /* Thin toolbar shared by the file tree and the preview. */
@@ -1817,9 +1886,31 @@ body.is-resizing-rows iframe {
     flex-direction: column;
   }
 
-  .mc-editor {
+  .mc-split {
+    flex-direction: column;
+  }
+
+  .mc-editor,
+  .mc-split > .mc-editor {
     flex: 1 1 0;
     min-height: 220px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* No panel toggles on phones, so nothing stays hidden. */
+  .layout-toggles {
+    display: none;
+  }
+
+  .mc-output[hidden] {
+    display: flex;
+  }
+
+  .prompt-strip {
+    flex: 0 0 auto;
+    flex-direction: row;
+    padding: 4px 8px;
     border-right: 0;
     border-bottom: 1px solid var(--border);
   }

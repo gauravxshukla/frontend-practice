@@ -203,6 +203,7 @@
 
 /* ---------- Console drawer (under the live preview) ---------- */
 .console-drawer {
+  container: console / inline-size;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -310,6 +311,35 @@
   width: 120px;
   min-width: 0;
   padding: 0 8px;
+}
+
+.console-search-toggle {
+  display: none;
+}
+
+/* Narrow pane: the level menu shrinks and the text filter folds into a search button. */
+@container console (max-width: 380px) {
+  .console-filter-level {
+    max-width: 84px;
+  }
+
+  .console-search-toggle {
+    display: inline-grid;
+    width: 26px;
+    height: 26px;
+  }
+
+  .console-drawer-tools:not(.searching) .console-filter-text {
+    display: none;
+  }
+
+  .console-drawer-tools.searching .console-search-toggle {
+    display: none;
+  }
+
+  .console-drawer-tools.searching .console-filter-level {
+    display: none;
+  }
 }
 
 .console-drawer-body {
