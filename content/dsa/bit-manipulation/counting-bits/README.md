@@ -34,11 +34,11 @@ Explanation: 0→0, 1→1, 10→1, 11→2, 100→1, 101→2.
 
 ## Notes
 
-- **Key insight:** `i >> 1` is `i` with its last bit dropped, and you already know its answer. So `ans[i] = ans[i >> 1] + (i & 1)`.
-- Another recurrence: `ans[i] = ans[i & (i − 1)] + 1`, since `i & (i − 1)` removes the lowest set bit.
-- Or by most-significant bit: `ans[i] = 1 + ans[i − offset]`, where `offset` is the largest power of two ≤ i.
-- O(n) time, O(1) extra space besides the output.
-- Brute force: popcount each number independently, O(n log n) (or O(32 n)).
-- Edge case: `n = 0` returns `[0]`, an array of length 1.
-- Pitfall: off-by-one. The array has `n + 1` entries and includes `n` itself.
-- Follow-up: do it without any built-in popcount, which every recurrence above already satisfies.
+- **Identify:** set-bit counts for every number 0..n → DP reusing smaller numbers' counts
+- **Key formula:** bits[i] = bits[i >> 1] + (i & 1)
+- **Brute force:** count bits of each number separately, O(n log n)
+- **Insight:** dropping the last bit gives a smaller number whose count is already known
+- **Steps:** bits[0] = 0; for i = 1..n: bits[i] = bits[i >> 1] + (i & 1)
+- **Complexity:** O(n log n) → O(n) time, O(n) space for the output
+- **Pitfall:** the output has n + 1 entries, including 0
+- **Related:** Number of 1 Bits, Climbing Stairs, Reverse Bits

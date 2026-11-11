@@ -36,10 +36,11 @@ Output: 1
 
 ## Notes
 
-- **Key insight:** binary addition splits into two parts. `a ^ b` is the sum ignoring carries, and `(a & b) << 1` is the carries shifted into place.
-- Repeat `[a, b] = [a ^ b, (a & b) << 1]` until `b` (the carry) is 0. Then `a` is the answer.
-- Each round pushes the carry at least one bit further left, so it takes at most 32 iterations: O(1) time and space.
-- Negatives just work in two's complement. In JS, `^`, `&` and `<<` all produce signed 32-bit results, so the carry eventually shifts out of bit 31 and the loop ends.
-- In Python (unbounded ints) you need a `0xFFFFFFFF` mask and a final sign fix; in Java/C++ the fixed width does the job, just like JS here.
-- Pitfall: hiding a `+` inside helpers like `Math.max` tricks or `reduce`. The point is to show you understand the carry.
-- Follow-up: subtraction without `-`, using `a + (~b + 1)` (the two's-complement negation) built from the same adder.
+- **Identify:** add without + or − → XOR adds without carry, AND finds the carries
+- **Key formula:** a + b = (a ^ b) + ((a & b) << 1)
+- **Brute force:** increment one at a time |b| times, O(|b|)
+- **Insight:** repeat "sum without carry" and "carry shifted left" until there is no carry
+- **Steps:** while b ≠ 0: carry = (a & b) << 1; a = a ^ b; b = carry; return a
+- **Complexity:** O(|b|) → O(32) time, O(1) space
+- **Pitfall:** Python ints never overflow, so mask to 32 bits and convert back to a signed value
+- **Related:** Reverse Integer, Plus One, Number of 1 Bits

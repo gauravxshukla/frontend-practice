@@ -34,11 +34,11 @@ Output (matrix after the call): [[0,0,0,0],[0,4,5,0],[0,3,1,0]]
 
 ## Notes
 
-- **Key insight:** you need to remember which rows and columns to clear *before* you start clearing, otherwise newly written zeros spread too far.
-- Simple version: two sets (or boolean arrays) `rows` and `cols` from a first pass, then zero the cells in a second pass. O(m·n) time, O(m + n) space.
-- **O(1) space:** reuse the first row and first column as the marker arrays. Remember separately whether the first row and first column themselves contained a zero.
-- Pass 1: for every zero at `(i, j)`, set `m[i][0] = 0` and `m[0][j] = 0`.
-- Pass 2: for `i ≥ 1, j ≥ 1`, zero `m[i][j]` if `m[i][0] === 0 || m[0][j] === 0`. Finally clear the first row/column if their flags say so.
-- Pitfall: processing the first row/column before the inner cells destroys the markers.
-- Pitfall: zeroing as you scan in a single pass. The new zeros look like original ones and wipe the whole matrix.
-- Brute force: copy the matrix, scan the copy, and zero rows/columns in the original. O(m·n) extra space.
+- **Identify:** zero the full row and column of every 0 → record which rows/columns, then clear them
+- **Brute force:** copy the matrix and zero rows/columns from the copy, O(m·n) extra space
+- **Better:** a rows set and a cols set from a first pass, O(m + n) extra space
+- **Insight:** use the first row and first column as those markers, with one flag for the first column itself
+- **Steps:** mark matrix[r][0] and matrix[0][c] for zeros; zero inner cells from the marks; then the first row; then the first column
+- **Complexity:** O(m·n) time; O(m·n) → O(1) extra space
+- **Pitfall:** clear the first row and column last, or their markers wipe out real data too early
+- **Related:** Rotate Image, Spiral Matrix, Valid Sudoku

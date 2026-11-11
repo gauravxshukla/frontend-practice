@@ -1,30 +1,29 @@
 /**
- * O(1) extra space: the first row and column store the markers.
  * @param {number[][]} matrix
- * @return {void}
+ * @return {void} zeroes rows and columns in place
  */
 export default function setZeroes(matrix) {
   const rows = matrix.length;
   const cols = matrix[0].length;
-  const firstRowZero = matrix[0].some((v) => v === 0);
-  const firstColZero = matrix.some((row) => row[0] === 0);
-
-  // Mark rows/columns to clear in the first column/row.
-  for (let i = 1; i < rows; i++) {
-    for (let j = 1; j < cols; j++) {
-      if (matrix[i][j] === 0) {
-        matrix[i][0] = 0;
-        matrix[0][j] = 0;
+  // matrix[0][0] marks row 0, so column 0 needs its own flag
+  let firstColZero = false;
+  // 1. record zeros in the first row/column (the markers)
+  for (let r = 0; r < rows; r++) {
+    if (matrix[r][0] === 0) firstColZero = true;
+    for (let c = 1; c < cols; c++) {
+      if (matrix[r][c] === 0) {
+        matrix[r][0] = 0;
+        matrix[0][c] = 0;
       }
     }
   }
-  // Clear the inner cells using the markers.
-  for (let i = 1; i < rows; i++) {
-    for (let j = 1; j < cols; j++) {
-      if (matrix[i][0] === 0 || matrix[0][j] === 0) matrix[i][j] = 0;
+  // 2. zero inner cells whose row or column is marked
+  for (let r = 1; r < rows; r++) {
+    for (let c = 1; c < cols; c++) {
+      if (matrix[r][0] === 0 || matrix[0][c] === 0) matrix[r][c] = 0;
     }
   }
-  // Finally the first row and column themselves.
-  if (firstRowZero) for (let j = 0; j < cols; j++) matrix[0][j] = 0;
-  if (firstColZero) for (let i = 0; i < rows; i++) matrix[i][0] = 0;
+  // 3. the markers themselves go last, so they weren't overwritten while still needed
+  if (matrix[0][0] === 0) for (let c = 0; c < cols; c++) matrix[0][c] = 0;
+  if (firstColZero) for (let r = 0; r < rows; r++) matrix[r][0] = 0;
 }

@@ -36,11 +36,11 @@ Output: 30
 
 ## Notes
 
-- **Key insight (Brian Kernighan):** `n & (n − 1)` clears the lowest set bit. Repeat until `n` is 0 and count the iterations, which takes exactly as many steps as there are 1 bits.
-- Simple alternative: check `n & 1` and shift with `n >>>= 1`, 32 iterations at most.
-- O(number of set bits) or O(32) time, O(1) space.
-- JS pitfall: bitwise operators work on **signed** 32-bit ints. For n ≥ 2³¹, `n >> 1` drags the sign bit in forever, so use `>>>` (unsigned shift), or apply `>>> 0` to get back an unsigned value.
-- JS pitfall: `while (n > 0)` fails once `n & (n − 1)` turns the value negative. Normalise with `>>> 0` or loop on `n !== 0`.
-- Baseline: `n.toString(2)` and count the `"1"` characters. Fine in an interview only as a first step.
-- Follow-up: if this is called many times, precompute popcounts for every byte (256 entries) and add four table lookups.
-- Related: Counting Bits computes the counts for every number from 0 to n in O(n).
+- **Identify:** count set bits in an unsigned 32-bit integer → clear the lowest set bit repeatedly
+- **Key formula:** n & (n − 1) removes the lowest set bit
+- **Brute force:** check all 32 bits one by one with n & 1 and a shift, always 32 steps
+- **Insight:** each n & (n − 1) removes exactly one set bit, so the loop runs once per 1 bit
+- **Steps:** count = 0; while n ≠ 0: n &= n − 1; count++
+- **Complexity:** O(32) → O(set bits) time, O(1) space
+- **Pitfall:** treat the input as unsigned: values ≥ 2³¹ must not be read as negative
+- **Related:** Counting Bits, Reverse Bits, Single Number

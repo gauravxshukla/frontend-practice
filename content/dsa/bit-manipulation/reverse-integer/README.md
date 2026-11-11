@@ -36,12 +36,10 @@ Output: 21
 
 ## Notes
 
-- **Key insight:** build the result one digit at a time, `rev = rev * 10 + digit`, and check for overflow *before* the multiply-and-add.
-- Pop digits with `digit = x % 10` and `x = Math.trunc(x / 10)`. In JS `%` keeps the sign of `x`, so negatives work without special handling.
-- Overflow check for positives: overflow if `rev > MAX / 10`, or `rev === Math.trunc(MAX / 10)` and `digit > 7` (MAX = 2147483647). For negatives the limits are `MIN / 10` and `digit < −8`.
-- Since an input with 10 digits starts with 1 or 2, the final digit is at most 2, so `rev > MAX / 10` alone is a sufficient check in practice; the full check is clearer to an interviewer.
-- O(log₁₀|x|) time, O(1) space.
-- Baseline: string reverse plus a range check afterwards. Easy in JS, but it relies on numbers bigger than 32 bits, which the problem asks you to avoid.
-- Pitfall: `Math.floor` on negatives rounds the wrong way (`Math.floor(−12 / 10)` is −2). Use `Math.trunc`.
-- Pitfall: `-0`. Reversing 0 should return 0.
-- Follow-up: Palindrome Number, which reverses only half of the digits to avoid overflow entirely.
+- **Identify:** reverse digits but return 0 on 32-bit overflow → pop digits and check before pushing
+- **Brute force:** reverse the digit string and parse it, then range-check (needs 64-bit space)
+- **Insight:** check the overflow before rev × 10 + digit happens, so no wider integer is needed
+- **Steps:** keep the sign, work on |x|; for each digit, if rev > (limit − digit) / 10 return 0; rev = rev × 10 + digit
+- **Complexity:** O(log x) time, O(1) space
+- **Pitfall:** the limit differs by sign (2³¹ − 1 vs 2³¹), and |−2³¹| itself overflows an int
+- **Related:** Sum of Two Integers, Plus One, Pow(x, n)

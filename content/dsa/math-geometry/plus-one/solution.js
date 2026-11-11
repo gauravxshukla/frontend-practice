@@ -1,17 +1,18 @@
 /**
- * @param {number[]} digits
+ * @param {number[]} digits most significant first
  * @return {number[]}
  */
 export default function plusOne(digits) {
-  const out = [...digits];
-
-  for (let i = out.length - 1; i >= 0; i--) {
-    if (out[i] < 9) {
-      out[i]++;
-      return out; // no carry left
+  const result = [...digits];
+  for (let i = result.length - 1; i >= 0; i--) {
+    // no carry past a digit below 9, so we're done
+    if (result[i] < 9) {
+      result[i]++;
+      return result;
     }
-    out[i] = 0; // 9 + 1 = 10: write 0, carry 1
+    // 9 + 1 = 10: write 0 and carry left
+    result[i] = 0;
   }
-  // Every digit was 9.
-  return [1, ...out];
+  // every digit was 9, so the number gains a leading 1
+  return [1, ...result];
 }

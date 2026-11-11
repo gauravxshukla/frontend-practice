@@ -3,26 +3,27 @@
  * @return {number[]}
  */
 export default function spiralOrder(matrix) {
-  const out = [];
+  const result = [];
+  // the unread part is always the rectangle between these four bounds
   let top = 0;
   let bottom = matrix.length - 1;
   let left = 0;
   let right = matrix[0].length - 1;
-
   while (top <= bottom && left <= right) {
-    for (let c = left; c <= right; c++) out.push(matrix[top][c]);
+    for (let c = left; c <= right; c++) result.push(matrix[top][c]);
     top++;
-    for (let r = top; r <= bottom; r++) out.push(matrix[r][right]);
+    for (let r = top; r <= bottom; r++) result.push(matrix[r][right]);
     right--;
-    // The ring may have collapsed to a single row or column.
+    // a single remaining row was already read left to right
     if (top <= bottom) {
-      for (let c = right; c >= left; c--) out.push(matrix[bottom][c]);
+      for (let c = right; c >= left; c--) result.push(matrix[bottom][c]);
       bottom--;
     }
+    // a single remaining column was already read top to bottom
     if (left <= right) {
-      for (let r = bottom; r >= top; r--) out.push(matrix[r][left]);
+      for (let r = bottom; r >= top; r--) result.push(matrix[r][left]);
       left++;
     }
   }
-  return out;
+  return result;
 }

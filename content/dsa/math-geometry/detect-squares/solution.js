@@ -1,34 +1,27 @@
-const keyOf = (x, y) => x + ',' + y;
-
 export default class DetectSquares {
   constructor() {
-    this.counts = new Map(); // "x,y" -> number of copies
-    this.points = []; // distinct points
+    this.counts = new Map(); // "x,y" -> how many times the point was added
   }
 
-  /**
-   * @param {number[]} point
-   * @return {void}
-   */
+  /** @param {number[]} point [x, y] */
   add([x, y]) {
-    const k = keyOf(x, y);
-    if (!this.counts.has(k)) this.points.push([x, y]);
-    this.counts.set(k, (this.counts.get(k) ?? 0) + 1);
+    const key = x + ',' + y;
+    this.counts.set(key, (this.counts.get(key) ?? 0) + 1);
   }
 
   /**
-   * @param {number[]} point
+   * @param {number[]} point [x, y]
    * @return {number}
    */
-  count([qx, qy]) {
+  count([x, y]) {
+    const countAt = (px, py) => this.counts.get(px + ',' + py) ?? 0;
     let total = 0;
-    for (const [px, py] of this.points) {
-      // p must be the diagonal corner of a square with positive area.
-      if (px === qx || Math.abs(px - qx) !== Math.abs(py - qy)) continue;
-      total +=
-        this.counts.get(keyOf(px, py)) *
-        (this.counts.get(keyOf(qx, py)) ?? 0) *
-        (this.counts.get(keyOf(px, qy)) ?? 0);
+    for (const [key, n] of this.counts) {
+      const [px, py] = key.split(',').map(Number);
+      // a diagonal corner must differ by the same non-zero amount on both axes
+      if (Math.abs(px - x) !== Math.abs(py - y) || px === x) continue;
+      // the other two corners are then fixed; duplicates multiply the ways
+      total += n * countAt(x, py) * countAt(px, y);
     }
     return total;
   }

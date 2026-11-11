@@ -38,11 +38,11 @@ Output: 1
 
 ## Notes
 
-- **Key insight:** XOR cancels pairs. `a ^ a = 0` and `a ^ 0 = a`, and XOR is commutative and associative, so XOR-ing the whole array leaves only the unpaired value.
-- One line: `nums.reduce((acc, n) => acc ^ n, 0)`.
-- O(n) time, O(1) space.
-- Hash-map baseline: count occurrences and return the value with count 1. O(n) time, O(n) space.
-- Sort baseline: sort and scan pairs. O(n log n) time.
-- Math trick: `2 · sum(set) − sum(nums)`. O(n) space, and may overflow in fixed-width languages.
-- Negatives work fine with XOR in JS, because both sides are converted to the same 32-bit pattern.
-- Follow-ups: every value appears **three** times except one (count each bit mod 3), or **two** values appear once (split by the lowest set bit of the total XOR).
+- **Identify:** every value appears twice except one, O(1) space → XOR everything
+- **Key formula:** a ^ a = 0 and a ^ 0 = a, in any order
+- **Brute force:** count occurrences in a hash map and find the count of 1, O(n) space
+- **Insight:** XOR cancels each pair, so only the single value survives
+- **Steps:** result = 0; XOR every number into it; return result
+- **Complexity:** O(n) time either way; O(n) → O(1) space
+- **Pitfall:** works for negatives and zero too; it relies on every other value appearing exactly twice
+- **Related:** Missing Number, Contains Duplicate, Find the Duplicate Number

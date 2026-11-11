@@ -1,12 +1,14 @@
 class Solution:
     def myPow(self, x: float, n: int) -> float:
-        # Fast exponentiation by squaring.
-        if n < 0:
-            x, n = 1 / x, -n
+        # a negative power is the positive power of the reciprocal
+        base = 1 / x if n < 0 else x
+        exp = abs(n)
         result = 1.0
-        while n:
-            if n & 1:
-                result *= x
-            x *= x
-            n >>= 1
+        while exp > 0:
+            # the lowest bit of exp is set: this power of base is part of the answer
+            if exp % 2 == 1:
+                result *= base
+            # move to the next bit: base^(2k), half the exponent
+            base *= base
+            exp //= 2
         return result

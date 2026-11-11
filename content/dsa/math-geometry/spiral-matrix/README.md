@@ -32,11 +32,10 @@ Output: [1,2,3,4,8,12,11,10,9,5,6,7]
 
 ## Notes
 
-- **Key insight:** keep four shrinking boundaries, `top`, `bottom`, `left`, `right`. Each pass peels one ring off the matrix.
-- Loop while `top ≤ bottom && left ≤ right`: read the top row (left → right) then `top++`; read the right column (top → bottom) then `right--`.
-- Then **re-check** before the last two sides: if `top ≤ bottom`, read the bottom row (right → left) and `bottom--`; if `left ≤ right`, read the left column (bottom → top) and `left++`.
-- O(m·n) time, O(1) extra space besides the output.
-- Alternative: simulate with a direction vector and a `visited` grid, turning right whenever the next cell is out of bounds or already visited. Simpler logic, O(m·n) extra space.
-- Pitfall: skipping the re-checks makes single-row or single-column leftovers get read twice (try a 3×1 or 1×4 matrix).
-- Edge cases: one row, one column, one element, non-square shapes.
-- Follow-up: Spiral Matrix II, which fills an n × n matrix with 1..n² in spiral order.
+- **Identify:** read a matrix in spiral order → shrink four boundaries (top, bottom, left, right)
+- **Brute force:** walk with a direction and a visited grid, turning when blocked, O(m·n) extra space
+- **Insight:** after each side is read, its boundary moves inward, so no visited grid is needed
+- **Steps:** read top row, right column, bottom row (if rows remain), left column (if columns remain); shrink each bound
+- **Complexity:** O(m·n) time either way; O(m·n) → O(1) extra space
+- **Pitfall:** check top ≤ bottom and left ≤ right again before the bottom and left passes, or a single row/column repeats
+- **Related:** Rotate Image, Set Matrix Zeroes, Valid Sudoku
