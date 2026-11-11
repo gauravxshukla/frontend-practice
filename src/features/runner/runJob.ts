@@ -1,4 +1,5 @@
 import type { DsaCase, DsaSpec } from '../../lib/content/catalog';
+import type { LogEntry } from '../console/types';
 
 export interface CaseResult {
   index: number;
@@ -11,7 +12,8 @@ export interface CaseResult {
   expected?: string;
   /** null = no expected value to compare against (custom case, no reference). */
   passed: boolean | null;
-  stdout: string[];
+  /** Console output captured while this case / test ran. */
+  logs: LogEntry[];
   /** JS: assertion message when an expectation failed. */
   failure?: string;
   error?: { message: string; line: number | null };

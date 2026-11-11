@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SandpackCodeEditor, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react';
 import { CloudUpload, Play, RotateCcw } from 'lucide-react';
 import type { Question, RunnerAssets } from '../../lib/content/catalog';
 import { clearDraft, loadDraft } from '../../lib/drafts';
 import { markAttempted, markSolved } from '../../lib/progress';
 import { useTheme } from '../../lib/theme';
-import { usePersistentState } from '../../lib/usePersistentState';
+import { useRowResize } from '../../lib/useRowResize';
 import { Kbd } from '../../components/Kbd';
 import { runJob, type RunJob } from '../runner/runJob';
 import { toVerdict, type Verdict } from '../runner/verdict';
@@ -30,25 +30,6 @@ function exampleTests(names: string[]) {
   return examples.length ? examples : names.slice(0, 2);
 }
 
-function useConsoleResize() {
-  const [height, setHeight] = usePersistentState('fp:consoleHeight', 280);
-  const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const container = (e.currentTarget.parentElement as HTMLElement).getBoundingClientRect();
-    document.body.classList.add('is-resizing-rows');
-    const onMove = (ev: PointerEvent) =>
-      setHeight(Math.round(Math.min(Math.max(container.bottom - ev.clientY, 120), container.height - 120)));
-    const onUp = () => {
-      document.body.classList.remove('is-resizing-rows');
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onUp);
-    };
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
-  };
-  return { height, onPointerDown };
-}
-
 function Inner({ question, assets, onAccepted, onResetCode }: Props & { onResetCode: () => void }) {
   const { sandpack } = useSandpack();
   const codeRef = useRef('');
@@ -68,7 +49,7 @@ function Inner({ question, assets, onAccepted, onResetCode }: Props & { onResetC
   const [running, setRunning] = useState<'run' | 'submit' | null>(null);
   const [lastMode, setLastMode] = useState<'run' | 'submit'>('run');
   const [verdict, setVerdict] = useState<Verdict | null>(null);
-  const consoleResize = useConsoleResize();
+  const consoleResize = useRowResize('fp:consoleHeight', 280);
 
   // JS questions: learn the suite's test names (registering tests doesn't run them).
   useEffect(() => {
@@ -163,7 +144,15 @@ function Inner({ question, assets, onAccepted, onResetCode }: Props & { onResetC
         <SandpackCodeEditor className="code-editor" showLineNumbers showTabs={false} wrapContent showInlineErrors={false} />
       </div>
 
-      <div className="row-resize" role="separator" aria-orientation="horizontal" aria-label="Resize console" onPointerDown={consoleResize.onPointerDown} />
+      <div
+        className="row-resize"
+        role="separator"
+        aria-orientation="horizontal"
+        aria-label="Resize console"
+        tabIndex={0}
+        onPointerDown={consoleResize.onPointerDown}
+        onKeyDown={consoleResize.onKeyDown}
+      />
 
       <section className="console" style={{ height: consoleResize.height }} aria-label="Console">
         <div className="console-header">
@@ -234,7 +223,7 @@ export default function CodeWorkspace({ question, assets, onAccepted }: Props) {
   // Bumping this remounts the editor, which is how "Reset code" discards edits.
   const [resetKey, setResetKey] = useState(0);
   const initialCode = useMemo(
-    () => loadDraft(question.slug)?.[FILE] ?? assets.starter,
+    () => loadDraft(question.slug)?.files[FILE] ?? assets.starter,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [question.slug, assets.starter, resetKey],
   );

@@ -1,0 +1,337 @@
+/* ---------- Console: log rows + value inspector (shared by the preview drawer and DSA stdout) ---------- */
+.console-view {
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.55;
+  font-variant-ligatures: none;
+}
+
+.console-empty {
+  margin: 0;
+  padding: 12px 14px;
+  color: var(--text-faint);
+  font-family: var(--font);
+  font-size: 13px;
+}
+
+.log-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 12px 6px 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.log-icon {
+  flex: 0 0 14px;
+  display: flex;
+  padding-top: 3px;
+}
+
+.log-args {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0 10px;
+  word-break: break-word;
+}
+
+/* An expanded object needs the full width for its tree. */
+.log-args > .iv-node[data-open] {
+  flex-basis: 100%;
+}
+
+.log-count {
+  flex-shrink: 0;
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+
+.log-warn {
+  background: var(--medium-soft);
+  border-bottom-color: color-mix(in srgb, var(--medium) 25%, transparent);
+}
+.log-warn .log-icon,
+.log-warn .iv-text {
+  color: var(--medium);
+}
+
+.log-error {
+  background: var(--hard-soft);
+  border-bottom-color: color-mix(in srgb, var(--hard) 25%, transparent);
+}
+.log-error .log-icon,
+.log-error .iv-text {
+  color: var(--hard);
+}
+
+.log-info .log-icon {
+  color: var(--accent-text);
+}
+
+.log-debug .log-icon,
+.log-debug .iv-text {
+  color: var(--text-muted);
+}
+
+.console-view.compact {
+  font-size: 12.5px;
+}
+
+.console-view.compact .log-row {
+  padding: 3px 10px 3px 6px;
+}
+
+.console-view.compact .log-row:last-child {
+  border-bottom: 0;
+}
+
+/* ---------- Value inspector ---------- */
+.iv-node {
+  min-width: 0;
+}
+
+.iv-toggle {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 2px;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.iv-toggle:hover {
+  background: var(--surface-2);
+}
+
+.iv-caret {
+  flex-shrink: 0;
+  margin-top: 4px;
+  color: var(--text-faint);
+  transition: transform var(--duration) var(--ease);
+}
+
+.iv-node[data-open] > .iv-toggle > .iv-caret {
+  transform: rotate(90deg);
+}
+
+.iv-children {
+  margin-left: 6px;
+  padding-left: 8px;
+  border-left: 1px solid var(--border);
+}
+
+/* Leaves line up with the labels of expandable siblings (caret 12px + gap 2px). */
+.iv-child > .iv-leaf {
+  display: block;
+  padding-left: 14px;
+}
+
+.iv-leaf,
+.iv-text {
+  white-space: pre-wrap;
+}
+
+.iv-key {
+  color: var(--accent-text);
+}
+
+.iv-string {
+  color: var(--easy);
+}
+.iv-number,
+.iv-bigint,
+.iv-boolean {
+  color: #2563eb;
+}
+:root[data-theme='dark'] .iv-number,
+:root[data-theme='dark'] .iv-bigint,
+:root[data-theme='dark'] .iv-boolean {
+  color: #93b4ff;
+}
+.iv-null,
+.iv-undefined,
+.iv-circular,
+.iv-special,
+.iv-note {
+  color: var(--text-faint);
+}
+.iv-symbol,
+.iv-dom {
+  color: #be185d;
+}
+:root[data-theme='dark'] .iv-symbol,
+:root[data-theme='dark'] .iv-dom {
+  color: #f472b6;
+}
+.iv-fn {
+  font-style: italic;
+  color: var(--text-muted);
+}
+.iv-error {
+  color: var(--hard);
+}
+
+.iv-stack {
+  margin: 4px 0 0 14px;
+  color: var(--hard);
+  font: inherit;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+.iv-more {
+  margin: 2px 0 2px 14px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.iv-more:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Console drawer (under the live preview) ---------- */
+.console-drawer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+
+/* While open the resize handle above already draws the divider. */
+.console-drawer.open {
+  border-top: 0;
+}
+
+.console-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 36px;
+  flex-shrink: 0;
+  padding: 0 8px 0 4px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-1);
+}
+
+.console-drawer:not(.open) .console-drawer-header {
+  border-bottom: 0;
+}
+
+.console-drawer-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px 0 4px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.console-drawer-toggle:hover {
+  background: var(--surface-2);
+}
+
+.console-drawer-caret {
+  color: var(--text-muted);
+  transition: transform var(--duration) var(--ease);
+}
+
+.console-drawer-toggle[aria-expanded='true'] .console-drawer-caret {
+  transform: rotate(90deg);
+}
+
+.console-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.console-badge.tone-warn {
+  background: var(--medium-soft);
+  color: var(--medium);
+}
+
+.console-badge.tone-error {
+  background: var(--hard-soft);
+  color: var(--hard);
+}
+
+.console-drawer-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.console-filter-level,
+.console-filter-text {
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+}
+
+.console-filter-level {
+  padding: 0 4px;
+}
+
+.console-filter-text {
+  width: 120px;
+  min-width: 0;
+  padding: 0 8px;
+}
+
+.console-drawer-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* ---------- Stdout in the DSA / JS result panel ---------- */
+.result-logs {
+  max-height: 220px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-1);
+}

@@ -1,15 +1,22 @@
 // Runs user code off the main thread. The main thread kills this worker on a
 // timeout, which is how infinite loops become "Time Limit Exceeded".
 import { errorLine, execute, formatInput, judge } from './core.js';
-import { createJest, format } from './miniJest.js';
+import { createJest } from './miniJest.js';
 import { installDom } from './dom.js';
+import { serializeValue } from '../console/serialize.js';
 
 /* ------------------------------------------------------------ console capture */
 
+// Entries are structured (see src/features/console/types.ts) so the result
+// panel can show logged objects as expandable trees.
+const MAX_LOGS = 200;
 let logs = [];
+let logSeq = 0;
 for (const level of ['log', 'info', 'warn', 'error', 'debug']) {
   console[level] = (...args) => {
-    if (logs.length < 200) logs.push(args.map((a) => format(a)).join(' '));
+    if (logs.length < MAX_LOGS) {
+      logs.push({ id: String(logSeq++), level, args: args.map((a) => serializeValue(a)), count: 1 });
+    }
   };
 }
 
@@ -56,7 +63,7 @@ async function runDsa({ userCode, refCode, checkerCode, spec, cases }) {
     }
 
     logs = [];
-    const result = { index, hidden: Boolean(kase.hidden), input: formatInput(spec, kase.input), stdout: [] };
+    const result = { index, hidden: Boolean(kase.hidden), input: formatInput(spec, kase.input), logs: [] };
     try {
       const output = await execute(spec, user.module.default, kase.input);
       result.output = JSON.stringify(output);
@@ -66,7 +73,7 @@ async function runDsa({ userCode, refCode, checkerCode, spec, cases }) {
       result.passed = false;
     }
     result.expected = hasExpected ? JSON.stringify(expected) : undefined;
-    result.stdout = logs;
+    result.logs = logs;
     results.push(result);
   }
   return { type: 'done', results, runtimeMs: Math.round(performance.now() - started) };
@@ -96,7 +103,7 @@ async function runJest({ userCode, testCode, env, only }) {
   if (loaded.compileError) return { type: 'compile-error', message: loaded.compileError };
 
   const started = performance.now();
-  const stdoutByTest = new Map();
+  const logsByTest = new Map();
   let currentTest = null;
   const results = await loaded.jest.run({
     only,
@@ -104,7 +111,7 @@ async function runJest({ userCode, testCode, env, only }) {
       currentTest = name;
       logs = [];
     },
-    onTestEnd: () => stdoutByTest.set(currentTest, logs),
+    onTestEnd: () => logsByTest.set(currentTest, logs),
   });
   return {
     type: 'done',
@@ -113,7 +120,7 @@ async function runJest({ userCode, testCode, env, only }) {
       index,
       name: r.name,
       passed: r.passed,
-      stdout: stdoutByTest.get(r.name) ?? [],
+      logs: logsByTest.get(r.name) ?? [],
       failure: r.error?.assertion ? r.error.message : undefined,
       error:
         r.error && !r.error.assertion

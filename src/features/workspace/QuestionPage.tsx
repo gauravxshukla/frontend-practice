@@ -24,7 +24,7 @@ import {
   type Question,
   type RunnerAssets,
 } from '../../lib/content/catalog';
-import { clearDraft, loadDraft } from '../../lib/drafts';
+import { applyDraft, clearDraft, loadDraft } from '../../lib/drafts';
 import { useProgress } from '../../lib/progress';
 import { useTheme } from '../../lib/theme';
 import { usePersistentState } from '../../lib/usePersistentState';
@@ -147,7 +147,7 @@ export default function QuestionPage() {
       loadRunnerAssets(question).then((a) => !cancelled && setAssets(a));
     } else {
       loadQuestionFiles(question, 'starter').then((files) => {
-        if (!cancelled) setStarter({ ...files, ...(loadDraft(question.slug) ?? {}) });
+        if (!cancelled) setStarter(applyDraft(files, loadDraft(question.slug)));
       });
     }
     return () => {
@@ -204,7 +204,7 @@ export default function QuestionPage() {
 
   const backToAttempt = () => {
     // The attempt sandbox unmounted while the solution was shown; remount it from the latest draft.
-    setStarter((prevFiles) => (prevFiles ? { ...prevFiles, ...(loadDraft(question.slug) ?? {}) } : prevFiles));
+    setStarter((prevFiles) => (prevFiles ? applyDraft(prevFiles, loadDraft(question.slug)) : prevFiles));
     setUiView('attempt');
   };
 
