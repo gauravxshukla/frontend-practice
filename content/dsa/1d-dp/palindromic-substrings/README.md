@@ -34,12 +34,11 @@ Explanation: "a" three times, "aa" twice, "aaa" once.
 
 ## Notes
 
-- **Key insight:** grow palindromes outward from each of the `2n - 1` centres. Every step where both ends still match adds exactly one new palindrome.
-- **Expand around centre:** O(n²) time in the worst case (`"aaaa…"`), O(1) space.
-- **DP formulation:** `pal[i][j] = s[i] === s[j] && (j - i < 2 || pal[i + 1][j - 1])`; the answer is the number of true cells. O(n²) time and space.
-- **Space optimisation of the DP:** row `i` reads only row `i + 1`, so a single array swept with `j` descending keeps it at O(n) space.
-- **Brute force:** test all `n(n + 1) / 2` substrings with a two-pointer check. O(n³).
-- Every single character is a palindrome, so the answer is always at least `n`.
-- Pitfall: counting distinct palindromes instead of positions. The problem counts positions.
-- Pitfall: handling only odd centres. `"aa"` has 3 palindromes, not 2.
-- Follow-up: Manacher's algorithm gives O(n); the count is the sum of `ceil(radius)` over all centres.
+- **Identify:** count every palindromic substring → expand around every centre and count each step
+- **Brute force:** check all O(n²) substrings, each in O(n), O(n³)
+- **Better:** a dp[i][j] palindrome table, O(n²) time and space
+- **Insight:** each successful expansion from a centre is one more palindrome, so count while expanding
+- **Steps:** for each i, expand from (i, i) and (i, i + 1); add 1 for every matching step
+- **Complexity:** O(n³) → O(n²) time, O(n²) → O(1) space
+- **Pitfall:** single letters count, and so do overlapping palindromes ("aaa" has 6)
+- **Related:** Longest Palindromic Substring, Palindrome Partitioning, Valid Palindrome

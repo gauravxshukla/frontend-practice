@@ -4,14 +4,13 @@
  * @return {boolean}
  */
 export default function wordBreak(s, wordDict) {
-  const words = new Set(wordDict);
-  const lengths = [...new Set(wordDict.map((w) => w.length))];
-  // ok[i] = the prefix s[0..i) can be split into dictionary words.
+  // ok[i]: the first i characters can be split into dictionary words
   const ok = new Array(s.length + 1).fill(false);
-  ok[0] = true;
+  ok[0] = true; // the empty prefix needs no words
   for (let i = 1; i <= s.length; i++) {
-    for (const len of lengths) {
-      if (len <= i && ok[i - len] && words.has(s.slice(i - len, i))) {
+    for (const w of wordDict) {
+      // w can be the last word of the prefix if the part before it already splits
+      if (w.length <= i && ok[i - w.length] && s.startsWith(w, i - w.length)) {
         ok[i] = true;
         break;
       }

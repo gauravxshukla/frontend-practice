@@ -33,12 +33,11 @@ Output: "bb"
 
 ## Notes
 
-- **Key insight:** every palindrome has a centre, either a single character (odd length) or the gap between two characters (even length). There are only `2n - 1` centres.
-- **Expand around centre:** from each centre, move `left` and `right` outward while the characters match, and keep the longest window seen. O(n²) time, O(1) extra space.
-- **DP formulation:** `pal[i][j]` is true when `s[i] === s[j]` and (`j - i < 2` or `pal[i + 1][j - 1]`). Fill by increasing length (or `i` from right to left). O(n²) time and O(n²) space.
-- **Space optimisation of the DP:** row `i` only reads row `i + 1`, so one boolean array of length `n` updated with `j` from right to left gives O(n) space. Expand-around-centre gets to O(1) more simply.
-- **Brute force:** check every substring for being a palindrome. O(n³).
-- Pitfall: forgetting even-length centres (`"cbbd"` → `"bb"`).
-- Pitfall: off-by-one when converting the final `left`/`right` back to a slice. After the loop the window is `left + 1 .. right - 1`.
-- Follow-up: Manacher's algorithm finds the answer in O(n) by reusing mirror information around the rightmost palindrome found so far.
-- Follow-up: "Palindromic Substrings" counts all of them with the same centre expansion.
+- **Identify:** longest contiguous palindrome → expand around every centre
+- **Brute force:** check every substring for being a palindrome, O(n³)
+- **Better:** dp[i][j] = s[i] == s[j] and dp[i + 1][j − 1], O(n²) time and O(n²) space
+- **Insight:** every palindrome grows outward from a centre; there are only 2n − 1 centres (letters and gaps)
+- **Steps:** for each i, expand from (i, i) and (i, i + 1) while ends match; keep the longest span
+- **Complexity:** O(n³) → O(n²) time, O(n²) → O(1) space
+- **Pitfall:** even-length palindromes ("abba") need the gap centre (i, i + 1)
+- **Related:** Palindromic Substrings, Palindrome Partitioning, Valid Palindrome

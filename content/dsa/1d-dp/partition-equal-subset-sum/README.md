@@ -34,12 +34,11 @@ Explanation: The total 11 is odd.
 
 ## Notes
 
-- **Key insight:** two equal halves means one group sums to `total / 2`. If `total` is odd the answer is immediately `false`; otherwise this is a subset-sum question.
-- **Recurrence (0/1 knapsack):** `can(i, s)` = some subset of the first `i` numbers sums to `s`. `can(0, 0) = true`, and `can(i, s) = can(i - 1, s) OR (s ≥ nums[i-1] AND can(i - 1, s - nums[i-1]))`.
-- **2-D table:** O(n · target) time and space.
-- **Space optimisation:** row `i` reads only row `i - 1`, so keep one boolean array and sweep `s` from `target` **down** to `nums[i]`. Sweeping upward would reuse the same number twice. O(n · target) time, O(target) space.
-- Stop early once `reachable[target]` turns true.
-- **Brute force:** try all 2ⁿ assignments of elements to the two groups.
-- Alternative: a `Set` of reachable sums (or a BigInt bitset with `bits |= bits << n`) gives the same result.
-- Edge cases: a single element → false, two equal elements → true, one element larger than half the total → false.
-- Follow-up: split into `k` equal groups (Partition to K Equal Sum Subsets, backtracking with bitmask memo).
+- **Identify:** split into two equal-sum halves → is there a subset summing to total / 2 (0/1 knapsack)
+- **Key formula:** can[s] |= can[s − num], iterating s downward for each num
+- **Brute force:** try every subset, O(2^n)
+- **Insight:** only reachable sums up to total / 2 matter; a boolean array of sums replaces the subsets
+- **Steps:** odd total → false; can[0] = true; for each num, for s from target down to num: can[s] ||= can[s − num]
+- **Complexity:** O(2^n) → O(n · target) time, O(target) space
+- **Pitfall:** loop s downward, or one number gets counted twice in the same pass
+- **Related:** Target Sum, Coin Change, Subsets

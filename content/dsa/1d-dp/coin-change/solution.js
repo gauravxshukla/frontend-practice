@@ -4,13 +4,14 @@
  * @return {number}
  */
 export default function coinChange(coins, amount) {
-  // fewest[a] = fewest coins summing to a; fewest[a] = 1 + min over coins c ≤ a of fewest[a - c].
-  const fewest = new Array(amount + 1).fill(Infinity);
-  fewest[0] = 0;
+  // dp[a] = fewest coins that make amount a (Infinity = impossible so far)
+  const dp = new Array(amount + 1).fill(Infinity);
+  dp[0] = 0; // zero coins make zero
   for (let a = 1; a <= amount; a++) {
     for (const c of coins) {
-      if (c <= a && fewest[a - c] + 1 < fewest[a]) fewest[a] = fewest[a - c] + 1;
+      // using coin c last leaves a - c, whose best answer is already known
+      if (c <= a && dp[a - c] + 1 < dp[a]) dp[a] = dp[a - c] + 1;
     }
   }
-  return fewest[amount] === Infinity ? -1 : fewest[amount];
+  return dp[amount] === Infinity ? -1 : dp[amount];
 }

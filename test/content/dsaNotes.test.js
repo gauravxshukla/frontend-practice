@@ -25,6 +25,8 @@ const CONVERTED = new Set([
   'backtracking',
   'graphs',
   'advanced-graphs',
+  '1d-dp',
+  '2d-dp',
 ]);
 const topicOf = (dir) => dir.split('/')[2];
 const frontmatter = (raw) => Object.fromEntries(

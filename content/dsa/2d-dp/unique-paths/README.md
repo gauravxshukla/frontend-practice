@@ -33,12 +33,11 @@ Explanation: Right-Down-Down, Down-Right-Down, Down-Down-Right.
 
 ## Notes
 
-- **Key insight:** the last move into cell `(r, c)` comes from above or from the left, so the counts add.
-- **Recurrence:** `paths(r, c) = paths(r - 1, c) + paths(r, c - 1)`, with `paths(0, c) = paths(r, 0) = 1` (a single straight line along the first row or column).
-- **2-D table:** O(m · n) time and space.
-- **Space optimisation:** a row only reads the row above and the cell to its left, so update one array in place with `row[c] += row[c - 1]`. O(m · n) time, O(n) space (use `min(m, n)` by swapping).
-- **Combinatorics:** every route is a sequence of `m - 1` downs and `n - 1` rights, so the answer is `C(m + n - 2, m - 1)`. Compute it with a running product that divides as it goes to stay exact.
-- **Brute force:** recursively branch right/down from the start. O(2^(m+n)).
-- Edge cases: a `1 × n` or `m × 1` grid has exactly one route.
-- Pitfall: computing the binomial with full factorials, which overflow long before `m = n = 100`.
-- Follow-up: Unique Paths II adds obstacles. Set an obstacle cell's count to 0 and the same rolling row works.
+- **Identify:** count right/down paths across a grid → grid DP, each cell from its top and left
+- **Key formula:** paths[r][c] = paths[r − 1][c] + paths[r][c − 1]
+- **Brute force:** recurse right and down from the start, O(2^(m+n))
+- **Insight:** a row only needs the row above, so one array updated left to right holds everything
+- **Steps:** row = all 1s (top row); for each next row, row[c] += row[c − 1]; answer is row[n − 1]
+- **Complexity:** O(2^(m+n)) → O(m·n) time, O(n) space
+- **Pitfall:** the first row and column each have exactly one path; 1 × 1 is 1
+- **Related:** Longest Common Subsequence, Climbing Stairs, Edit Distance

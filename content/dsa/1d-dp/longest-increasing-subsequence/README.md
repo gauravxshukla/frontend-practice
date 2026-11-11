@@ -37,12 +37,11 @@ Explanation: Equal values are not strictly increasing.
 
 ## Notes
 
-- **O(n²) DP:** let `lis(i)` be the longest increasing subsequence that **ends at** index `i`. Then `lis(i) = 1 + max(lis(j))` over `j < i` with `nums[j] < nums[i]` (or 1 if there is none). The answer is `max(lis(i))`. O(n²) time, O(n) space.
-- **Optimal, patience sorting:** keep `tails[k]`, the smallest tail of any increasing subsequence of length `k + 1`. `tails` stays sorted, so for each `x` binary-search the first tail `≥ x` and overwrite it, or append if `x` is larger than all of them. The answer is `tails.length`. O(n log n) time, O(n) space.
-- Why it works: a smaller tail can only help future elements extend the sequence, and replacing never shortens the best length found.
-- `tails` is **not** itself a valid subsequence, only its length is meaningful.
-- **Brute force:** check all 2ⁿ subsequences. O(2ⁿ · n).
-- Pitfall: "strictly" increasing. Search for the first tail `≥ x` (lower bound). Using `> x` would let equal values extend the sequence.
-- Edge cases: all equal → 1, strictly decreasing → 1, already sorted → n.
-- Follow-up: reconstruct the subsequence (store the predecessor index for each position in `tails`).
-- Follow-up: Russian Doll Envelopes reduces to LIS after sorting by width ascending and height descending.
+- **Identify:** longest strictly increasing subsequence → patience sorting: binary search on tail values
+- **Brute force:** try all 2^n subsequences, O(2^n · n)
+- **Better:** dp[i] = 1 + max dp[j] for j < i with nums[j] < nums[i], O(n²)
+- **Insight:** keep tails[k] = smallest possible tail of an increasing run of length k + 1; it stays sorted
+- **Steps:** for each num, binary search the first tail ≥ num; replace it, or append if none; answer is tails' length
+- **Complexity:** O(2^n · n) → O(n log n) time, O(n) space
+- **Pitfall:** tails isn't an actual subsequence, only its length is meaningful; use ≥ for strictly increasing
+- **Related:** Longest Common Subsequence, Longest Increasing Path in a Matrix, Binary Search

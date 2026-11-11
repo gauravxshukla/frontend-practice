@@ -1,21 +1,20 @@
 /**
- * @param {string} s
+ * @param {string} s digits
  * @return {number}
  */
 export default function numDecodings(s) {
-  // ways(i) = ways for the suffix s[i..].
-  // ways(i) = (s[i] !== '0' ? ways(i + 1) : 0) + (s[i..i+1] is 10..26 ? ways(i + 2) : 0)
-  let next = 1; // ways(i + 1), starting with ways(n) = 1 (empty suffix)
-  let nextNext = 0; // ways(i + 2)
-  for (let i = s.length - 1; i >= 0; i--) {
-    let current = 0;
-    if (s[i] !== '0') {
-      current = next;
-      const pair = Number(s.slice(i, i + 2));
-      if (i + 1 < s.length && pair <= 26) current += nextNext;
-    }
-    nextNext = next;
-    next = current;
+  // ways to decode the first i - 2 and i - 1 digits
+  let twoBack = 1; // empty prefix: one way (decode nothing)
+  let oneBack = s[0] === '0' ? 0 : 1; // a leading zero can't be decoded
+  for (let i = 2; i <= s.length; i++) {
+    let ways = 0;
+    // last digit on its own: any digit except 0
+    if (s[i - 1] !== '0') ways += oneBack;
+    // last two digits together: 10..26 (a leading 0 like "06" isn't allowed)
+    const pair = Number(s.slice(i - 2, i));
+    if (pair >= 10 && pair <= 26) ways += twoBack;
+    twoBack = oneBack;
+    oneBack = ways;
   }
-  return next;
+  return oneBack;
 }

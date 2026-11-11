@@ -38,11 +38,11 @@ Output: 1
 
 ## Notes
 
-- **Key insight:** to avoid counting orderings, decide coin types one at a time. A combination either uses no more of coin `i` or uses at least one more.
-- **Recurrence:** `ways(i, 0) = 1`, `ways(0, a > 0) = 0`, and `ways(i, a) = ways(i - 1, a) + ways(i, a - coins[i - 1])` (the second term only when `a ≥ coins[i - 1]`). It stays on row `i` because the coin can be reused.
-- **2-D table:** O(n · amount) time and space.
-- **Space optimisation:** row `i` reads row `i - 1` at the same column and itself to the left, so one array swept **upward** in `a` works. O(n · amount) time, O(amount) space.
-- **Loop order matters:** coins outside and amounts inside counts combinations. Swapping the loops counts ordered sequences (Combination Sum IV), so `[1, 2]` would be counted twice.
-- **Brute force:** recursion over `(coin index, remaining)` choosing how many of the current coin to take. Exponential without memoisation.
-- Edge cases: `amount = 0` → 1 even with unusable coins; no coin divides the amount → 0.
-- Pitfall: sweeping `a` downward turns it into 0/1 knapsack (each coin used at most once).
+- **Identify:** number of coin combinations (order doesn't matter) for an amount → unbounded knapsack counting
+- **Key formula:** ways[a] += ways[a − coin], coins in the outer loop
+- **Brute force:** recurse over coins with a start index, exponential
+- **Insight:** looping coins outside amounts counts each combination once, in coin order, never as permutations
+- **Steps:** ways[0] = 1; for each coin, for a = coin..amount: ways[a] += ways[a − coin]
+- **Complexity:** exponential → O(coins · amount) time, O(amount) space
+- **Pitfall:** amounts in the outer loop count orderings (1+2 and 2+1) separately
+- **Related:** Coin Change, Target Sum, Partition Equal Subset Sum

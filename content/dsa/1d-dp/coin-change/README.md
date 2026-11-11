@@ -38,12 +38,11 @@ Output: 0
 
 ## Notes
 
-- **Key insight:** the last coin used is one of `coins`. Whatever it is, the rest must be an optimal answer for `amount - coin`.
-- **Recurrence:** `fewest(0) = 0`, `fewest(a) = 1 + min(fewest(a - c))` over coins `c ≤ a`, and `Infinity` when no coin fits. Report `-1` for `Infinity`.
-- **Bottom-up:** fill `fewest[0..amount]`. O(amount · coins) time, O(amount) space. The table is already one-dimensional, so there is nothing further to squeeze.
-- **BFS view:** amounts are nodes, coins are edges, and the answer is the shortest path from `0` to `amount`. Same complexity, and it stops early.
-- **Brute force:** recursively try every coin at every step. Exponential in `amount / min(coin)`.
-- **Greedy (largest coin first) is wrong:** `coins = [1, 3, 4], amount = 6` gives `4 + 1 + 1` (3 coins) but `3 + 3` uses 2.
-- Edge cases: `amount = 0` → 0, no coin small enough → -1, a single coin that does not divide the amount → -1.
-- Pitfall: initialising with `amount + 1` is fine as a sentinel, but `Number.MAX_SAFE_INTEGER + 1` overflows into wrong comparisons.
-- Follow-up: count the number of combinations instead (Coin Change II), where loop order matters.
+- **Identify:** fewest coins to make an amount, unlimited coins → unbounded knapsack DP over amounts
+- **Key formula:** dp[a] = min over coins c ≤ a of dp[a − c] + 1
+- **Brute force:** try every combination of coins recursively, exponential
+- **Insight:** the best for amount a reuses the best for a smaller amount, so fill amounts bottom-up once
+- **Steps:** dp[0] = 0, others ∞; for a = 1..amount, for each coin ≤ a, dp[a] = min(dp[a], dp[a − c] + 1)
+- **Complexity:** exponential → O(amount · coins) time, O(amount) space
+- **Pitfall:** greedy (largest coin first) fails, e.g. [1, 3, 4] for 6; unreachable amounts return −1
+- **Related:** Coin Change II, Climbing Stairs, Partition Equal Subset Sum

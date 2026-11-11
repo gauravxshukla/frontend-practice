@@ -33,12 +33,11 @@ Output: 10
 
 ## Notes
 
-- **Key insight:** think about the balloon burst **last** in a range, not first. If `k` is the last one popped between walls `l` and `r`, its neighbours at that moment are exactly `l` and `r`, and the two sides `(l, k)` and `(k, r)` are independent subproblems.
-- Pad the array with a `1` at each end so the walls always exist.
-- **Recurrence (interval DP):** `best(l, r) = max over l < k < r of best(l, k) + vals[l]·vals[k]·vals[r] + best(k, r)`, with `best(l, l + 1) = 0` (nothing between). The answer is `best(0, n + 1)`.
-- Fill by increasing interval length so both halves are ready. O(n³) time, O(n²) space.
-- No space reduction applies. Interval DP needs arbitrary sub-intervals, so the full table stays.
-- **Brute force:** try every burst order. O(n!) (or O(n · 2ⁿ) with a bitmask memo), only usable for about 10 balloons.
-- Why "first burst" fails: choosing the first balloon changes who is adjacent to whom, so the sides are not independent.
-- Edge cases: a single balloon → its value; zeros make some bursts worthless but can still be good to pop early.
-- Follow-up: Minimum Cost to Merge Stones and Matrix Chain Multiplication use the same "split point" interval DP.
+- **Identify:** order of bursting changes neighbours, maximise coins → interval DP on the last balloon burst
+- **Key formula:** dp[l][r] = max over k in (l, r) of dp[l][k] + vals[l]·vals[k]·vals[r] + dp[k][r]
+- **Brute force:** try every bursting order, O(n!)
+- **Insight:** choose the balloon burst last in an interval; its neighbours are then the fixed interval ends
+- **Steps:** pad with 1 at both ends; for widening intervals (l, r), try every last k; answer dp[0][n + 1]
+- **Complexity:** O(n!) → O(n³) time, O(n²) space
+- **Pitfall:** thinking about the first burst makes subproblems depend on each other; think about the last one
+- **Related:** Partition Equal Subset Sum, Longest Common Subsequence, Edit Distance

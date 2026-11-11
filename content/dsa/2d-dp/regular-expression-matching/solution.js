@@ -1,24 +1,25 @@
 /**
  * @param {string} s
- * @param {string} p
+ * @param {string} p pattern with '.' and '*'
  * @return {boolean}
  */
 export default function isMatch(s, p) {
   const m = s.length;
   const n = p.length;
-  // match[i][j]: s[i..] is matched by p[j..]. Fill from the ends backwards.
-  const match = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(false));
-  match[m][n] = true;
+  // dp[i][j]: s[i..] matches p[j..]
+  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(false));
+  dp[m][n] = true; // both used up
   for (let i = m; i >= 0; i--) {
     for (let j = n - 1; j >= 0; j--) {
-      const firstMatches = i < m && (p[j] === s[i] || p[j] === '.');
-      if (p[j + 1] === '*') {
-        // Use "x*" zero times (skip it), or consume one char and stay on "x*".
-        match[i][j] = match[i][j + 2] || (firstMatches && match[i + 1][j]);
+      // does the current pattern character match s[i]? (never past the end of s)
+      const first = i < m && (p[j] === s[i] || p[j] === '.');
+      if (j + 1 < n && p[j + 1] === '*') {
+        // "x*": use it zero times (skip both chars), or once and stay on it
+        dp[i][j] = dp[i][j + 2] || (first && dp[i + 1][j]);
       } else {
-        match[i][j] = firstMatches && match[i + 1][j + 1];
+        dp[i][j] = first && dp[i + 1][j + 1];
       }
     }
   }
-  return match[0][0];
+  return dp[0][0];
 }

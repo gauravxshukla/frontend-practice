@@ -38,11 +38,11 @@ Output: false
 
 ## Notes
 
-- **Key insight:** a prefix `s[0..i)` is breakable exactly when some dictionary word ends at `i` and the prefix before that word is breakable.
-- **Recurrence:** `ok(0) = true`, `ok(i) = OR over words w ending at i of ok(i - |w|)`. The answer is `ok(n)`.
-- **Bottom-up:** for each `i`, try only the distinct word lengths (at most 20) and look the slice up in a `Set`. O(n · L · L) time with L = max word length (the slice costs L), O(n) space.
-- The DP is already one-dimensional. Since a word can be up to 20 long, the table cannot shrink to a fixed window smaller than `maxLen + 1` entries.
-- **Brute force:** recursively try every dictionary word as the next piece. On `"aaaa…ab"` with `["a", "aa", "aaa"]` it explores exponentially many splits before failing. Memoising on the start index turns it into the same O(n · L²) DP.
-- **BFS view:** indices are nodes, and a dictionary word starting at `i` is an edge to `i + |w|`. Reach `n` from `0`.
-- Pitfall: greedily taking the longest (or shortest) matching word. `"aaaaaaa"` with `["aaaa", "aaa"]` needs `aaa + aaaa`.
-- Follow-up: Word Break II returns every valid sentence (backtracking with memoised suffix results).
+- **Identify:** can s be split into dictionary words → DP over prefixes
+- **Key formula:** ok[i] = some word w ends at i with ok[i − len(w)]
+- **Brute force:** try every split point recursively, O(2^n)
+- **Insight:** whether a prefix can be split never changes, so compute each prefix once, shortest first
+- **Steps:** ok[0] = true; for i = 1..n, for each word w, if s ends with w at i and ok[i − |w|], set ok[i]
+- **Complexity:** O(2^n) → O(n · words · L) time, O(n) space
+- **Pitfall:** words can be reused, and greedy longest-match fails ("aaaaaaa" with "aaaa", "aaa")
+- **Related:** Decode Ways, Coin Change, Word Search II
