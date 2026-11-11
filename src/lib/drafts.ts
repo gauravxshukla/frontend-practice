@@ -8,6 +8,10 @@ import type { FileMap } from './content/catalog';
 // FileMap of edited files) predate the explorer and are merged over the starter.
 const key = (slug: string) => `fp:draft:${slug}`;
 
+/** Draft id for a question: React Native attempts are kept apart from web ones. */
+export const draftKey = (slug: string, platform: 'web' | 'native' = 'web') =>
+  platform === 'native' ? `${slug}#native` : slug;
+
 export interface Draft {
   files: FileMap;
   /** true = `files` is the whole file set (v2); false = edits to merge over the starter (v1). */

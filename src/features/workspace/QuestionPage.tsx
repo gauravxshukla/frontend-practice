@@ -9,7 +9,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type RefObject,
 } from 'react';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import { SandpackCodeViewer, SandpackProvider } from '@codesandbox/sandpack-react';
 import { ArrowLeft, ArrowRight, CheckCircle2, ChevronRight, Clock, Eye, Lock, RotateCcw, Undo2 } from 'lucide-react';
 import { DifficultyBadge, Tag } from '../../components/Badges';
@@ -25,13 +25,14 @@ import {
   type Question,
   type RunnerAssets,
 } from '../../lib/content/catalog';
-import { applyDraft, clearDraft, loadDraft } from '../../lib/drafts';
+import { applyDraft, clearDraft, draftKey, loadDraft } from '../../lib/drafts';
 import { useProgress } from '../../lib/progress';
 import { useTheme } from '../../lib/theme';
 import { usePersistentState } from '../../lib/usePersistentState';
 import { LANGUAGES, languageInfo } from '../runner/languages/registry';
 import type { LanguageId } from '../runner/languages/types';
 import CodeWorkspace from './CodeWorkspace';
+import type { Platform } from './native/nativeSetup';
 import Workspace from './Workspace';
 import { sandpackThemes } from './sandpackThemes';
 import { useEditorLanguages } from './useEditorLanguages';
@@ -135,6 +136,31 @@ function SolutionCode({ question }: { question: Question }) {
   );
 }
 
+const PLATFORMS: { id: Platform; label: string; hint: string }[] = [
+  { id: 'web', label: 'Web', hint: 'React DOM' },
+  { id: 'native', label: 'Native', hint: 'React Native (rendered with react-native-web)' },
+];
+
+/** Web / Native switch for React questions. */
+function PlatformToggle({ value, onChange }: { value: Platform; onChange: (p: Platform) => void }) {
+  return (
+    <div className="segmented" role="radiogroup" aria-label="Platform">
+      {PLATFORMS.map((p) => (
+        <button
+          key={p.id}
+          type="button"
+          role="radio"
+          aria-checked={value === p.id}
+          title={p.hint}
+          onClick={() => onChange(p.id)}
+        >
+          {p.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function LockedPanel({ onReveal, what }: { onReveal: () => void; what: string }) {
   return (
     <div className="locked-panel">
@@ -152,11 +178,15 @@ export default function QuestionPage() {
   const slug = useParams()['*'] ?? '';
   const question = getQuestion(slug);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const progress = useProgress();
   const bodyRef = useRef<HTMLDivElement>(null);
   const divider = useResizablePrompt(bodyRef);
 
   const isCode = question?.type === 'js' || question?.type === 'dsa';
+  // React questions can be solved in React Native; `?platform=native` keeps it deep-linkable.
+  const platform: Platform = question?.type === 'react' && searchParams.get('platform') === 'native' ? 'native' : 'web';
+  const draftId = question ? draftKey(question.slug, platform) : '';
   const solved = question ? progress[question.slug] === 'solved' : false;
 
   const [leftTab, setLeftTab] = useState<LeftTab>('description');
@@ -170,10 +200,13 @@ export default function QuestionPage() {
   const [resetKey, setResetKey] = useState(0);
 
   useEffect(() => {
-    if (!question) return;
-    let cancelled = false;
     setLeftTab('description');
     setRevealed(false);
+  }, [question]);
+
+  useEffect(() => {
+    if (!question) return;
+    let cancelled = false;
     setAssets(null);
     setUiView('attempt');
     setStarter(null);
@@ -181,32 +214,37 @@ export default function QuestionPage() {
     if (question.type === 'js' || question.type === 'dsa') {
       loadRunnerAssets(question).then((a) => !cancelled && setAssets(a));
     } else {
-      loadQuestionFiles(question, 'starter').then((files) => {
-        if (!cancelled) setStarter(applyDraft(files, loadDraft(question.slug)));
+      loadQuestionFiles(question, 'starter', platform).then((files) => {
+        if (!cancelled) setStarter(applyDraft(files, loadDraft(draftKey(question.slug, platform))));
       });
     }
     return () => {
       cancelled = true;
     };
-  }, [question]);
+  }, [question, platform]);
 
   useEffect(() => {
     if (uiView !== 'solution' || solutionFiles || !question) return;
-    loadQuestionFiles(question, 'solution').then(setSolutionFiles);
-  }, [uiView, solutionFiles, question]);
+    loadQuestionFiles(question, 'solution', platform).then(setSolutionFiles);
+  }, [uiView, solutionFiles, question, platform]);
 
   const { prev, next } = question ? getNeighbours(question) : {};
+  // Moving between React questions stays on the platform you're practising.
+  const hrefOf = useCallback(
+    (q: Question) => (q.type === 'react' && platform === 'native' ? `/q/${q.slug}?platform=native` : `/q/${q.slug}`),
+    [platform],
+  );
 
   // Alt+←/→ moves between questions in the same topic.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (!e.altKey) return;
-      if (e.key === 'ArrowLeft' && prev) navigate(`/q/${prev.slug}`);
-      if (e.key === 'ArrowRight' && next) navigate(`/q/${next.slug}`);
+      if (e.key === 'ArrowLeft' && prev) navigate(hrefOf(prev));
+      if (e.key === 'ArrowRight' && next) navigate(hrefOf(next));
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [prev, next, navigate]);
+  }, [prev, next, navigate, hrefOf]);
 
   const onAccepted = useCallback(() => setRevealed(true), []);
 
@@ -230,8 +268,8 @@ export default function QuestionPage() {
 
   const resetUi = () => {
     if (!window.confirm('Discard your code and restore the starter?')) return;
-    clearDraft(question.slug);
-    loadQuestionFiles(question, 'starter').then((files) => {
+    clearDraft(draftId);
+    loadQuestionFiles(question, 'starter', platform).then((files) => {
       setStarter(files);
       setResetKey((k) => k + 1);
     });
@@ -239,9 +277,13 @@ export default function QuestionPage() {
 
   const backToAttempt = () => {
     // The attempt sandbox unmounted while the solution was shown; remount it from the latest draft.
-    setStarter((prevFiles) => (prevFiles ? applyDraft(prevFiles, loadDraft(question.slug)) : prevFiles));
+    setStarter((prevFiles) => (prevFiles ? applyDraft(prevFiles, loadDraft(draftId)) : prevFiles));
     setUiView('attempt');
   };
+
+  const hasUiSolution = platform === 'native' ? question.hasNativeSolution : question.hasSolution;
+  const changePlatform = (next: Platform) =>
+    setSearchParams(next === 'native' ? { platform: 'native' } : {}, { replace: true });
 
   const tabs: { id: LeftTab; label: string }[] = [
     { id: 'description', label: 'Description' },
@@ -278,12 +320,13 @@ export default function QuestionPage() {
         </div>
 
         <div className="question-actions">
+          {question.type === 'react' && <PlatformToggle value={platform} onChange={changePlatform} />}
           <div className="btn-group" role="group" aria-label="Question navigation">
             <button
               type="button"
               className="icon-btn bordered"
               disabled={!prev}
-              onClick={() => prev && navigate(`/q/${prev.slug}`)}
+              onClick={() => prev && navigate(hrefOf(prev))}
               title={prev ? `Previous: ${prev.title} (Alt+←)` : 'No previous question'}
               aria-label="Previous question"
             >
@@ -293,7 +336,7 @@ export default function QuestionPage() {
               type="button"
               className="icon-btn bordered"
               disabled={!next}
-              onClick={() => next && navigate(`/q/${next.slug}`)}
+              onClick={() => next && navigate(hrefOf(next))}
               title={next ? `Next: ${next.title} (Alt+→)` : 'No next question'}
               aria-label="Next question"
             >
@@ -313,10 +356,10 @@ export default function QuestionPage() {
                     setRevealed(true);
                     setUiView('solution');
                   }}
-                  disabled={!question.hasSolution}
-                  title={question.hasSolution ? undefined : 'No reference solution has been written yet'}
+                  disabled={!hasUiSolution}
+                  title={hasUiSolution ? undefined : `No ${platform === 'native' ? 'React Native ' : ''}reference solution has been written yet`}
                 >
-                  <Eye size={14} aria-hidden /> {question.hasSolution ? 'Reveal solution' : 'No solution yet'}
+                  <Eye size={14} aria-hidden /> {hasUiSolution ? 'Reveal solution' : 'No solution yet'}
                 </button>
               </>
             ) : (
@@ -384,15 +427,32 @@ export default function QuestionPage() {
           ) : (
             <>
               {uiView === 'solution' && <p className="solution-banner">Reference solution · read-only</p>}
+              {uiView === 'attempt' && platform === 'native' && !question.hasNativeStarter && (
+                <p className="solution-banner">
+                  No React Native starter for this question yet: build the prompt with React Native primitives.
+                </p>
+              )}
               {uiView === 'attempt' &&
                 (starter ? (
-                  <Workspace key={`${question.slug}:${resetKey}`} question={question} files={starter} draftSlug={question.slug} />
+                  <Workspace
+                    key={`${question.slug}:${platform}:${resetKey}`}
+                    question={question}
+                    files={starter}
+                    draftSlug={draftId}
+                    platform={platform}
+                  />
                 ) : (
                   <WorkspaceSkeleton />
                 ))}
               {uiView === 'solution' &&
                 (solutionFiles ? (
-                  <Workspace key={`${question.slug}:solution`} question={question} files={solutionFiles} readOnly />
+                  <Workspace
+                    key={`${question.slug}:${platform}:solution`}
+                    question={question}
+                    files={solutionFiles}
+                    platform={platform}
+                    readOnly
+                  />
                 ) : (
                   <WorkspaceSkeleton />
                 ))}
