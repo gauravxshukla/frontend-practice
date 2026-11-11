@@ -133,7 +133,7 @@ export default function ConsoleDrawer({ entries, onClear }: ConsoleDrawerProps) 
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
-              <button type="button" className="icon-btn" title="Clear console" aria-label="Clear console" onClick={onClear}>
+              <button type="button" className="icon-btn" data-tooltip="Clear console" aria-label="Clear console" onClick={onClear}>
                 <Ban size={14} />
               </button>
             </div>

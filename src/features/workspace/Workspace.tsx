@@ -112,7 +112,7 @@ export default function Workspace({ question, files, readOnly = false, draftSlug
             <button
               type="button"
               className="icon-btn"
-              title="Show files"
+              data-tooltip="Show files"
               aria-label="Show files"
               onClick={() => setExplorerOpen(true)}
             >

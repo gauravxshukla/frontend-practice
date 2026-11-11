@@ -24,7 +24,7 @@ export default function RuntimeStatus({ label, status, download, error, onRetry 
   }
   if (status === 'error') {
     return (
-      <span className="runtime-status tone-bad" role="alert" title={error}>
+      <span className="runtime-status tone-bad" role="alert" data-tooltip={error}>
         <TriangleAlert size={13} aria-hidden />
         Couldn’t load the {label} runtime. Are you offline?
         <button type="button" className="btn btn-ghost btn-sm" onClick={onRetry}>

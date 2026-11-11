@@ -1,4 +1,4 @@
-import { useEffect, type CSSProperties, type ReactNode, type RefObject } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router';
 import {
   Atom,
@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Code2,
   FileCode,
+  House,
   LayoutGrid,
   ListChecks,
   Monitor,
@@ -23,10 +24,13 @@ import {
 import { getQuestion, questionsIn, questionTree, type QuestionGroup } from '../lib/content/catalog';
 import { noteSections, notes } from '../lib/content/notes';
 import { quizDecks } from '../lib/content/quiz';
+import { modKey } from '../lib/platform';
 import { useProgress } from '../lib/progress';
 import { useTheme, type ThemeMode } from '../lib/theme';
+import { useHoverIntent } from '../lib/useHoverIntent';
 import { usePersistentState } from '../lib/usePersistentState';
 import { Kbd } from '../components/Kbd';
+import SidebarPeek, { type SectionId } from './SidebarPeek';
 import './sidebar.css';
 
 const GROUP_ICONS: Record<string, LucideIcon> = {
@@ -37,11 +41,11 @@ const GROUP_ICONS: Record<string, LucideIcon> = {
   'machine-coding/vanilla': FileCode,
 };
 
-const SECTIONS = [
+const SECTIONS: { id: SectionId; label: string; icon: LucideIcon }[] = [
   { id: 'questions', label: 'Questions', icon: Code2 },
   { id: 'quiz', label: 'Quiz', icon: ListChecks },
   { id: 'notes', label: 'Notes', icon: StickyNote },
-] as const;
+];
 
 const THEME_OPTIONS: { mode: ThemeMode; label: string; icon: LucideIcon }[] = [
   { mode: 'system', label: 'System', icon: Monitor },
@@ -52,12 +56,10 @@ const THEME_OPTIONS: { mode: ThemeMode; label: string; icon: LucideIcon }[] = [
 interface SidebarProps {
   collapsed: boolean;
   onToggleCollapsed: () => void;
-  onExpand: () => void;
   mobileOpen: boolean;
   onCloseMobile: () => void;
-  filter: string;
-  onFilterChange: (value: string) => void;
-  filterRef: RefObject<HTMLInputElement | null>;
+  /** Opens the command palette. */
+  onOpenSearch: () => void;
 }
 
 /**
@@ -81,13 +83,6 @@ function locate(pathname: string): { activeLeaf?: string; open: string[] } {
     return { activeLeaf: `notes:${sectionId}`, open: ['notes'] };
   }
   return { open: [] };
-}
-
-const matches = (term: string, ...fields: string[]) => fields.some((f) => f.toLowerCase().includes(term));
-
-/** A topic stays visible while filtering if its name or any of its questions match. */
-function topicMatches(group: QuestionGroup, term: string) {
-  return matches(term, group.label) || questionsIn(group).some((q) => matches(term, q.title, ...q.tags));
 }
 
 interface GroupProps {
@@ -138,7 +133,14 @@ function TopicLink({
   meta?: ReactNode;
 }) {
   return (
-    <Link to={to} className={`nav-item${active ? ' active' : ''}`} aria-current={active ? 'page' : undefined} title={label}>
+    <Link
+      to={to}
+      className={`nav-item${active ? ' active' : ''}`}
+      aria-current={active ? 'page' : undefined}
+      // Only long names get cut off; a tooltip on every row would be noise.
+      data-tooltip={label.length > 26 ? label : undefined}
+      data-tooltip-side="right"
+    >
       {Icon ? <Icon className="nav-icon" size={15} aria-hidden /> : <span className="nav-bullet" aria-hidden />}
       <span className="nav-item-label">{label}</span>
       {meta}
@@ -149,33 +151,45 @@ function TopicLink({
 function Progress({ solved, total }: { solved: number; total: number }) {
   if (total && solved === total) {
     return (
-      <span className="nav-count complete" title="All solved">
+      <span className="nav-count complete" data-tooltip="All solved">
         <CheckCircle2 size={13} aria-label="all solved" />
       </span>
     );
   }
   return (
-    <span className="nav-count" title={`${solved} of ${total} solved`}>
+    <span className="nav-count" data-tooltip={`${solved} of ${total} solved`}>
       {solved ? `${solved}/${total}` : total}
     </span>
   );
 }
 
-export default function Sidebar({
-  collapsed,
-  onToggleCollapsed,
-  onExpand,
-  mobileOpen,
-  onCloseMobile,
-  filter,
-  onFilterChange,
-  filterRef,
-}: SidebarProps) {
+export default function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobile, onOpenSearch }: SidebarProps) {
   const { pathname } = useLocation();
   const { mode, setMode } = useTheme();
   const progress = useProgress();
   const [openIds, setOpenIds] = usePersistentState<string[]>('fp:sidebar:open', ['questions']);
   const location = locate(pathname);
+
+  // Collapsed rail: hovering a section peeks at it; clicking (or the keyboard) pins it open.
+  const hover = useHoverIntent<SectionId>();
+  const [pinned, setPinned] = useState(false);
+  const [focusFirst, setFocusFirst] = useState(false);
+  const railButtons = useRef(new Map<SectionId, HTMLButtonElement>());
+  const peek = collapsed ? hover.current : null;
+
+  const closePeek = (focusAnchor = false) => {
+    const anchor = peek ? railButtons.current.get(peek) : undefined;
+    hover.set(null);
+    setPinned(false);
+    setFocusFirst(false);
+    if (focusAnchor) anchor?.focus();
+  };
+
+  const openPeek = (id: SectionId, fromKeyboard: boolean) => {
+    hover.set(id);
+    setPinned(true);
+    setFocusFirst(fromKeyboard);
+  };
 
   // Reveal wherever the current route lives in the tree.
   useEffect(() => {
@@ -183,22 +197,33 @@ export default function Sidebar({
     setOpenIds((prev) => (needed.every((id) => prev.includes(id)) ? prev : [...new Set([...prev, ...needed])]));
   }, [pathname, setOpenIds]);
 
-  const term = filter.trim().toLowerCase();
-  const filtering = term.length > 0;
-  const isOpen = (id: string) => filtering || openIds.includes(id);
+  // Navigating, or expanding the sidebar, puts the peek away.
+  const { set: setPeek } = hover;
+  useEffect(() => {
+    setPeek(null);
+    setPinned(false);
+  }, [pathname, collapsed, setPeek]);
+
+  // A pinned peek closes on a click anywhere else.
+  useEffect(() => {
+    if (!pinned) return;
+    const onPointerDown = (e: PointerEvent) => {
+      const target = e.target as Element;
+      if (!target.closest('.sidebar-peek, .rail-section')) {
+        setPeek(null);
+        setPinned(false);
+      }
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [pinned, setPeek]);
+
+  const isOpen = (id: string) => openIds.includes(id);
   const toggle = (id: string) =>
     setOpenIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
   const solvedIn = (group: QuestionGroup) => questionsIn(group).filter((q) => progress[q.slug] === 'solved').length;
   const progressOf = (group: QuestionGroup) => <Progress solved={solvedIn(group)} total={questionsIn(group).length} />;
-
-  const visibleTree = questionTree
-    .map((g) => (g.children.length ? { ...g, children: g.children.filter((c) => !filtering || topicMatches(c, term)) } : g))
-    .filter((g) => !filtering || (g.children.length ? g.children.length > 0 : topicMatches(g, term)));
-  const decks = filtering ? quizDecks.filter((d) => matches(term, d.title)) : quizDecks;
-  const sections = filtering
-    ? noteSections.filter((s) => matches(term, s.label, ...s.notes.map((n) => n.title)))
-    : noteSections;
 
   const topicLink = (group: QuestionGroup) => (
     <TopicLink
@@ -211,13 +236,17 @@ export default function Sidebar({
     />
   );
 
-  const openSectionFromRail = (id: string) => {
-    setOpenIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
-    onExpand();
+  const onRailClick = (id: SectionId) => (e: MouseEvent<HTMLButtonElement>) => {
+    // detail 0: Enter/Space. Open and move into the menu.
+    // A mouse click pins a hover-opened peek, or closes a pinned one.
+    const fromKeyboard = e.detail === 0;
+    if (!fromKeyboard && peek === id && pinned) closePeek();
+    else openPeek(id, fromKeyboard);
   };
 
-  const nothingFound = filtering && !visibleTree.length && !decks.length && !sections.length;
   const railActive = location.open[0];
+  const toggleLabel = collapsed ? 'Expand sidebar' : 'Collapse sidebar';
+  const themeLabel = THEME_OPTIONS.find((o) => o.mode === mode)?.label ?? 'System';
 
   return (
     <aside
@@ -225,36 +254,81 @@ export default function Sidebar({
       aria-label="Primary"
     >
       <div className="sidebar-header">
-        <Link to="/" className="brand" title="Home">
+        <Link to="/" className="brand" aria-label="Frontend Practice, home">
           <span className="brand-mark" aria-hidden>
             {'</>'}
           </span>
           <span className="brand-name">Frontend Practice</span>
         </Link>
+        {/* Collapsed: the logo turns into the expand button on hover. */}
+        <button
+          type="button"
+          className="sidebar-expand"
+          onClick={onToggleCollapsed}
+          aria-label="Expand sidebar"
+          data-tooltip="Expand sidebar"
+          data-tooltip-kbd={`${modKey} B`}
+          data-tooltip-side="right"
+        >
+          <span className="brand-mark" aria-hidden>
+            {'</>'}
+          </span>
+          <PanelLeftOpen size={18} className="sidebar-expand-icon" aria-hidden />
+        </button>
         <button
           type="button"
           className="icon-btn sidebar-collapse"
           onClick={onToggleCollapsed}
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          title={`${collapsed ? 'Expand' : 'Collapse'} sidebar (⌘B)`}
+          aria-label="Collapse sidebar"
+          data-tooltip="Collapse sidebar"
+          data-tooltip-kbd={`${modKey} B`}
         >
-          {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+          <PanelLeftClose size={16} />
         </button>
         <button type="button" className="icon-btn sidebar-close" onClick={onCloseMobile} aria-label="Close menu">
           <X size={16} />
         </button>
       </div>
 
-      {/* Collapsed rail: one icon per section. */}
+      {/* Collapsed rail: Home, one icon per section (peek menus), Search. */}
       <nav className="rail" aria-label="Sections">
+        <Link
+          to="/"
+          className={`icon-btn rail-btn${pathname === '/' ? ' active' : ''}`}
+          aria-label="Home"
+          aria-current={pathname === '/' ? 'page' : undefined}
+          data-tooltip="Home"
+          data-tooltip-side="right"
+        >
+          <House size={18} />
+        </Link>
         {SECTIONS.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
+            ref={(el) => {
+              if (el) railButtons.current.set(id, el);
+              else railButtons.current.delete(id);
+            }}
             type="button"
-            className={`icon-btn rail-btn${railActive === id ? ' active' : ''}`}
-            onClick={() => openSectionFromRail(id)}
+            className={`icon-btn rail-btn rail-section${railActive === id ? ' active' : ''}${peek === id ? ' peeking' : ''}`}
             aria-label={label}
-            title={label}
+            aria-expanded={peek === id}
+            aria-controls={peek === id ? `peek-${id}` : undefined}
+            data-tooltip={label}
+            data-tooltip-kbd="→"
+            data-tooltip-side="right"
+            data-tooltip-focus-only=""
+            onPointerEnter={(e) => e.pointerType === 'mouse' && hover.enter(id)}
+            onPointerLeave={(e) => e.pointerType === 'mouse' && !pinned && hover.leave()}
+            onClick={onRailClick(id)}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                openPeek(id, true);
+              } else if (e.key === 'Escape' && peek === id) {
+                closePeek();
+              }
+            }}
           >
             <Icon size={18} />
           </button>
@@ -262,115 +336,112 @@ export default function Sidebar({
         <button
           type="button"
           className="icon-btn rail-btn"
-          onClick={() => {
-            onExpand();
-            requestAnimationFrame(() => filterRef.current?.focus());
-          }}
+          onClick={onOpenSearch}
           aria-label="Search"
-          title="Search (/)"
+          aria-keyshortcuts="/"
+          data-tooltip="Search"
+          data-tooltip-kbd="/"
+          data-tooltip-side="right"
         >
           <Search size={18} />
         </button>
       </nav>
 
-      <div className="sidebar-search">
-        <Search size={14} className="search-icon" aria-hidden />
-        <input
-          ref={filterRef}
-          type="search"
-          placeholder="Find a topic or question…"
-          value={filter}
-          onChange={(e) => onFilterChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') {
-              onFilterChange('');
-              e.currentTarget.blur();
-            }
-          }}
-          aria-label="Find a topic, question, deck or note"
+      {peek && railButtons.current.get(peek) && (
+        <SidebarPeek
+          id={`peek-${peek}`}
+          section={peek}
+          label={SECTIONS.find((sec) => sec.id === peek)!.label}
+          anchor={railButtons.current.get(peek)!}
+          activeLeaf={location.activeLeaf}
+          focusFirst={focusFirst}
+          onClose={closePeek}
+          onPointerEnter={hover.cancelClose}
+          onPointerLeave={() => !pinned && hover.leave()}
+          groupIcons={GROUP_ICONS}
         />
-        {!filter && <Kbd>/</Kbd>}
+      )}
+
+      {/* Expanded: looks like a search box, opens the command palette. */}
+      <div className="sidebar-search">
+        <button type="button" className="sidebar-search-trigger" onClick={onOpenSearch} aria-keyshortcuts="/">
+          <Search size={14} className="search-icon" aria-hidden />
+          <span>Search…</span>
+          <Kbd>/</Kbd>
+        </button>
       </div>
 
       <nav className="sidebar-tree" aria-label="Topics">
-        {visibleTree.length > 0 && (
-          <AccordionGroup
-            id="questions"
-            label="Questions"
-            meta={<Progress solved={questionTree.reduce((n, g) => n + solvedIn(g), 0)} total={questionTree.reduce((n, g) => n + questionsIn(g).length, 0)} />}
-            depth={0}
-            open={isOpen('questions')}
-            onToggle={toggle}
-            icon={Code2}
-          >
-            {visibleTree.map((group) =>
-              group.children.length ? (
-                <AccordionGroup
-                  key={group.id}
-                  id={`questions/${group.id}`}
-                  label={group.label}
-                  meta={progressOf(group)}
-                  depth={1}
-                  open={isOpen(`questions/${group.id}`)}
-                  onToggle={toggle}
-                  icon={GROUP_ICONS[group.id]}
-                >
-                  {group.children.map(topicLink)}
-                </AccordionGroup>
-              ) : (
-                <div key={group.id} className="nav-leaf-row" style={{ '--depth': 1 } as CSSProperties}>
-                  {topicLink(group)}
-                </div>
-              ),
-            )}
-          </AccordionGroup>
-        )}
+        <AccordionGroup
+          id="questions"
+          label="Questions"
+          meta={<Progress solved={questionTree.reduce((n, g) => n + solvedIn(g), 0)} total={questionTree.reduce((n, g) => n + questionsIn(g).length, 0)} />}
+          depth={0}
+          open={isOpen('questions')}
+          onToggle={toggle}
+          icon={Code2}
+        >
+          {questionTree.map((group) =>
+            group.children.length ? (
+              <AccordionGroup
+                key={group.id}
+                id={`questions/${group.id}`}
+                label={group.label}
+                meta={progressOf(group)}
+                depth={1}
+                open={isOpen(`questions/${group.id}`)}
+                onToggle={toggle}
+                icon={GROUP_ICONS[group.id]}
+              >
+                {group.children.map(topicLink)}
+              </AccordionGroup>
+            ) : (
+              <div key={group.id} className="nav-leaf-row" style={{ '--depth': 1 } as CSSProperties}>
+                {topicLink(group)}
+              </div>
+            ),
+          )}
+        </AccordionGroup>
 
-        {decks.length > 0 && (
-          <AccordionGroup
-            id="quiz"
-            label="Quiz"
-            meta={<span className="nav-count">{decks.length}</span>}
-            depth={0}
-            open={isOpen('quiz')}
-            onToggle={toggle}
-            icon={ListChecks}
-          >
-            {decks.map((deck) => (
-              <TopicLink
-                key={deck.slug}
-                to={`/quiz/${deck.slug}`}
-                label={deck.title}
-                active={location.activeLeaf === `quiz:${deck.slug}`}
-                meta={<span className="nav-count">{deck.cards.length}</span>}
-              />
-            ))}
-          </AccordionGroup>
-        )}
+        <AccordionGroup
+          id="quiz"
+          label="Quiz"
+          meta={<span className="nav-count">{quizDecks.length}</span>}
+          depth={0}
+          open={isOpen('quiz')}
+          onToggle={toggle}
+          icon={ListChecks}
+        >
+          {quizDecks.map((deck) => (
+            <TopicLink
+              key={deck.slug}
+              to={`/quiz/${deck.slug}`}
+              label={deck.title}
+              active={location.activeLeaf === `quiz:${deck.slug}`}
+              meta={<span className="nav-count">{deck.cards.length}</span>}
+            />
+          ))}
+        </AccordionGroup>
 
-        {sections.length > 0 && (
-          <AccordionGroup
-            id="notes"
-            label="Notes"
-            meta={<span className="nav-count">{sections.length}</span>}
-            depth={0}
-            open={isOpen('notes')}
-            onToggle={toggle}
-            icon={StickyNote}
-          >
-            {sections.map((s) => (
-              <TopicLink
-                key={s.id}
-                to={`/notes/${s.id}`}
-                label={s.label}
-                active={location.activeLeaf === `notes:${s.id}`}
-                meta={<span className="nav-count">{s.notes.length}</span>}
-              />
-            ))}
-          </AccordionGroup>
-        )}
-
-        {nothingFound && <p className="nav-empty">Nothing matches “{filter}”.</p>}
+        <AccordionGroup
+          id="notes"
+          label="Notes"
+          meta={<span className="nav-count">{noteSections.length}</span>}
+          depth={0}
+          open={isOpen('notes')}
+          onToggle={toggle}
+          icon={StickyNote}
+        >
+          {noteSections.map((s) => (
+            <TopicLink
+              key={s.id}
+              to={`/notes/${s.id}`}
+              label={s.label}
+              active={location.activeLeaf === `notes:${s.id}`}
+              meta={<span className="nav-count">{s.notes.length}</span>}
+            />
+          ))}
+        </AccordionGroup>
       </nav>
 
       <div className="sidebar-footer">
@@ -383,7 +454,6 @@ export default function Sidebar({
               aria-checked={mode === m}
               className={mode === m ? 'active' : ''}
               onClick={() => setMode(m)}
-              title={label}
             >
               <Icon size={14} aria-hidden />
               <span>{label}</span>
@@ -397,12 +467,27 @@ export default function Sidebar({
             const i = THEME_OPTIONS.findIndex((o) => o.mode === mode);
             setMode(THEME_OPTIONS[(i + 1) % THEME_OPTIONS.length].mode);
           }}
-          aria-label={`Theme: ${mode}`}
-          title={`Theme: ${mode}`}
+          aria-label={`Theme: ${themeLabel}. Switch theme`}
+          data-tooltip={`Theme: ${themeLabel} · click to switch`}
+          data-tooltip-side="right"
         >
           {mode === 'light' ? <Sun size={18} /> : mode === 'dark' ? <Moon size={18} /> : <Monitor size={18} />}
         </button>
       </div>
+
+      {/* The sidebar's right border: hover shows a handle, click toggles. Keyboard users have ⌘B and the header buttons. */}
+      <button
+        type="button"
+        className="sidebar-edge"
+        tabIndex={-1}
+        onClick={onToggleCollapsed}
+        aria-label={toggleLabel}
+        data-tooltip={toggleLabel}
+        data-tooltip-kbd={`${modKey} B`}
+        data-tooltip-side="right"
+      >
+        <span className="sidebar-edge-pill" aria-hidden />
+      </button>
     </aside>
   );
 }

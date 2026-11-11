@@ -76,8 +76,190 @@
   color: var(--text);
 }
 
-.sidebar-close {
+.sidebar-close,
+.sidebar-expand {
   display: none;
+}
+
+/* Collapsed: the logo, which turns into the expand icon on hover or focus. */
+.sidebar-expand {
+  position: relative;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.sidebar-expand > * {
+  grid-area: 1 / 1;
+  transition: opacity var(--duration) var(--ease), transform var(--duration) var(--ease);
+}
+
+.sidebar-expand-icon {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.sidebar-expand:is(:hover, :focus-visible) {
+  background: var(--surface-3);
+  color: var(--text);
+}
+
+.sidebar-expand:is(:hover, :focus-visible) .brand-mark {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.sidebar-expand:is(:hover, :focus-visible) .sidebar-expand-icon {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Edge handle (both states) ---------- */
+.sidebar-edge {
+  position: absolute;
+  top: 0;
+  right: -6px;
+  bottom: 0;
+  z-index: 2;
+  width: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.sidebar-edge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 5px;
+  width: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity var(--duration) var(--ease);
+}
+
+.sidebar-edge-pill {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 8px;
+  height: 32px;
+  margin-top: -16px;
+  border-radius: 4px;
+  background: var(--accent);
+  opacity: 0;
+  transform: scaleY(0.6);
+  transition: opacity var(--duration) var(--ease), transform var(--duration) var(--ease);
+}
+
+.sidebar-edge:hover::before {
+  opacity: 0.5;
+}
+
+.sidebar-edge:hover .sidebar-edge-pill {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Peek flyout (collapsed rail) ---------- */
+.sidebar-peek {
+  position: fixed;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  width: 280px;
+  max-height: min(70vh, 560px);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: var(--shadow-lg);
+  animation: peek-in 120ms var(--ease);
+}
+
+/* Bridges the gap to the rail so moving the pointer across doesn't close it. */
+.sidebar-peek::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -12px;
+  width: 12px;
+}
+
+.peek-header {
+  padding: 10px 14px 6px;
+  color: var(--text-faint);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.peek-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 6px 6px;
+  scrollbar-width: thin;
+}
+
+.peek-group + .peek-group {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+.peek-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 4px 8px;
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.peek-link.depth-1 {
+  padding-left: 30px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.peek-link:hover,
+.peek-link:focus-visible {
+  background: var(--surface-3);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.peek-link.active {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.peek-link-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@keyframes peek-in {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
 }
 
 /* ---------- Search ---------- */
@@ -95,25 +277,25 @@
   pointer-events: none;
 }
 
-.sidebar-search input {
+/* Looks like a search box; opens the command palette. */
+.sidebar-search-trigger {
+  display: flex;
+  align-items: center;
   width: 100%;
   height: 32px;
   padding: 0 30px 0 28px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg);
-  font-size: 13px;
-  transition: border-color var(--duration) var(--ease);
-}
-
-.sidebar-search input::placeholder {
   color: var(--text-faint);
+  font-size: 13px;
+  text-align: left;
+  transition: border-color var(--duration) var(--ease), color var(--duration) var(--ease);
 }
 
-.sidebar-search input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+.sidebar-search-trigger:hover {
+  border-color: var(--border-strong);
+  color: var(--text-muted);
 }
 
 .sidebar-search .kbd {
@@ -337,19 +519,16 @@
 }
 
 .sidebar.collapsed .sidebar-header {
-  flex-direction: column;
   justify-content: center;
-  height: auto;
-  padding: 12px 0;
-  gap: 10px;
+  padding: 0;
 }
 
-.sidebar.collapsed .brand {
-  margin: 0;
-}
-
-.sidebar.collapsed :is(.brand-name, .sidebar-search, .sidebar-tree, .theme-switch) {
+.sidebar.collapsed :is(.brand, .sidebar-collapse, .sidebar-search, .sidebar-tree, .theme-switch) {
   display: none;
+}
+
+.sidebar.collapsed .sidebar-expand {
+  display: inline-grid;
 }
 
 .sidebar.collapsed .rail {
@@ -381,6 +560,15 @@
   color: var(--accent-text);
 }
 
+.rail-btn.peeking {
+  background: var(--surface-3);
+  color: var(--text);
+}
+
+.rail-btn:hover {
+  text-decoration: none;
+}
+
 /* ---------- Mobile drawer ---------- */
 .sidebar-backdrop {
   display: none;
@@ -408,10 +596,15 @@
     padding: 0 10px 0 14px;
   }
   .sidebar.collapsed .brand {
+    display: flex;
     margin-right: auto;
   }
-  .sidebar.collapsed :is(.brand-name, .sidebar-search, .sidebar-tree, .theme-switch) {
+  .sidebar.collapsed :is(.sidebar-search, .sidebar-tree, .theme-switch) {
     display: revert;
+  }
+  .sidebar.collapsed .sidebar-expand,
+  .sidebar-edge {
+    display: none;
   }
   .sidebar.collapsed .sidebar-search {
     display: flex;

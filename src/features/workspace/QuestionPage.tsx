@@ -14,6 +14,8 @@ import { SandpackCodeViewer, SandpackProvider } from '@codesandbox/sandpack-reac
 import { ArrowLeft, ArrowRight, CheckCircle2, ChevronRight, Clock, Eye, Lock, RotateCcw, Undo2 } from 'lucide-react';
 import { DifficultyBadge, Tag } from '../../components/Badges';
 import Markdown from '../../components/Markdown';
+import { useConfirm } from '../../components/overlay/ConfirmProvider';
+import { useToast } from '../../components/overlay/ToastProvider';
 import {
   breadcrumbOf,
   getNeighbours,
@@ -25,7 +27,7 @@ import {
   type Question,
   type RunnerAssets,
 } from '../../lib/content/catalog';
-import { applyDraft, clearDraft, draftKey, loadDraft } from '../../lib/drafts';
+import { applyDraft, clearDraft, draftKey, loadDraft, saveDraft } from '../../lib/drafts';
 import { useProgress } from '../../lib/progress';
 import { useTheme } from '../../lib/theme';
 import { usePersistentState } from '../../lib/usePersistentState';
@@ -151,7 +153,7 @@ function PlatformToggle({ value, onChange }: { value: Platform; onChange: (p: Pl
           type="button"
           role="radio"
           aria-checked={value === p.id}
-          title={p.hint}
+          data-tooltip={p.hint}
           onClick={() => onChange(p.id)}
         >
           {p.label}
@@ -182,6 +184,8 @@ export default function QuestionPage() {
   const progress = useProgress();
   const bodyRef = useRef<HTMLDivElement>(null);
   const divider = useResizablePrompt(bodyRef);
+  const confirm = useConfirm();
+  const toast = useToast();
 
   const isCode = question?.type === 'js' || question?.type === 'dsa';
   // React questions can be solved in React Native; `?platform=native` keeps it deep-linkable.
@@ -262,16 +266,45 @@ export default function QuestionPage() {
   }
 
   const unlocked = revealed || solved;
-  const reveal = () => {
-    if (window.confirm('Reveal the reference solution and notes?')) setRevealed(true);
+  const confirmReveal = () =>
+    confirm({
+      title: 'Reveal the solution?',
+      body: <p>You'll see the reference solution and notes for this question. They unlock on their own once a submission is accepted.</p>,
+      confirmLabel: 'Reveal',
+      cancelLabel: 'Keep trying',
+    });
+
+  const reveal = async () => {
+    if (await confirmReveal()) setRevealed(true);
   };
 
+  const revealUiSolution = async () => {
+    if (!(await confirmReveal())) return;
+    setRevealed(true);
+    setUiView('solution');
+  };
+
+  // No confirm: reset straight away and offer Undo, which puts the previous draft back.
   const resetUi = () => {
-    if (!window.confirm('Discard your code and restore the starter?')) return;
+    const previous = loadDraft(draftId);
     clearDraft(draftId);
     loadQuestionFiles(question, 'starter', platform).then((files) => {
       setStarter(files);
       setResetKey((k) => k + 1);
+      if (!previous) return;
+      toast.show({
+        message: 'Reset to the starter',
+        action: {
+          label: 'Undo',
+          done: 'Restored your code',
+          run: () => {
+            const restored = applyDraft(files, previous);
+            saveDraft(draftId, restored);
+            setStarter(restored);
+            setResetKey((k) => k + 1);
+          },
+        },
+      });
     });
   };
 
@@ -327,7 +360,9 @@ export default function QuestionPage() {
               className="icon-btn bordered"
               disabled={!prev}
               onClick={() => prev && navigate(hrefOf(prev))}
-              title={prev ? `Previous: ${prev.title} (Alt+←)` : 'No previous question'}
+              data-tooltip={prev ? `Previous: ${prev.title}` : 'No previous question'}
+              data-tooltip-kbd={prev ? 'Alt ←' : undefined}
+              aria-keyshortcuts="Alt+ArrowLeft"
               aria-label="Previous question"
             >
               <ArrowLeft size={15} />
@@ -337,7 +372,9 @@ export default function QuestionPage() {
               className="icon-btn bordered"
               disabled={!next}
               onClick={() => next && navigate(hrefOf(next))}
-              title={next ? `Next: ${next.title} (Alt+→)` : 'No next question'}
+              data-tooltip={next ? `Next: ${next.title}` : 'No next question'}
+              data-tooltip-kbd={next ? 'Alt →' : undefined}
+              aria-keyshortcuts="Alt+ArrowRight"
               aria-label="Next question"
             >
               <ArrowRight size={15} />
@@ -352,12 +389,9 @@ export default function QuestionPage() {
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={() => {
-                    setRevealed(true);
-                    setUiView('solution');
-                  }}
+                  onClick={revealUiSolution}
                   disabled={!hasUiSolution}
-                  title={hasUiSolution ? undefined : `No ${platform === 'native' ? 'React Native ' : ''}reference solution has been written yet`}
+                  data-tooltip={hasUiSolution ? undefined : `No ${platform === 'native' ? 'React Native ' : ''}reference solution has been written yet`}
                 >
                   <Eye size={14} aria-hidden /> {hasUiSolution ? 'Reveal solution' : 'No solution yet'}
                 </button>
