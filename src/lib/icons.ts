@@ -1,11 +1,11 @@
 import {
   Atom,
   BookOpen,
+  Brain,
   Braces,
-  CodeXml,
   FileCode2,
-  Layers,
-  LayoutDashboard,
+  House,
+  ListChecks,
   Network,
   PanelsTopLeft,
   type LucideIcon,
@@ -22,9 +22,9 @@ export const TRACK_ICONS: Record<string, LucideIcon> = {
 
 /** The app's sections, as they appear in the sidebar rail. */
 export const SECTION_ICONS = {
-  home: LayoutDashboard,
-  questions: CodeXml,
-  quiz: Layers,
+  home: House,
+  questions: ListChecks,
+  quiz: Brain,
   notes: BookOpen,
 } satisfies Record<string, LucideIcon>;
 

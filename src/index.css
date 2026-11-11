@@ -65,10 +65,11 @@
   /* The phone frame around a React Native preview looks the same in both themes. */
   --device-bezel: #18181b;
   --device-screen: #ffffff;
-  /* The logo tile: indigo into violet, with a white glyph. */
+  /* The logo tile: indigo into violet, with a white "F" and full stop (the stop has its own token, so it can be tinted). */
   --brand-from: #5b5bd6;
   --brand-to: #9b4fd6;
   --brand-ink: #ffffff;
+  --brand-dot: #ffffff;
 }
 
 :root[data-theme='dark'] {
@@ -111,6 +112,7 @@
   --brand-from: #6c6ce8;
   --brand-to: #a35ee6;
   --brand-ink: #ffffff;
+  --brand-dot: #ffffff;
 }
 
 * {
