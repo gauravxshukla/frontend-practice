@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { baseName, buildTree, dirOf, joinPath, type TreeNode } from './buildTree';
-import { validateNewPath } from './validateNewPath';
+import { baseName, buildTree, dirOf, joinPath, type TreeNode } from '../../../../src/features/workspace/explorer/buildTree';
+import { validateNewPath } from '../../../../src/features/workspace/explorer/validateNewPath';
 
 const shape = (nodes: TreeNode[]): unknown =>
   nodes.map((n) => (n.kind === 'folder' ? { [n.name]: shape(n.children) } : n.name));

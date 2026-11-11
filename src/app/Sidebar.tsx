@@ -9,6 +9,7 @@ import {
   Code2,
   FileCode,
   House,
+  Keyboard,
   LayoutGrid,
   ListChecks,
   Monitor,
@@ -24,8 +25,8 @@ import {
 import { getQuestion, questionsIn, questionTree, type QuestionGroup } from '../lib/content/catalog';
 import { noteSections, notes } from '../lib/content/notes';
 import { quizDecks } from '../lib/content/quiz';
-import { modKey } from '../lib/platform';
 import { useProgress } from '../lib/progress';
+import { ariaKeysFor, keysFor } from '../lib/shortcuts';
 import { useTheme, type ThemeMode } from '../lib/theme';
 import { useHoverIntent } from '../lib/useHoverIntent';
 import { usePersistentState } from '../lib/usePersistentState';
@@ -60,6 +61,7 @@ interface SidebarProps {
   onCloseMobile: () => void;
   /** Opens the command palette. */
   onOpenSearch: () => void;
+  onOpenShortcuts: () => void;
 }
 
 /**
@@ -163,7 +165,14 @@ function Progress({ solved, total }: { solved: number; total: number }) {
   );
 }
 
-export default function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobile, onOpenSearch }: SidebarProps) {
+export default function Sidebar({
+  collapsed,
+  onToggleCollapsed,
+  mobileOpen,
+  onCloseMobile,
+  onOpenSearch,
+  onOpenShortcuts,
+}: SidebarProps) {
   const { pathname } = useLocation();
   const { mode, setMode } = useTheme();
   const progress = useProgress();
@@ -267,7 +276,8 @@ export default function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCl
           onClick={onToggleCollapsed}
           aria-label="Expand sidebar"
           data-tooltip="Expand sidebar"
-          data-tooltip-kbd={`${modKey} B`}
+          data-tooltip-kbd={keysFor('sidebar')}
+          aria-keyshortcuts={ariaKeysFor('sidebar')}
           data-tooltip-side="right"
         >
           <span className="brand-mark" aria-hidden>
@@ -281,7 +291,8 @@ export default function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCl
           onClick={onToggleCollapsed}
           aria-label="Collapse sidebar"
           data-tooltip="Collapse sidebar"
-          data-tooltip-kbd={`${modKey} B`}
+          data-tooltip-kbd={keysFor('sidebar')}
+          aria-keyshortcuts={ariaKeysFor('sidebar')}
         >
           <PanelLeftClose size={16} />
         </button>
@@ -315,7 +326,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCl
             aria-expanded={peek === id}
             aria-controls={peek === id ? `peek-${id}` : undefined}
             data-tooltip={label}
-            data-tooltip-kbd="→"
+            data-tooltip-kbd={keysFor('rail-open')}
             data-tooltip-side="right"
             data-tooltip-focus-only=""
             onPointerEnter={(e) => e.pointerType === 'mouse' && hover.enter(id)}
@@ -338,9 +349,9 @@ export default function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCl
           className="icon-btn rail-btn"
           onClick={onOpenSearch}
           aria-label="Search"
-          aria-keyshortcuts="/"
+          aria-keyshortcuts={ariaKeysFor('search')}
           data-tooltip="Search"
-          data-tooltip-kbd="/"
+          data-tooltip-kbd={keysFor('search')}
           data-tooltip-side="right"
         >
           <Search size={18} />
@@ -364,7 +375,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCl
 
       {/* Expanded: looks like a search box, opens the command palette. */}
       <div className="sidebar-search">
-        <button type="button" className="sidebar-search-trigger" onClick={onOpenSearch} aria-keyshortcuts="/">
+        <button type="button" className="sidebar-search-trigger" onClick={onOpenSearch} aria-keyshortcuts={ariaKeysFor('search')}>
           <Search size={14} className="search-icon" aria-hidden />
           <span>Search…</span>
           <Kbd>/</Kbd>
@@ -473,6 +484,18 @@ export default function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCl
         >
           {mode === 'light' ? <Sun size={18} /> : mode === 'dark' ? <Moon size={18} /> : <Monitor size={18} />}
         </button>
+        <button
+          type="button"
+          className="icon-btn sidebar-keys"
+          onClick={onOpenShortcuts}
+          aria-label="Keyboard shortcuts"
+          aria-keyshortcuts={ariaKeysFor('shortcuts')}
+          data-tooltip="Keyboard shortcuts"
+          data-tooltip-kbd={keysFor('shortcuts')}
+          data-tooltip-side={collapsed ? 'right' : 'top'}
+        >
+          <Keyboard size={collapsed ? 18 : 16} />
+        </button>
       </div>
 
       {/* The sidebar's right border: hover shows a handle, click toggles. Keyboard users have ⌘B and the header buttons. */}
@@ -483,7 +506,7 @@ export default function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCl
         onClick={onToggleCollapsed}
         aria-label={toggleLabel}
         data-tooltip={toggleLabel}
-        data-tooltip-kbd={`${modKey} B`}
+        data-tooltip-kbd={keysFor('sidebar')}
         data-tooltip-side="right"
       >
         <span className="sidebar-edge-pill" aria-hidden />

@@ -42,6 +42,19 @@
   --shadow: 0 1px 3px rgb(0 0 0 / 0.08), 0 4px 12px rgb(0 0 0 / 0.04);
   --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.14);
   --focus: 0 0 0 2px var(--bg), 0 0 0 4px #8d8dec;
+  /* Floating surfaces (toasts, tooltips): an elevated card in the current theme. */
+  --overlay-bg: #ffffff;
+  --overlay-border: #e4e4e7;
+  --overlay-shadow: 0 8px 28px rgb(0 0 0 / 0.12), 0 1px 3px rgb(0 0 0 / 0.08);
+  --backdrop: rgb(0 0 0 / 0.38);
+  --on-danger: #ffffff;
+  --on-submit: #ffffff;
+  --chip-on-accent: rgb(255 255 255 / 0.22);
+  --syntax-number: #2563eb;
+  --syntax-symbol: #be185d;
+  /* The phone frame around a React Native preview looks the same in both themes. */
+  --device-bezel: #18181b;
+  --device-screen: #ffffff;
 }
 
 :root[data-theme='dark'] {
@@ -70,6 +83,17 @@
   --shadow: 0 1px 3px rgb(0 0 0 / 0.5), 0 4px 12px rgb(0 0 0 / 0.3);
   --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.5);
   --focus: 0 0 0 2px var(--bg), 0 0 0 4px #6262d8;
+  --overlay-bg: #232328;
+  --overlay-border: #3a3a42;
+  --overlay-shadow: 0 10px 32px rgb(0 0 0 / 0.55), 0 1px 3px rgb(0 0 0 / 0.4);
+  --backdrop: rgb(0 0 0 / 0.6);
+  --on-danger: #111113;
+  --on-submit: #0d1f16;
+  --chip-on-accent: rgb(0 0 0 / 0.18);
+  --syntax-number: #93b4ff;
+  --syntax-symbol: #f472b6;
+  --device-bezel: #18181b;
+  --device-screen: #ffffff;
 }
 
 * {

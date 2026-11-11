@@ -8,9 +8,9 @@ import { existsSync, globSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { loadPyodide } from 'pyodide';
-import { gradeOutputs } from '../src/features/runner/core.js';
-import { createPythonRunner } from '../src/features/runner/python/harness.js';
-import { pythonStub } from '../src/features/runner/stubs/pythonStub.ts';
+import { gradeOutputs } from '../../src/features/runner/core.js';
+import { createPythonRunner } from '../../src/features/runner/python/harness.js';
+import { pythonStub } from '../../src/features/runner/stubs/pythonStub.ts';
 
 const only = process.env.DSA_ONLY; // e.g. DSA_ONLY=content/dsa/trees
 const specFiles = globSync('content/dsa/**/cases.json').filter((f) => !only || f.startsWith(only)).sort();

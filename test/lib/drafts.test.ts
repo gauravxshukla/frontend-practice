@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyDraft, parseDraft } from './drafts';
+import { applyDraft, parseDraft } from '../../src/lib/drafts';
 
 const starter = { '/App.js': 'starter app', '/styles.css': 'starter css' };
 

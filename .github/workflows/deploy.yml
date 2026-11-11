@@ -26,7 +26,7 @@ jobs:
           node-version: 22
           cache: npm
 
-      # scripts/verify-java.test.js compiles the Java harness and solutions with a real JDK.
+      # test/content/verify-java.test.js compiles the Java harness and solutions with a real JDK.
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

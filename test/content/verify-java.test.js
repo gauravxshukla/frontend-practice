@@ -10,9 +10,9 @@ import { existsSync, globSync, mkdirSync, mkdtempSync, readFileSync, readdirSync
 import { tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { gradeOutputs } from '../src/features/runner/core.js';
-import { cleanCompilerOutput, jobJson, prepareJavaRun } from '../src/features/runner/java/prepare.js';
-import { javaStub } from '../src/features/runner/stubs/javaStub.ts';
+import { gradeOutputs } from '../../src/features/runner/core.js';
+import { cleanCompilerOutput, jobJson, prepareJavaRun } from '../../src/features/runner/java/prepare.js';
+import { javaStub } from '../../src/features/runner/stubs/javaStub.ts';
 
 const hasJdk = spawnSync('javac', ['-version']).status === 0;
 const only = process.env.DSA_ONLY; // e.g. DSA_ONLY=content/dsa/trees

@@ -466,9 +466,22 @@
 
 /* ---------- Footer ---------- */
 .sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   flex-shrink: 0;
   padding: 10px 12px;
   border-top: 1px solid var(--border);
+}
+
+.sidebar-footer .theme-switch {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-keys {
+  width: 32px;
+  height: 32px;
 }
 
 .segmented {
@@ -541,9 +554,14 @@
 }
 
 .sidebar.collapsed .sidebar-footer {
-  display: flex;
-  justify-content: center;
+  flex-direction: column-reverse;
+  gap: 4px;
   padding: 10px 0;
+}
+
+.sidebar.collapsed .sidebar-keys {
+  width: 36px;
+  height: 36px;
 }
 
 .sidebar.collapsed .rail-theme {
@@ -616,7 +634,7 @@
     display: none;
   }
   .sidebar.collapsed .sidebar-footer {
-    display: block;
+    flex-direction: row;
     padding: 10px 12px;
   }
 
@@ -632,7 +650,7 @@
     position: fixed;
     inset: 0;
     z-index: 15;
-    background: rgb(0 0 0 / 0.35);
+    background: var(--backdrop);
     animation: fade-in var(--duration) var(--ease);
   }
 }

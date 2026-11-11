@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { decodeSandpackValue, fromSandpackPayload, isClearPayload } from './fromSandpack';
+import { decodeSandpackValue, fromSandpackPayload, isClearPayload } from '../../../src/features/console/fromSandpack';
 
 // `log` payloads captured from a real Sandpack preview (react template, runtime
 // bundler 2.19.8) by listening to the iframe's `console` messages; ids shortened

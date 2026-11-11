@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { DsaSpec } from '../../../lib/content/catalog';
-import { jsClassMethods, pythonStub } from './pythonStub';
+import type { DsaSpec } from '../../../../src/lib/content/catalog';
+import { jsClassMethods, pythonStub } from '../../../../src/features/runner/stubs/pythonStub';
 
 describe('pythonStub', () => {
   it('writes a Solution method with typed params', () => {

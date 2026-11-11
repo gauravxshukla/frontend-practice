@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { PaletteItem, PaletteKind } from './paletteIndex';
-import { fuzzyRanges, rankItems, toSections } from './rank';
+import type { PaletteItem, PaletteKind } from '../../../src/features/palette/paletteIndex';
+import { fuzzyRanges, rankItems, toSections } from '../../../src/features/palette/rank';
 
 let n = 0;
 const item = (title: string, over: Partial<PaletteItem> = {}): PaletteItem => ({

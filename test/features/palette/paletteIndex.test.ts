@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { findGroup, getQuestion, questions } from '../../lib/content/catalog';
-import { getNote, getNoteSection, notes, noteSections } from '../../lib/content/notes';
-import { getDeck, quizDecks } from '../../lib/content/quiz';
-import { buildIndex, suggestions, type PaletteItem } from './paletteIndex';
+import { findGroup, getQuestion, questions } from '../../../src/lib/content/catalog';
+import { getNote, getNoteSection, notes, noteSections } from '../../../src/lib/content/notes';
+import { getDeck, quizDecks } from '../../../src/lib/content/quiz';
+import { buildIndex, suggestions, type PaletteItem } from '../../../src/features/palette/paletteIndex';
 
 const resolves = (href: string) => {
   const [, kind, ...rest] = href.split('/');

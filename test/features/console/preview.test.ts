@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { serializeValue } from './serialize.js';
-import { entryText, isExpandable, previewOf } from './preview';
-import { groupRepeats } from './groupRepeats';
-import { textLog, type InspectValue, type LogEntry } from './types';
+import { serializeValue } from '../../../src/features/console/serialize.js';
+import { entryText, isExpandable, previewOf } from '../../../src/features/console/preview';
+import { groupRepeats } from '../../../src/features/console/groupRepeats';
+import { textLog, type InspectValue, type LogEntry } from '../../../src/features/console/types';
 
 const s = (v: unknown) => serializeValue(v) as InspectValue;
 

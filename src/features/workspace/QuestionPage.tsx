@@ -30,6 +30,7 @@ import {
 import { applyDraft, clearDraft, draftKey, loadDraft, saveDraft } from '../../lib/drafts';
 import { useProgress } from '../../lib/progress';
 import { useTheme } from '../../lib/theme';
+import { ariaKeysFor, keysFor } from '../../lib/shortcuts';
 import { usePersistentState } from '../../lib/usePersistentState';
 import { LANGUAGES, languageInfo } from '../runner/languages/registry';
 import type { LanguageId } from '../runner/languages/types';
@@ -361,8 +362,8 @@ export default function QuestionPage() {
               disabled={!prev}
               onClick={() => prev && navigate(hrefOf(prev))}
               data-tooltip={prev ? `Previous: ${prev.title}` : 'No previous question'}
-              data-tooltip-kbd={prev ? 'Alt ←' : undefined}
-              aria-keyshortcuts="Alt+ArrowLeft"
+              data-tooltip-kbd={prev ? keysFor('prev') : undefined}
+              aria-keyshortcuts={ariaKeysFor('prev')}
               aria-label="Previous question"
             >
               <ArrowLeft size={15} />
@@ -373,8 +374,8 @@ export default function QuestionPage() {
               disabled={!next}
               onClick={() => next && navigate(hrefOf(next))}
               data-tooltip={next ? `Next: ${next.title}` : 'No next question'}
-              data-tooltip-kbd={next ? 'Alt →' : undefined}
-              aria-keyshortcuts="Alt+ArrowRight"
+              data-tooltip-kbd={next ? keysFor('next') : undefined}
+              aria-keyshortcuts={ariaKeysFor('next')}
               aria-label="Next question"
             >
               <ArrowRight size={15} />

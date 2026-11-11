@@ -9,7 +9,7 @@ import { usePersistentState } from '../../lib/usePersistentState';
 import { useRowResize } from '../../lib/useRowResize';
 import { Kbd } from '../../components/Kbd';
 import { useToast } from '../../components/overlay/ToastProvider';
-import { isMac, modKey } from '../../lib/platform';
+import { ariaKeysFor, keysFor } from '../../lib/shortcuts';
 import { isLanguageId, languageInfo } from '../runner/languages/registry';
 import type { LanguageId } from '../runner/languages/types';
 import { useLanguageRuntime } from '../runner/languages/useLanguageRuntime';
@@ -167,8 +167,6 @@ function Inner({ question, assets, onAccepted, language, multiLanguage, onLangua
     return () => window.removeEventListener('keydown', onKey, true);
   }, [execute]);
 
-  const mod = modKey;
-  const ariaMod = isMac ? 'Meta' : 'Control';
   const canRun = running === null && status === 'ready';
 
   // No confirm: reset straight away and offer Undo.
@@ -253,10 +251,10 @@ function Inner({ question, assets, onAccepted, language, multiLanguage, onLangua
               onClick={() => execute('run')}
               disabled={!canRun}
               data-tooltip="Run the visible testcases"
-              data-tooltip-kbd={`${mod} '`}
-              aria-keyshortcuts={`${ariaMod}+'`}
+              data-tooltip-kbd={keysFor('run')}
+              aria-keyshortcuts={ariaKeysFor('run')}
             >
-              <Play size={13} aria-hidden /> Run <Kbd>{`${mod}'`}</Kbd>
+              <Play size={13} aria-hidden /> Run <Kbd>{keysFor('run', { separator: '' })}</Kbd>
             </button>
             <button
               type="button"
@@ -264,10 +262,10 @@ function Inner({ question, assets, onAccepted, language, multiLanguage, onLangua
               onClick={() => execute('submit')}
               disabled={!canRun}
               data-tooltip="Judge against every testcase, including hidden ones"
-              data-tooltip-kbd={`${mod} ↵`}
-              aria-keyshortcuts={`${ariaMod}+Enter`}
+              data-tooltip-kbd={keysFor('submit')}
+              aria-keyshortcuts={ariaKeysFor('submit')}
             >
-              <CloudUpload size={13} aria-hidden /> Submit <Kbd>{`${mod}↵`}</Kbd>
+              <CloudUpload size={13} aria-hidden /> Submit <Kbd>{keysFor('submit', { separator: '' })}</Kbd>
             </button>
           </div>
         </div>

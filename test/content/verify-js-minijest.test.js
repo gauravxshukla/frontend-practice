@@ -6,9 +6,9 @@ import { existsSync, globSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { expect as vitestExpect } from 'vitest';
-import { createJest } from '../src/features/runner/miniJest.js';
-import { installDom } from '../src/features/runner/dom.js';
-import { parseFrontmatter } from '../src/lib/content/frontmatter.js';
+import { createJest } from '../../src/features/runner/miniJest.js';
+import { installDom } from '../../src/features/runner/dom.js';
+import { parseFrontmatter } from '../../src/lib/content/frontmatter.js';
 
 const only = process.env.JS_ONLY; // e.g. JS_ONLY=content/js/dom to check one topic
 const suites = globSync('content/js/**/solution.test.js')
