@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Check, Loader2, X } from 'lucide-react';
 import type { CaseResult } from '../runner/runJob';
 import type { Verdict } from '../runner/verdict';
+import ConsoleView from '../console/ConsoleView';
 
 function Field({ label, children, tone }: { label: string; children: ReactNode; tone?: 'bad' | 'good' }) {
   return (
@@ -25,7 +26,14 @@ function CaseDetail({ result }: { result: CaseResult }) {
           ))}
         </Field>
       )}
-      {result.stdout.length > 0 && <Field label="Stdout">{result.stdout.join('\n')}</Field>}
+      {result.logs.length > 0 && (
+        <div className="result-field">
+          <div className="result-field-label">Stdout</div>
+          <div className="result-logs">
+            <ConsoleView entries={result.logs} compact />
+          </div>
+        </div>
+      )}
       {result.failure && (
         <Field label="Failed expectation" tone="bad">
           {result.failure}
