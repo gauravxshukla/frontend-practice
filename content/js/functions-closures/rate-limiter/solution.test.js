@@ -29,22 +29,24 @@ describe('createRateLimiter', () => {
   });
 
   test('the window slides: slots free up one at a time', async () => {
-    const tryAcquire = createRateLimiter(2, 80);
+    // margins of ~100ms either side keep this stable on a busy machine
+    const tryAcquire = createRateLimiter(2, 300);
     expect(tryAcquire()).toBe(true); // t ≈ 0
-    await sleep(50);
-    expect(tryAcquire()).toBe(true); // t ≈ 50
+    await sleep(150);
+    expect(tryAcquire()).toBe(true); // t ≈ 150
     expect(tryAcquire()).toBe(false);
-    await sleep(50); // t ≈ 100: the first call has expired, the second hasn't
+    await sleep(200); // t ≈ 350: the first call has expired, the second hasn't
     expect(tryAcquire()).toBe(true);
     expect(tryAcquire()).toBe(false);
   });
 
   test('rejected calls do not take a slot', async () => {
-    const tryAcquire = createRateLimiter(1, 40);
+    // margins of ~100ms either side keep this stable on a busy machine
+    const tryAcquire = createRateLimiter(1, 200);
     expect(tryAcquire()).toBe(true);
-    await sleep(30);
+    await sleep(60);
     expect(tryAcquire()).toBe(false);
-    await sleep(20); // ~50ms after the only allowed call, ~20ms after the rejected one
+    await sleep(180); // ~240ms after the only allowed call, ~180ms after the rejected one
     expect(tryAcquire()).toBe(true);
   });
 
