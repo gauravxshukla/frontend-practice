@@ -12,6 +12,7 @@ import { isLanguageId, languageInfo } from '../runner/languages/registry';
 import type { LanguageId } from '../runner/languages/types';
 import { useLanguageRuntime } from '../runner/languages/useLanguageRuntime';
 import { runJob, type RunResponse } from '../runner/runJob';
+import { javaStub } from '../runner/stubs/javaStub';
 import { pythonStub } from '../runner/stubs/pythonStub';
 import { toVerdict, type Verdict } from '../runner/verdict';
 import DraftSaver from './DraftSaver';
@@ -31,11 +32,12 @@ interface Props {
   onAccepted: () => void;
 }
 
-/** Starter per language file. DSA questions get Python too: a committed starter.py, else one generated from cases.json. */
+/** Starter per language file. DSA questions get Python and Java too: a committed starter, else one generated from cases.json. */
 function starterFiles(assets: RunnerAssets, multiLanguage: boolean): FileMap {
   const files: FileMap = { [languageInfo('javascript').file]: assets.starter };
   if (multiLanguage && assets.spec) {
     files[languageInfo('python').file] = assets.pyStarter ?? pythonStub(assets.spec, assets.starter);
+    files[languageInfo('java').file] = assets.javaStarter ?? javaStub(assets.spec, assets.starter);
   }
   return files;
 }

@@ -23,7 +23,8 @@ export interface CaseResult {
 export type RunResponse =
   | { type: 'done'; results: CaseResult[]; runtimeMs: number }
   | { type: 'collected'; names: string[] }
-  | { type: 'compile-error'; message: string }
+  /** `kind: 'compile'` marks a compiler error (javac); otherwise a SyntaxError message decides. */
+  | { type: 'compile-error'; message: string; kind?: 'compile' | 'runtime' }
   | { type: 'timeout'; limitMs: number }
   | { type: 'internal-error'; message: string };
 

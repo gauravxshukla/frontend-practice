@@ -2,7 +2,7 @@ import type { DsaCase, DsaSpec } from '../../../lib/content/catalog';
 import type { LogEntry } from '../../console/types';
 import type { RunResponse } from '../runJob';
 
-export type LanguageId = 'javascript' | 'python';
+export type LanguageId = 'javascript' | 'python' | 'java';
 
 /** `cold` = not loaded yet; `restarting` = reloading after a timeout killed it. */
 export type RuntimeStatus = 'cold' | 'loading' | 'ready' | 'error' | 'restarting';

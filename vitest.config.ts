@@ -12,7 +12,7 @@ export default defineConfig({
   test: {
     // DSA questions are data-driven (cases.json) and graded by scripts/verify-dsa.test.js.
     // App unit tests live next to their code under src/.
-    include: [...jsSuites, 'scripts/verify-dsa.test.js', 'scripts/verify-js-minijest.test.js', 'scripts/verify-python.test.js', 'src/**/*.test.{js,ts}'],
+    include: [...jsSuites, 'scripts/verify-dsa.test.js', 'scripts/verify-js-minijest.test.js', 'scripts/verify-python.test.js', 'scripts/verify-java.test.js', 'src/**/*.test.{js,ts}'],
     setupFiles: ['scripts/vitest-setup.js'],
     globals: true,
     environment: 'node',
