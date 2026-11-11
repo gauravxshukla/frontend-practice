@@ -37,11 +37,10 @@ Explanation: 5 cards cannot be split into groups of 4.
 
 ## Notes
 
-- **Key insight:** the smallest remaining card has no smaller neighbour, so it *must* start a group. That forced choice makes the greedy correct.
-- Quick reject: if `hand.length % groupSize !== 0`, return `false`.
-- Count cards in a `Map`, sort the distinct values, and walk them in order. For each value `v` with `count[v] > 0`, take `c = count[v]` groups starting at `v`: every `v + j` (for `j` from 0 to `groupSize − 1`) must have count ≥ `c`. Subtract `c` from each.
-- O(n log n) time for the sort, O(n) space for the map.
-- Brute force: sort, then repeatedly remove the smallest card and search/splice its successors, O(n²).
-- Pitfall: iterating the `Map` in insertion order instead of sorted order. The greedy only works from the smallest value up.
-- Pitfall: duplicates. `[1,1,2,2,3,3]` with size 3 is two groups, so subtract counts rather than removing values.
-- Same problem on LeetCode as "Divide Array in Sets of K Consecutive Numbers".
+- **Identify:** split cards into runs of groupSize consecutive values → greedy from the smallest card
+- **Brute force:** try every way of forming groups with backtracking, exponential
+- **Insight:** the smallest remaining card must start a run, so build that run immediately
+- **Steps:** if n % groupSize ≠ 0 return false; count cards; for each value in sorted order with count > 0, use one of each of the next groupSize values
+- **Complexity:** exponential → O(n log n + n·k) time, O(n) space
+- **Pitfall:** process values in sorted order and skip ones already used up by earlier runs
+- **Related:** Task Scheduler, Partition Labels, Longest Consecutive Sequence

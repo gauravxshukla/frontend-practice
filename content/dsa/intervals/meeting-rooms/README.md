@@ -35,10 +35,10 @@ Output: true
 
 ## Notes
 
-- **Key insight:** after sorting by start time, only *neighbouring* meetings can clash. If meeting `i` ends after meeting `i + 1` starts, you have a conflict.
-- Sort a copy by start, then check `sorted[i][0] < sorted[i - 1][1]` for each `i`.
-- O(n log n) time for the sort, O(n) for the copy (O(1) if you sort in place).
-- Brute force: compare every pair, overlapping iff `a.start < b.end && b.start < a.end`. O(n²).
-- Pitfall: `≤` vs `<`. Back-to-back meetings `[0,5]` and `[5,10]` are fine.
-- Edge cases: no meetings or a single meeting is always `true`. Identical meetings always clash.
-- Follow-up: Meeting Rooms II asks how many rooms you need if they can't all be attended.
+- **Identify:** can one person attend every meeting → sort by start and look for any overlap
+- **Brute force:** compare every pair of meetings, O(n²)
+- **Insight:** after sorting by start, an overlap can only happen between neighbours
+- **Steps:** sort by start; if any meeting starts before the previous one ends, return false
+- **Complexity:** O(n²) → O(n log n) time, O(1) extra space
+- **Pitfall:** back-to-back meetings ([0, 5] then [5, 10]) are fine: use a strict <
+- **Related:** Meeting Rooms II, Merge Intervals, Non-overlapping Intervals

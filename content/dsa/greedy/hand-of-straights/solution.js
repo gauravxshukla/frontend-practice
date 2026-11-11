@@ -4,20 +4,18 @@
  * @return {boolean}
  */
 export default function isNStraightHand(hand, groupSize) {
+  // the cards must split into whole groups
   if (hand.length % groupSize !== 0) return false;
-
   const count = new Map();
   for (const card of hand) count.set(card, (count.get(card) ?? 0) + 1);
-  const values = [...count.keys()].sort((a, b) => a - b);
-
-  for (const v of values) {
-    const c = count.get(v);
-    if (c === 0) continue;
-    // The smallest remaining card must start c groups: v, v+1, ..., v+groupSize-1.
-    for (let j = 0; j < groupSize; j++) {
-      const have = count.get(v + j) ?? 0;
-      if (have < c) return false;
-      count.set(v + j, have - c);
+  const sorted = [...hand].sort((a, b) => a - b);
+  for (const card of sorted) {
+    // already used by an earlier run
+    if (count.get(card) === 0) continue;
+    // the smallest card left can only be the start of a run, so build it now
+    for (let v = card; v < card + groupSize; v++) {
+      if (!count.get(v)) return false;
+      count.set(v, count.get(v) - 1);
     }
   }
   return true;

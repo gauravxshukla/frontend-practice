@@ -37,11 +37,10 @@ Explanation: Total gas (9) is less than total cost (10), so no start works.
 
 ## Notes
 
-- **Key insight 1:** if `sum(gas) < sum(cost)` no start can work. If `sum(gas) ≥ sum(cost)` some start always works.
-- **Key insight 2:** if you start at `s` and run dry arriving at `i + 1`, then no station between `s` and `i` can be the answer either. Each of them would arrive at `i + 1` with even less fuel, since everything before it contributed a non-negative amount.
-- So sweep once: keep a running `tank`. When it goes negative, reset it to 0 and set `start = i + 1`. Track `total` separately for the feasibility check.
-- O(n) time, O(1) space.
-- Brute force: simulate a full loop from every start, O(n²).
-- Pitfall: checking `tank < 0` against the full total instead of resetting it, or forgetting the global `total ≥ 0` check at the end.
-- Edge case: one station works exactly when `gas[0] ≥ cost[0]`.
-- Follow-up: explain why the uniqueness guarantee matters. Without it there may be several valid starts, and the greedy returns the first one in its sweep.
+- **Identify:** starting station for a full loop → total gas check + reset the start when the tank goes negative
+- **Brute force:** simulate the loop from every station, O(n²)
+- **Insight:** if you run dry going from a to b, no station between them can be the start either, so jump past b
+- **Steps:** if Σgas < Σcost return −1; tank = 0; for each i: tank += gas − cost; if tank < 0, start = i + 1, tank = 0
+- **Complexity:** O(n²) → O(n) time, O(1) space
+- **Pitfall:** the total check is what guarantees the found start completes the wrap-around
+- **Related:** Jump Game, Maximum Subarray, Jump Game II

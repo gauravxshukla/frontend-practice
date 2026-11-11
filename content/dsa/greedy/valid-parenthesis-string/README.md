@@ -38,11 +38,11 @@ Explanation: Treat * as ( to get (()).
 
 ## Notes
 
-- **Key insight:** you don't need to fix each `*`. Track the **range** of possible open-bracket counts `[lo, hi]`.
-- `(`: `lo++`, `hi++`. `)`: `lo--`, `hi--`. `*`: `lo--` (treat as `)`), `hi++` (treat as `(`).
-- If `hi < 0`, even treating every `*` as `(` can't save a `)`, so return `false`. Clamp `lo = max(lo, 0)`, since a negative count is never a real option.
-- At the end, valid iff `lo === 0` (zero opens is reachable).
-- O(n) time, O(1) space.
-- Brute force: try all 3^k wildcard choices. A memoised DP over (index, open count) is O(n²) and is a good stepping stone.
-- Alternative O(n): two stacks of indices, one for `(` and one for `*`. Match `)` with `(` first, then `*`. At the end, each leftover `(` needs a `*` with a larger index.
-- Pitfall: without the clamp, `lo` can dip below 0 and a later `(` brings it back to 0, wrongly accepting strings like `"(*)("`.
+- **Identify:** parentheses with wildcards "*" (open, close or empty) → track the range of possible open counts
+- **Brute force:** try all three meanings of every "*", O(3^k · n)
+- **Better:** DP over (index, open count), O(n²)
+- **Insight:** instead of tracking each choice, track lo and hi, the fewest and most open brackets possible
+- **Steps:** "(" → lo++, hi++; ")" → lo−−, hi−−; "*" → lo−−, hi++; if hi < 0 return false; clamp lo at 0; end: lo == 0
+- **Complexity:** O(3^k · n) → O(n) time, O(1) space
+- **Pitfall:** clamp lo at 0 (you can't have negative opens), but hi < 0 means too many ")" for sure
+- **Related:** Valid Parentheses, Generate Parentheses, Jump Game

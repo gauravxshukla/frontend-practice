@@ -35,11 +35,11 @@ Output: 1
 
 ## Notes
 
-- **Key insight:** the answer is the largest number of meetings running at the same moment. That peak always happens at some meeting's start.
-- **Two sorted arrays (chronological sweep):** sort `starts` and `ends` separately. Walk the starts; if the earliest unprocessed end is `≤` the current start, a room was freed (advance the end pointer), otherwise you need a new room.
-- **Min-heap alternative:** sort by start, keep a min-heap of end times of rooms in use. Pop the top if it ends `≤` the current start, then push the current end. The heap size at the end is the answer.
-- Both are O(n log n) time and O(n) space.
-- Brute force: for each start time count the meetings active at that instant, O(n²).
-- Pitfall: freeing a room only when `end < start` counts back-to-back meetings as needing two rooms.
-- Edge cases: empty input needs 0 rooms. Identical meetings need one room each.
-- Follow-up: return which room each meeting goes to (the heap version extends naturally by storing room ids).
+- **Identify:** fewest rooms for overlapping meetings → maximum number of meetings running at once
+- **Brute force:** for every time point, count the meetings covering it, O(n · range)
+- **Better:** sort by start and keep a min-heap of end times, O(n log n)
+- **Insight:** only the order of starts and ends matters: sweep both sorted lists with two pointers
+- **Steps:** sort starts and ends; for each start, if it's ≥ the earliest unfinished end, reuse that room (move end pointer), else add a room
+- **Complexity:** O(n · range) → O(n log n) time, O(n) space
+- **Pitfall:** a meeting starting exactly when another ends can reuse its room (≥)
+- **Related:** Meeting Rooms, Merge Intervals, Minimum Interval to Include Each Query

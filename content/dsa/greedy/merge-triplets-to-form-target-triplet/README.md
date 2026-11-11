@@ -37,11 +37,10 @@ Explanation: No triplet has 2 in the middle, and the max can never go down.
 
 ## Notes
 
-- **Key insight:** max never decreases. Any triplet with some value *above* the target in that position poisons whatever it touches, so it can never be used.
-- Every other triplet is safe to merge in, since it can only raise values up to (never past) the target.
-- So: skip triplets where any `t[k] > target[k]`. Among the rest, record which positions hit `target[k]` exactly. Return `true` if all three positions get hit.
-- O(n) time, O(1) space.
-- Brute force: try every subset of triplets and take its element-wise max, O(2ⁿ).
-- Pitfall: checking each position independently across *all* triplets, including bad ones. A triplet like `[1,8,4]` matches nothing useful when 8 exceeds the target.
-- Pitfall: requiring a single triplet to match the whole target. The three positions can come from different triplets.
-- Follow-up: return the indices of a set of triplets that forms the target.
+- **Identify:** merging takes the element-wise max → keep only triplets that never exceed the target
+- **Brute force:** try every subset of triplets and merge it, O(2^n)
+- **Insight:** a triplet with any value above the target poisons the merge; every other triplet is safe to include
+- **Steps:** for each triplet with all values ≤ target, mark each position where it equals the target; need all 3 marked
+- **Complexity:** O(2^n) → O(n) time, O(1) space
+- **Pitfall:** a triplet that hits one target value but overshoots another must be skipped entirely
+- **Related:** Partition Labels, Gas Station, Hand of Straights

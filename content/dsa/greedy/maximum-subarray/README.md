@@ -39,11 +39,10 @@ Explanation: Taking the whole array gives 23.
 
 ## Notes
 
-- **Key insight (Kadane):** a running sum that has gone negative can only hurt whatever comes next, so drop it and start fresh at the current element.
-- Track `current = max(n, current + n)` and `best = max(best, current)` in one pass.
-- O(n) time, O(1) space. The brute force tries every (i, j) pair with a running sum: O(n²).
-- Initialise `best` with `nums[0]` (or `-Infinity`), not `0`. Otherwise an all-negative array wrongly returns 0.
-- Equivalent DP view: `dp[i]` = best sum of a slice ending at `i`, and `dp[i] = nums[i] + max(dp[i-1], 0)`.
-- Divide and conquer also works in O(n log n): the best slice is in the left half, the right half, or crosses the middle.
-- Follow-up: return the slice indices too. Remember where `current` was last reset.
-- Follow-up: the circular version (Maximum Sum Circular Subarray) uses `total − minimum subarray`.
+- **Identify:** largest sum of a contiguous subarray → Kadane: best sum ending at each index
+- **Brute force:** sum every subarray, O(n²)
+- **Insight:** a negative running sum only drags the next element down, so drop it and start fresh
+- **Steps:** current = max(n, current + n); best = max(best, current)
+- **Complexity:** O(n²) → O(n) time, O(1) space
+- **Pitfall:** start best at nums[0], not 0, so an all-negative array returns its largest element
+- **Related:** Maximum Product Subarray, Best Time to Buy and Sell Stock, House Robber

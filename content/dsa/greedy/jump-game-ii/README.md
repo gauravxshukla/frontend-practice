@@ -36,11 +36,11 @@ Output: 2
 
 ## Notes
 
-- **Key insight:** think of it as BFS over indices, where each "level" is the window of indices reachable with exactly `jumps` jumps. Those windows are contiguous, so no queue is needed.
-- Keep `end` (the right edge of the current level) and `farthest` (the furthest index reachable from anything in this level).
-- Walk `i` from 0 to `n − 2`. Update `farthest = max(farthest, i + nums[i])`. When `i === end`, the level is used up: `jumps++` and `end = farthest`.
-- Stop the loop at `n − 2`. Including the last index would count a jump you never need to take.
-- O(n) time, O(1) space.
-- Brute force: DP `dp[j] = min(dp[i] + 1)` over every `i` that can reach `j`, O(n · max(nums)), or O(n²).
-- Edge case: a single-element array needs 0 jumps.
-- Follow-up: return the actual indices you land on. Record which `i` produced `farthest` for each level.
+- **Identify:** fewest jumps to the last index → BFS by "levels" of reachable ranges, done greedily
+- **Brute force:** try every jump sequence recursively, exponential
+- **Better:** DP: jumps[i] = 1 + min over j that reach i, O(n²)
+- **Insight:** all indices reachable with k jumps form a window; the next window ends at the farthest jump from it
+- **Steps:** for i < n − 1: farthest = max(farthest, i + nums[i]); at the window's end, jumps++, end = farthest
+- **Complexity:** exponential → O(n) time, O(1) space
+- **Pitfall:** stop before the last index, or you count one jump too many when the window ends there
+- **Related:** Jump Game, Binary Tree Level Order Traversal, Gas Station
