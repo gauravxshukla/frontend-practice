@@ -40,11 +40,12 @@ Output: 10
 
 ## Notes
 
-- **Key insight (greedy):** always run the task with the most copies left. The most frequent task is the bottleneck, and delaying it only creates idle slots later.
-- **Heap simulation:** a max-heap of remaining counts plus a queue of `[count, readyTime]` for tasks in cooldown. Each tick, pop the top, decrement it, and park it in the queue until `time + n`. When the heap is empty, jump the clock to the queue's next ready time. O(T · log 26) ≈ O(T) time, O(26) space.
-- **Math shortcut:** with `maxCount` = the highest frequency and `numMax` = how many letters share it, the answer is `max(tasks.length, (maxCount − 1) · (n + 1) + numMax)`. The frame is `maxCount − 1` blocks of size `n + 1` plus the final row. If there are more tasks than slots, there's no idling. O(T) time, O(1) space.
-- Being able to explain *why* the formula works is what interviewers look for. The heap version is the safer one to code under pressure.
-- Brute force: try every ordering, which is factorial and only useful to state.
-- Pitfall: `n = 0` means no cooldown, so the answer is just `tasks.length`.
-- Pitfall: forgetting `numMax`, i.e. ties for the highest frequency extend the last row.
-- Follow-up: return the actual schedule, or handle tasks that must stay in a fixed order (simulate with a map of last-run times).
+- **Identify:** same task needs n idle slots between runs, minimise total time → the most frequent task sets the frame
+- **Key formula:** time = max(tasks, (maxCount − 1) × (n + 1) + tasksWithMaxCount)
+- **Brute force:** simulate time step by step, always running the available task with most left
+- **Better:** max-heap + cooldown queue simulation, O(total time · log 26)
+- **Insight:** lay out the most frequent task with gaps; other tasks fill the gaps, or there are no idles at all
+- **Steps:** count tasks; find maxCount and how many tasks share it; apply the formula
+- **Complexity:** simulation O(time · log 26) → O(n) time, O(26) space
+- **Pitfall:** when gaps overflow, the answer is just the task count, hence the max with tasks.length
+- **Related:** Last Stone Weight, Hand of Straights, Partition Labels

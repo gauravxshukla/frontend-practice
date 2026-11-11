@@ -52,11 +52,10 @@ Output: [null,null,null,[20],[]]
 
 ## Notes
 
-- **Key insight:** each user's tweets are already in time order, so building a feed is a **k-way merge** of the newest ends of k sorted lists, stopping after 10.
-- State: a global counter for timestamps, `Map<user, [time, tweetId][]>`, and `Map<user, Set<followee>>`.
-- `getNewsFeed`: push the newest tweet of the user and each followee into a max-heap keyed by time. Pop up to 10 times, and after each pop push that author's next-older tweet.
-- Complexity: post/follow/unfollow are O(1). The feed is O(f + 10 · log f) for f followees.
-- Brute force: gather every tweet from every relevant user, sort them by time, and take 10. O(T log T), which is simple and fine for small data.
-- Pitfall: forgetting to include the user's own tweets, or letting a self-follow / self-unfollow hide them.
-- Pitfall: using the tweet id as the timestamp. Ids aren't guaranteed to increase.
-- Follow-ups: fan-out-on-write vs fan-out-on-read for celebrities, pagination, and sharding by user.
+- **Identify:** 10 most recent tweets across followed users → merge per-user timelines with a max-heap
+- **Brute force:** gather every tweet of every followee, sort by time, take 10, O(T log T)
+- **Insight:** each user's tweets are already in time order, so a heap merges only their newest ones
+- **Steps:** tweets get a global time; feed pushes each followee's latest tweet, pops 10 times, pushing that user's previous tweet
+- **Complexity:** getNewsFeed O(T log T) → O(f + 10 log f) for f followees; O(1) post/follow
+- **Pitfall:** users always see their own tweets, and unfollowing yourself must not hide them
+- **Related:** Merge k Sorted Lists, K Closest Points to Origin, LRU Cache

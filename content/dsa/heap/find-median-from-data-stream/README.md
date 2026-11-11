@@ -48,11 +48,10 @@ Output: [null,null,-1,null,-1.5]
 
 ## Notes
 
-- **Key insight:** the median only depends on the boundary between the smaller half and the larger half. Keep the smaller half in a **max-heap** (`low`) and the larger half in a **min-heap** (`high`), and the median is at their tops.
-- Invariants: every value in `low` ≤ every value in `high`, and `low.size` is equal to `high.size` or one more.
-- `addNum`: push into `low`, move `low`'s max into `high` (this restores ordering), and if `high` became larger, move its min back to `low`.
-- `findMedian`: odd count → `low.peek()`. Even count → the average of both tops.
-- `addNum` is O(log n), `findMedian` is O(1), and space is O(n).
-- Brute force: keep a sorted array and insert with binary search. Lookup is O(1) but the insert shifts elements, O(n). Sorting on every query is O(n log n).
-- Pitfall: checking only the sizes and forgetting the ordering step lets a large number sit in `low`.
-- Follow-ups: if all numbers are in `[0, 100]`, use 101 counters and walk them. If 99% are in that range, add overflow counters for the outliers. For a sliding-window median, use two heaps with lazy deletion.
+- **Identify:** running median of a stream → two heaps: max-heap for the low half, min-heap for the high half
+- **Brute force:** keep a sorted list and insert in place, O(n) per add
+- **Insight:** the median lives at the tops of the two halves, so keep them balanced in size
+- **Steps:** push to low; move low's max to high; if high is bigger, move high's min back to low
+- **Complexity:** add O(n) → O(log n), findMedian O(1), O(n) space
+- **Pitfall:** low may hold one extra item; for an even count average the two tops as a float
+- **Related:** Kth Largest Element in a Stream, Merge k Sorted Lists, Median of Two Sorted Arrays
