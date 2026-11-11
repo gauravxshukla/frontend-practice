@@ -17,7 +17,8 @@ import {
   type RunnerAssets,
 } from '../../lib/content/catalog';
 import { applyDraft, clearDraft, draftKey, loadDraft, saveDraft } from '../../lib/drafts';
-import { useProgress } from '../../lib/progress';
+import { recordActivity } from '../../lib/activity';
+import { markAttempted, useProgress } from '../../lib/progress';
 import { useTheme } from '../../lib/theme';
 import { ariaKeysFor, keysFor } from '../../lib/shortcuts';
 import { groupUrl, parseRoute, questionUrl } from '../../lib/routes';
@@ -28,6 +29,7 @@ import type { LanguageId } from '../runner/languages/types';
 import { useOpenSearch } from '../../app/openSearch';
 import CodeWorkspace from './CodeWorkspace';
 import LayoutToggles from './LayoutToggles';
+import MarkComplete from './MarkComplete';
 import PromptStrip from './PromptStrip';
 import { useWorkspaceLayout, type PanelId } from './useWorkspaceLayout';
 import type { Platform } from './native/nativeSetup';
@@ -214,6 +216,13 @@ export default function QuestionPage() {
   }, [prev, next, navigate, hrefOf]);
 
   const onAccepted = useCallback(() => setRevealed(true), []);
+  // Machine coding: the first edit since opening the question counts as practice.
+  const slug = question?.slug;
+  const onFirstEdit = useCallback(() => {
+    if (!slug) return;
+    markAttempted(slug);
+    recordActivity(slug);
+  }, [slug]);
 
   if (!question) {
     return (
@@ -379,6 +388,7 @@ export default function QuestionPage() {
                 <button type="button" className="btn" onClick={resetUi}>
                   <RotateCcw size={14} aria-hidden /> Reset
                 </button>
+                <MarkComplete slug={question.slug} />
                 <button
                   type="button"
                   className="btn btn-primary"
@@ -481,6 +491,7 @@ export default function QuestionPage() {
                     files={starter}
                     draftSlug={draftId}
                     platform={platform}
+                    onFirstEdit={onFirstEdit}
                     {...workspacePanels}
                   />
                 ) : (

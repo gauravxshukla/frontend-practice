@@ -127,6 +127,17 @@
   background: var(--accent-hover);
 }
 
+.btn-complete {
+  border-color: var(--easy);
+  background: var(--easy-soft);
+  color: var(--easy);
+}
+
+.btn-complete:hover:not(:disabled) {
+  background: var(--easy-soft);
+  filter: brightness(0.97);
+}
+
 .btn-ghost {
   border-color: transparent;
   background: transparent;
@@ -1872,11 +1883,6 @@ body.is-resizing-rows iframe {
     background: var(--surface-1);
   }
 
-  .mobile-topbar .brand-mark {
-    width: 24px;
-    height: 24px;
-    font-size: 10px;
-  }
 
   .page {
     padding: 20px 16px 48px;

@@ -1,6 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { createBrowserRouter, Link, Navigate, Outlet, RouterProvider, useLocation } from 'react-router';
-import { Binary, Braces, House, Keyboard, LayoutGrid, ListChecks, Menu, Monitor, Moon, PanelLeft, Search, StickyNote, Sun } from 'lucide-react';
+import { Keyboard, Menu, Moon, PanelLeft, Search, Sun, SunMoon } from 'lucide-react';
 import CatalogPage from '../features/catalog/CatalogPage';
 import QuizIndex from '../features/quiz/QuizIndex';
 import QuizDeckPage from '../features/quiz/QuizDeckPage';
@@ -11,6 +11,8 @@ import KeyboardShortcuts from '../features/shortcuts/KeyboardShortcuts';
 import { buildIndex, type PaletteAction, type PaletteItem } from '../features/palette/paletteIndex';
 import { ConfirmProvider } from '../components/overlay/ConfirmProvider';
 import { ToastProvider } from '../components/overlay/ToastProvider';
+import { BrandMark } from '../components/BrandMark';
+import { SECTION_ICONS, TRACK_ICONS } from '../lib/icons';
 import TooltipLayer from '../components/overlay/TooltipLayer';
 import { isTyping } from '../lib/platform';
 import { recordVisit } from '../lib/recent';
@@ -30,9 +32,8 @@ const isMobile = () => window.matchMedia('(max-width: 860px)').matches;
 /** Before you type: the three tracks, then Quiz and Notes. */
 function jumpToItems(actions: PaletteAction[]): PaletteItem[] {
   const tracks = buildIndex().filter((i) => ['t:js', 't:dsa', 't:machine-coding'].includes(i.id));
-  const icons: Record<string, typeof Braces> = { 't:js': Braces, 't:dsa': Binary, 't:machine-coding': LayoutGrid };
   return [
-    ...tracks.map((t): PaletteAction => ({ ...t, kind: 'action', icon: icons[t.id] })),
+    ...tracks.map((t): PaletteAction => ({ ...t, kind: 'action', icon: TRACK_ICONS[t.id.slice(2)] })),
     ...actions.filter((a) => a.id === 'a:go-quiz' || a.id === 'a:go-notes'),
   ];
 }
@@ -120,9 +121,9 @@ function Layout() {
 
   const actions = useMemo(
     (): PaletteAction[] => [
-      { id: 'a:go-home', kind: 'action', title: 'Go to Home', keywords: ['dashboard', 'practice'], href: '/', icon: House },
-      { id: 'a:go-quiz', kind: 'action', title: 'Quiz', subtitle: 'Flashcard decks', keywords: ['flashcards'], href: quizUrl(), icon: ListChecks },
-      { id: 'a:go-notes', kind: 'action', title: 'Notes', subtitle: 'Reference material', keywords: ['reading'], href: notesUrl(), icon: StickyNote },
+      { id: 'a:go-home', kind: 'action', title: 'Go to Home', keywords: ['dashboard', 'practice'], href: '/', icon: SECTION_ICONS.home },
+      { id: 'a:go-quiz', kind: 'action', title: 'Quiz', subtitle: 'Flashcard decks', keywords: ['flashcards'], href: quizUrl(), icon: SECTION_ICONS.quiz },
+      { id: 'a:go-notes', kind: 'action', title: 'Notes', subtitle: 'Reference material', keywords: ['reading'], href: notesUrl(), icon: SECTION_ICONS.notes },
       {
         id: 'a:toggle-sidebar',
         kind: 'action',
@@ -143,7 +144,7 @@ function Layout() {
       },
       { id: 'a:theme-light', kind: 'action', title: 'Theme: Light', keywords: ['appearance', 'mode'], icon: Sun, run: () => setThemeMode('light') },
       { id: 'a:theme-dark', kind: 'action', title: 'Theme: Dark', keywords: ['appearance', 'mode'], icon: Moon, run: () => setThemeMode('dark') },
-      { id: 'a:theme-system', kind: 'action', title: 'Theme: System', keywords: ['appearance', 'mode', 'auto'], icon: Monitor, run: () => setThemeMode('system') },
+      { id: 'a:theme-system', kind: 'action', title: 'Theme: System', keywords: ['appearance', 'mode', 'auto'], icon: SunMoon, run: () => setThemeMode('system') },
     ],
     [collapsed, toggleSidebar],
   );
@@ -172,9 +173,7 @@ function Layout() {
                 <Menu size={18} />
               </button>
               <Link to="/" className="brand">
-                <span className="brand-mark" aria-hidden>
-                  {'</>'}
-                </span>
+                <BrandMark size={24} />
                 Frontend Practice
               </Link>
               <button type="button" className="icon-btn" onClick={() => openPalette()} aria-label="Search">

@@ -1,56 +1,41 @@
 import { useEffect, useRef, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router';
 import {
-  Atom,
-  Binary,
-  Braces,
   CheckCircle2,
   ChevronRight,
-  Code2,
-  FileCode,
-  House,
   Keyboard,
-  LayoutGrid,
-  ListChecks,
-  Monitor,
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
   Search,
-  StickyNote,
   Sun,
+  SunMoon,
   X,
   type LucideIcon,
 } from 'lucide-react';
 import { questionsIn, questionTree, type QuestionGroup } from '../lib/content/catalog';
 import { noteSections, notes } from '../lib/content/notes';
 import { quizDecks } from '../lib/content/quiz';
+import { SECTION_ICONS, TRACK_ICONS } from '../lib/icons';
 import { useProgress } from '../lib/progress';
 import { groupUrl, notesUrl, parseRoute, quizUrl } from '../lib/routes';
 import { ariaKeysFor, keysFor } from '../lib/shortcuts';
 import { useTheme, type ThemeMode } from '../lib/theme';
 import { useHoverIntent } from '../lib/useHoverIntent';
 import { usePersistentState } from '../lib/usePersistentState';
+import { BrandMark } from '../components/BrandMark';
 import { Kbd } from '../components/Kbd';
 import SidebarPeek, { type SectionId } from './SidebarPeek';
 import './sidebar.css';
 
-const GROUP_ICONS: Record<string, LucideIcon> = {
-  js: Braces,
-  dsa: Binary,
-  'machine-coding': LayoutGrid,
-  'machine-coding/react': Atom,
-  'machine-coding/vanilla': FileCode,
-};
-
 const SECTIONS: { id: SectionId; label: string; icon: LucideIcon }[] = [
-  { id: 'questions', label: 'Questions', icon: Code2 },
-  { id: 'quiz', label: 'Quiz', icon: ListChecks },
-  { id: 'notes', label: 'Notes', icon: StickyNote },
+  { id: 'questions', label: 'Questions', icon: SECTION_ICONS.questions },
+  { id: 'quiz', label: 'Quiz', icon: SECTION_ICONS.quiz },
+  { id: 'notes', label: 'Notes', icon: SECTION_ICONS.notes },
 ];
 
 const THEME_OPTIONS: { mode: ThemeMode; label: string; icon: LucideIcon }[] = [
-  { mode: 'system', label: 'System', icon: Monitor },
+  { mode: 'system', label: 'System', icon: SunMoon },
   { mode: 'light', label: 'Light', icon: Sun },
   { mode: 'dark', label: 'Dark', icon: Moon },
 ];
@@ -245,7 +230,7 @@ export default function Sidebar({
       to={groupUrl(group.id)}
       label={group.label}
       active={location.activeLeaf === `topic:${group.id}`}
-      icon={GROUP_ICONS[group.id]}
+      icon={TRACK_ICONS[group.id]}
       meta={progressOf(group)}
     />
   );
@@ -269,9 +254,7 @@ export default function Sidebar({
     >
       <div className="sidebar-header">
         <Link to="/" className="brand" aria-label="Frontend Practice, home">
-          <span className="brand-mark" aria-hidden>
-            {'</>'}
-          </span>
+          <BrandMark />
           <span className="brand-name">Frontend Practice</span>
         </Link>
         {/* Collapsed: the logo turns into the expand button on hover. */}
@@ -285,9 +268,7 @@ export default function Sidebar({
           aria-keyshortcuts={ariaKeysFor('sidebar')}
           data-tooltip-side="right"
         >
-          <span className="brand-mark" aria-hidden>
-            {'</>'}
-          </span>
+          <BrandMark />
           <PanelLeftOpen size={18} className="sidebar-expand-icon" aria-hidden />
         </button>
         <button
@@ -316,7 +297,7 @@ export default function Sidebar({
           data-tooltip="Home"
           data-tooltip-side="right"
         >
-          <House size={18} />
+          <SECTION_ICONS.home size={20} />
         </Link>
         {SECTIONS.map(({ id, label, icon: Icon }) => (
           <button
@@ -346,7 +327,7 @@ export default function Sidebar({
               }
             }}
           >
-            <Icon size={18} />
+            <Icon size={20} />
           </button>
         ))}
         <button
@@ -359,7 +340,7 @@ export default function Sidebar({
           data-tooltip-kbd={keysFor('search')}
           data-tooltip-side="right"
         >
-          <Search size={18} />
+          <Search size={20} />
         </button>
       </nav>
 
@@ -374,7 +355,7 @@ export default function Sidebar({
           onClose={closePeek}
           onPointerEnter={hover.cancelClose}
           onPointerLeave={() => !pinned && hover.leave()}
-          groupIcons={GROUP_ICONS}
+          groupIcons={TRACK_ICONS}
         />
       )}
 
@@ -395,7 +376,7 @@ export default function Sidebar({
           depth={0}
           open={isOpen('questions')}
           onToggle={toggle}
-          icon={Code2}
+          icon={SECTION_ICONS.questions}
         >
           {questionTree.map((group) =>
             group.children.length ? (
@@ -407,7 +388,7 @@ export default function Sidebar({
                 depth={1}
                 open={isOpen(`questions/${group.id}`)}
                 onToggle={toggle}
-                icon={GROUP_ICONS[group.id]}
+                icon={TRACK_ICONS[group.id]}
               >
                 {group.children.map(topicLink)}
               </AccordionGroup>
@@ -426,7 +407,7 @@ export default function Sidebar({
           depth={0}
           open={isOpen('quiz')}
           onToggle={toggle}
-          icon={ListChecks}
+          icon={SECTION_ICONS.quiz}
         >
           {quizDecks.map((deck) => (
             <TopicLink
@@ -446,7 +427,7 @@ export default function Sidebar({
           depth={0}
           open={isOpen('notes')}
           onToggle={toggle}
-          icon={StickyNote}
+          icon={SECTION_ICONS.notes}
         >
           {noteSections.map((s) => (
             <TopicLink
@@ -487,7 +468,7 @@ export default function Sidebar({
           data-tooltip={`Theme: ${themeLabel} · click to switch`}
           data-tooltip-side="right"
         >
-          {mode === 'light' ? <Sun size={18} /> : mode === 'dark' ? <Moon size={18} /> : <Monitor size={18} />}
+          {mode === 'light' ? <Sun size={20} /> : mode === 'dark' ? <Moon size={20} /> : <SunMoon size={20} />}
         </button>
         <button
           type="button"
@@ -499,7 +480,7 @@ export default function Sidebar({
           data-tooltip-kbd={keysFor('shortcuts')}
           data-tooltip-side={collapsed ? 'right' : 'top'}
         >
-          <Keyboard size={collapsed ? 18 : 16} />
+          <Keyboard size={collapsed ? 20 : 16} />
         </button>
       </div>
 

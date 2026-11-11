@@ -1,81 +1,24 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { Binary, Braces, CircleDot, LayoutGrid, Search, type LucideIcon } from 'lucide-react';
-import { DifficultyBadge, Tag } from '../../components/Badges';
-import {
-  questions,
-  questionsIn,
-  questionTree,
-  type Difficulty,
-  type Question,
-  type QuestionGroup,
-} from '../../lib/content/catalog';
+import { Search } from 'lucide-react';
+import { useOpenSearch } from '../../app/openSearch';
+import { useActivity } from '../../lib/activity';
+import { questions, questionsIn, questionTree, type Difficulty } from '../../lib/content/catalog';
 import { useProgress } from '../../lib/progress';
-import { groupUrl, questionUrl } from '../../lib/routes';
+import { groupUrl } from '../../lib/routes';
+import { keysFor } from '../../lib/shortcuts';
+import { localDay } from '../../lib/stats';
+import ActivityHeatmap from '../dashboard/ActivityHeatmap';
+import QuestionRow from '../dashboard/QuestionRow';
+import RecentAttempts from '../dashboard/RecentAttempts';
+import SolvedSummary from '../dashboard/SolvedSummary';
+import TrackProgress from '../dashboard/TrackProgress';
+import '../dashboard/dashboard.css';
 
 const DIFFICULTIES: Difficulty[] = ['easy', 'medium', 'hard'];
 
-const TRACK_META: Record<string, { icon: LucideIcon; blurb: string }> = {
-  js: { icon: Braces, blurb: 'Polyfills, utilities and async patterns, graded by tests.' },
-  dsa: { icon: Binary, blurb: 'The NeetCode 150, topic by topic, with hidden edge cases.' },
-  'machine-coding': { icon: LayoutGrid, blurb: 'Build UI in React or vanilla JS with a live preview.' },
-};
-
-function DifficultyBar({ items }: { items: Question[] }) {
-  return (
-    <div className="difficulty-bar" aria-hidden>
-      {DIFFICULTIES.map((d) => {
-        const n = items.filter((q) => q.difficulty === d).length;
-        return n ? <span key={d} className={`bar-${d}`} style={{ flexGrow: n }} /> : null;
-      })}
-    </div>
-  );
-}
-
-function TrackCard({ group }: { group: QuestionGroup }) {
-  const progress = useProgress();
-  const { icon: Icon, blurb } = TRACK_META[group.id];
-  const items = questionsIn(group);
-  const solved = items.filter((q) => progress[q.slug] === 'solved').length;
-
-  return (
-    <Link to={groupUrl(group.id)} className="track-card">
-      <span className="track-card-icon">
-        <Icon size={18} aria-hidden />
-      </span>
-      <span className="track-card-title">
-        {group.label}
-        <span className="track-card-count">{items.length}</span>
-      </span>
-      <span className="track-card-blurb">{blurb}</span>
-      <DifficultyBar items={items} />
-      <span className="track-card-legend">
-        <span>
-          {solved} / {items.length} solved
-        </span>
-        {group.children.length > 0 && <span>{group.children.length} topics</span>}
-      </span>
-    </Link>
-  );
-}
-
-function QuestionRow({ q }: { q: Question }) {
-  return (
-    <li>
-      <Link to={questionUrl(q)} className="question-row">
-        <span className="question-row-title">{q.title}</span>
-        <span className="question-row-tags">
-          {q.tags.slice(0, 3).map((tag) => (
-            <Tag key={tag}>{tag}</Tag>
-          ))}
-        </span>
-        <DifficultyBadge difficulty={q.difficulty} />
-      </Link>
-    </li>
-  );
-}
-
-export default function CatalogPage() {
+/** Search and filter every question, or browse topic by topic. */
+function Browse() {
   const progress = useProgress();
   const [search, setSearch] = useState('');
   const [difficulty, setDifficulty] = useState<Difficulty | ''>('');
@@ -89,30 +32,21 @@ export default function CatalogPage() {
           (!term || q.title.toLowerCase().includes(term) || q.tags.some((t) => t.includes(term))),
       )
     : [];
-  const inProgress = questions.filter((q) => progress[q.slug] === 'attempted').slice(0, 5);
 
   return (
-    <div className="page page-wide">
-      <header className="page-header">
-        <h1>Practice</h1>
-        <p className="muted">{questions.length} questions. Pick a topic, attempt it cold, run it, then submit.</p>
-      </header>
-
-      <div className="track-grid">
-        {questionTree.map((g) => (
-          <TrackCard key={g.id} group={g} />
-        ))}
-      </div>
-
+    <section className="browse" aria-labelledby="browse-title">
+      <h2 id="browse-title" className="browse-title">
+        Browse
+      </h2>
       <div className="toolbar">
         <label className="input-with-icon">
           <Search size={14} aria-hidden />
           <input
             type="search"
-            placeholder="Search every question by title or tag…"
+            placeholder="Filter every question by title or tag…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            aria-label="Search questions"
+            aria-label="Filter questions"
           />
         </label>
         <div className="segmented" role="radiogroup" aria-label="Difficulty">
@@ -127,9 +61,9 @@ export default function CatalogPage() {
       {searching ? (
         results.length ? (
           <section className="catalog-section">
-            <h2>
+            <h3>
               Results <span className="muted">{results.length}</span>
-            </h2>
+            </h3>
             <ul className="question-list">
               {results.map((q) => (
                 <QuestionRow key={q.slug} q={q} />
@@ -142,48 +76,69 @@ export default function CatalogPage() {
           </div>
         )
       ) : (
-        <>
-          {inProgress.length > 0 && (
-            <section className="home-section">
-              <h2>
-                <CircleDot size={13} className="status-attempted" aria-hidden /> Continue where you left off
-              </h2>
-              <ul className="question-list">
-                {inProgress.map((q) => (
-                  <QuestionRow key={q.slug} q={q} />
-                ))}
-              </ul>
-            </section>
-          )}
-          {questionTree
-            .filter((g) => g.children.length)
-            .map((g) => (
-              <section key={g.id} className="home-section">
-                <h2>{g.label}</h2>
-                <div className="topic-grid">
-                  {g.children.map((child) => {
-                    const items = questionsIn(child);
-                    const solved = items.filter((q) => progress[q.slug] === 'solved').length;
-                    const pct = items.length ? Math.round((solved / items.length) * 100) : 0;
-                    return (
-                      <Link key={child.id} to={groupUrl(child.id)} className="topic-card">
-                        <span className="topic-card-title">{child.label}</span>
-                        <span className="muted topic-card-count">
-                          {solved ? `${solved} / ${items.length} solved` : `${items.length} questions`}
-                        </span>
-                        <div className="topic-progress">
-                          <div className="progress-track">
-                            <div className="progress-fill" style={{ width: `${pct}%` }} />
-                          </div>
+        questionTree
+          .filter((g) => g.children.length)
+          .map((g) => (
+            <section key={g.id} className="home-section">
+              <h3>
+                <Link to={groupUrl(g.id)}>{g.label}</Link>
+              </h3>
+              <div className="topic-grid">
+                {g.children.map((child) => {
+                  const items = questionsIn(child);
+                  const solved = items.filter((q) => progress[q.slug] === 'solved').length;
+                  const pct = items.length ? Math.round((solved / items.length) * 100) : 0;
+                  return (
+                    <Link key={child.id} to={groupUrl(child.id)} className="topic-card">
+                      <span className="topic-card-title">{child.label}</span>
+                      <span className="muted topic-card-count">
+                        {solved ? `${solved} / ${items.length} solved` : `${items.length} questions`}
+                      </span>
+                      <div className="topic-progress">
+                        <div className="progress-track">
+                          <div className="progress-fill" style={{ width: `${pct}%` }} />
                         </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </section>
-            ))}
-        </>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          ))
       )}
+    </section>
+  );
+}
+
+/** The dashboard: how far you've got, when you practised, and where to pick up. */
+export default function CatalogPage() {
+  const progress = useProgress();
+  const activity = useActivity();
+  const openSearch = useOpenSearch();
+  const now = Date.now();
+
+  return (
+    <div className="page page-wide dashboard">
+      <header className="page-header dashboard-header">
+        <div>
+          <h1>Practice</h1>
+          <p className="muted">{questions.length} questions across JavaScript, DSA and machine coding.</p>
+        </div>
+        <button type="button" className="dashboard-search" onClick={() => openSearch()}>
+          <Search size={15} aria-hidden />
+          <span>Search…</span>
+          <kbd className="kbd">{keysFor('search')}</kbd>
+        </button>
+      </header>
+
+      <div className="dash-top">
+        <SolvedSummary questions={questions} progress={progress} />
+        <ActivityHeatmap activity={activity} today={localDay(now)} />
+      </div>
+
+      <TrackProgress tracks={questionTree} progress={progress} touched={activity.touched} />
+      <RecentAttempts questions={questions} progress={progress} touched={activity.touched} now={now} />
+      <Browse />
     </div>
   );
 }

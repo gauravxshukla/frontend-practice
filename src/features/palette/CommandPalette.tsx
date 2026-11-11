@@ -1,20 +1,8 @@
 import { Fragment, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router';
-import {
-  Binary,
-  Braces,
-  CheckCircle2,
-  CircleDot,
-  CornerDownLeft,
-  FolderTree,
-  LayoutGrid,
-  ListChecks,
-  Search,
-  StickyNote,
-  Zap,
-  type LucideIcon,
-} from 'lucide-react';
+import { Braces, CheckCircle2, CircleDot, CornerDownLeft, FolderTree, Search, Zap, type LucideIcon } from 'lucide-react';
 import { DifficultyBadge } from '../../components/Badges';
+import { questionIcon, SECTION_ICONS, TRACK_ICONS } from '../../lib/icons';
 import { Modal } from '../../components/overlay/Modal';
 import { useProgress } from '../../lib/progress';
 import { readRecent } from '../../lib/recent';
@@ -22,18 +10,18 @@ import { buildIndex, suggestions, type PaletteAction, type PaletteItem, type Pal
 import { rankItems, toSections, type Range } from './rank';
 import './palette.css';
 
-const TRACK_ICONS: Record<string, LucideIcon> = { js: Braces, dsa: Binary, 'machine-coding': LayoutGrid };
 const KIND_ICONS: Record<PaletteItem['kind'], LucideIcon> = {
   question: Braces,
   topic: FolderTree,
-  deck: ListChecks,
-  note: StickyNote,
+  deck: SECTION_ICONS.quiz,
+  note: SECTION_ICONS.notes,
   action: Zap,
 };
 
 function iconOf(item: PaletteItem): LucideIcon {
   if (item.kind === 'action') return (item as PaletteAction).icon ?? Zap;
-  if (item.question) return TRACK_ICONS[item.question.track] ?? Braces;
+  if (item.question) return questionIcon(item.question);
+  if (item.kind === 'topic') return TRACK_ICONS[item.id.slice(2)] ?? FolderTree;
   return KIND_ICONS[item.kind];
 }
 
