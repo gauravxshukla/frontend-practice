@@ -61,9 +61,11 @@ interface ResultPanelProps {
   mode: 'run' | 'submit';
   verdict: Verdict | null;
   running: boolean;
+  /** Language the verdict was produced in, when the question offers several. */
+  language?: string;
 }
 
-export default function ResultPanel({ mode, verdict, running }: ResultPanelProps) {
+export default function ResultPanel({ mode, verdict, running, language }: ResultPanelProps) {
   const [selected, setSelected] = useState(0);
   useEffect(() => setSelected(0), [verdict]);
 
@@ -87,6 +89,7 @@ export default function ResultPanel({ mode, verdict, running }: ResultPanelProps
       <div className="verdict">
         <h3 className={`verdict-title verdict-${verdict.kind}`}>{verdict.title}</h3>
         {verdict.detail && <span className="muted">{verdict.detail}</span>}
+        {language && <span className="verdict-language">{language}</span>}
       </div>
 
       {verdict.message && !results.length && <pre className="verdict-message">{verdict.message}</pre>}

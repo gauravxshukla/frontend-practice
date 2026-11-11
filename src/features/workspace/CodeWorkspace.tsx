@@ -1,21 +1,28 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SandpackCodeEditor, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react';
 import { CloudUpload, Play, RotateCcw } from 'lucide-react';
-import type { Question, RunnerAssets } from '../../lib/content/catalog';
-import { clearDraft, loadDraft } from '../../lib/drafts';
+import type { FileMap, Question, RunnerAssets } from '../../lib/content/catalog';
+import { loadDraft } from '../../lib/drafts';
 import { markAttempted, markSolved } from '../../lib/progress';
 import { useTheme } from '../../lib/theme';
+import { usePersistentState } from '../../lib/usePersistentState';
 import { useRowResize } from '../../lib/useRowResize';
 import { Kbd } from '../../components/Kbd';
-import { runJob, type RunJob } from '../runner/runJob';
+import { isLanguageId, languageInfo } from '../runner/languages/registry';
+import type { LanguageId } from '../runner/languages/types';
+import { useLanguageRuntime } from '../runner/languages/useLanguageRuntime';
+import { runJob, type RunResponse } from '../runner/runJob';
+import { pythonStub } from '../runner/stubs/pythonStub';
 import { toVerdict, type Verdict } from '../runner/verdict';
 import DraftSaver from './DraftSaver';
+import LanguageSelect from './LanguageSelect';
 import ResultPanel from './ResultPanel';
+import RuntimeStatus from './RuntimeStatus';
 import { DsaTestcasePanel, JsTestcasePanel, toEditable, toRunnable, type EditableCase } from './TestcasePanel';
 import { sandpackThemes } from './sandpackThemes';
+import { useEditorLanguages } from './useEditorLanguages';
 
-const FILE = '/solution.js';
-const LIMIT_MS = { dsa: 3000, jest: 6000 };
+const JEST_LIMIT_MS = 6000;
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
 
 interface Props {
@@ -24,16 +31,43 @@ interface Props {
   onAccepted: () => void;
 }
 
+/** Starter per language file. DSA questions get Python too: a committed starter.py, else one generated from cases.json. */
+function starterFiles(assets: RunnerAssets, multiLanguage: boolean): FileMap {
+  const files: FileMap = { [languageInfo('javascript').file]: assets.starter };
+  if (multiLanguage && assets.spec) {
+    files[languageInfo('python').file] = assets.pyStarter ?? pythonStub(assets.spec, assets.starter);
+  }
+  return files;
+}
+
 /** Tests a Run executes for JS questions: ones named "example…", else the first two. */
 function exampleTests(names: string[]) {
   const examples = names.filter((n) => /(^|› )example/i.test(n));
   return examples.length ? examples : names.slice(0, 2);
 }
 
-function Inner({ question, assets, onAccepted, onResetCode }: Props & { onResetCode: () => void }) {
+interface InnerProps extends Props {
+  language: LanguageId;
+  /** Only DSA questions offer other languages; the JS track's Jest suites are JS by nature. */
+  multiLanguage: boolean;
+  onLanguageChange: (id: LanguageId) => void;
+  starters: FileMap;
+}
+
+function Inner({ question, assets, onAccepted, language, multiLanguage, onLanguageChange, starters }: InnerProps) {
   const { sandpack } = useSandpack();
+  const info = languageInfo(language);
+  const { runtime, status, error } = useLanguageRuntime(language);
+  const editorLanguages = useEditorLanguages(language);
   const codeRef = useRef('');
-  codeRef.current = sandpack.files[FILE]?.code ?? '';
+  codeRef.current = sandpack.files[info.file]?.code ?? '';
+
+  // Every language's file lives in the sandbox; switching just changes which one is open,
+  // so each keeps its own code (and draft).
+  const { activeFile, openFile } = sandpack;
+  useEffect(() => {
+    if (activeFile !== info.file) openFile(info.file);
+  }, [activeFile, openFile, info.file]);
 
   const spec = assets.spec;
   const initialCases = useMemo(
@@ -49,6 +83,8 @@ function Inner({ question, assets, onAccepted, onResetCode }: Props & { onResetC
   const [running, setRunning] = useState<'run' | 'submit' | null>(null);
   const [lastMode, setLastMode] = useState<'run' | 'submit'>('run');
   const [verdict, setVerdict] = useState<Verdict | null>(null);
+  /** Language the shown verdict was produced in (the user may switch since). */
+  const [verdictLanguage, setVerdictLanguage] = useState(info.label);
   const consoleResize = useRowResize('fp:consoleHeight', 280);
 
   // JS questions: learn the suite's test names (registering tests doesn't run them).
@@ -63,8 +99,8 @@ function Inner({ question, assets, onAccepted, onResetCode }: Props & { onResetC
 
   const execute = useCallback(
     async (mode: 'run' | 'submit') => {
-      if (running) return;
-      let job: RunJob;
+      if (running || status !== 'ready') return;
+      let start: () => Promise<RunResponse>;
       if (spec) {
         let runnable;
         try {
@@ -75,23 +111,26 @@ function Inner({ question, assets, onAccepted, onResetCode }: Props & { onResetC
           setTab('testcase');
           return;
         }
-        job = { type: 'dsa', userCode: codeRef.current, refCode: assets.solution, checkerCode: assets.checker, spec, cases: runnable };
+        const input = { code: codeRef.current, spec, cases: runnable, refCode: assets.solution, checkerCode: assets.checker };
+        start = () => runtime.run(input, info.limitMs);
       } else if (assets.tests) {
-        job = {
-          type: 'jest',
+        const job = {
+          type: 'jest' as const,
           userCode: codeRef.current,
           testCode: assets.tests,
           env: question.env,
           only: mode === 'run' && testNames.length ? exampleTests(testNames) : undefined,
         };
+        start = () => runJob(job, JEST_LIMIT_MS);
       } else {
         return;
       }
 
       setRunning(mode);
       setLastMode(mode);
+      setVerdictLanguage(info.label);
       setTab('result');
-      const response = await runJob(job, spec ? LIMIT_MS.dsa : LIMIT_MS.jest);
+      const response = await start();
       const next = toVerdict(response);
       setVerdict(next);
       setRunning(null);
@@ -103,7 +142,7 @@ function Inner({ question, assets, onAccepted, onResetCode }: Props & { onResetC
         markAttempted(question.slug);
       }
     },
-    [running, spec, cases, assets, testNames, question.slug, question.env, onAccepted],
+    [running, status, spec, cases, assets, testNames, question.slug, question.env, onAccepted, runtime, info],
   );
 
   // ⌘' / Ctrl+' runs, ⌘↵ / Ctrl+↵ submits. Capture phase so the editor doesn't eat them.
@@ -125,23 +164,52 @@ function Inner({ question, assets, onAccepted, onResetCode }: Props & { onResetC
   }, [execute]);
 
   const mod = isMac ? '⌘' : 'Ctrl';
+  const canRun = running === null && status === 'ready';
+
+  const resetCode = () => {
+    if (!window.confirm(`Discard your ${info.label} code and restore the starter?`)) return;
+    // Only this language's file: the others keep their code.
+    sandpack.updateFile(info.file, starters[info.file] ?? '');
+  };
 
   return (
     <div className="code-workspace">
       <div className="editor-bar">
-        <span className="editor-lang">JavaScript</span>
+        <div className="editor-bar-start">
+          {multiLanguage ? (
+            <LanguageSelect value={language} onChange={onLanguageChange} disabled={running !== null} />
+          ) : (
+            <span className="editor-lang">JavaScript</span>
+          )}
+          <RuntimeStatus
+            label={info.label}
+            download={info.download}
+            status={status}
+            error={error}
+            onRetry={() => runtime.warmUp().catch(() => {})}
+          />
+        </div>
         <button
           type="button"
           className="btn btn-ghost btn-sm"
-          onClick={onResetCode}
-          title="Discard your code and restore the starter"
+          onClick={resetCode}
+          title={`Discard your ${info.label} code and restore the starter`}
         >
           <RotateCcw size={13} aria-hidden /> Reset code
         </button>
       </div>
 
       <div className="editor-area">
-        <SandpackCodeEditor className="code-editor" showLineNumbers showTabs={false} wrapContent showInlineErrors={false} />
+        {/* Remount once a lazily loaded grammar arrives so the editor picks it up. */}
+        <SandpackCodeEditor
+          key={editorLanguages.length}
+          className="code-editor"
+          showLineNumbers
+          showTabs={false}
+          wrapContent
+          showInlineErrors={false}
+          additionalLanguages={editorLanguages}
+        />
       </div>
 
       <div
@@ -170,7 +238,7 @@ function Inner({ question, assets, onAccepted, onResetCode }: Props & { onResetC
               type="button"
               className="btn btn-sm"
               onClick={() => execute('run')}
-              disabled={running !== null}
+              disabled={!canRun}
               title={`Run the visible testcases (${mod}')`}
             >
               <Play size={13} aria-hidden /> Run <Kbd>{`${mod}'`}</Kbd>
@@ -179,7 +247,7 @@ function Inner({ question, assets, onAccepted, onResetCode }: Props & { onResetC
               type="button"
               className="btn btn-sm btn-submit"
               onClick={() => execute('submit')}
-              disabled={running !== null}
+              disabled={!canRun}
               title={`Judge against every testcase, including hidden ones (${mod}↵)`}
             >
               <CloudUpload size={13} aria-hidden /> Submit <Kbd>{`${mod}↵`}</Kbd>
@@ -207,47 +275,48 @@ function Inner({ question, assets, onAccepted, onResetCode }: Props & { onResetC
               <JsTestcasePanel runNames={exampleTests(testNames)} total={testNames.length} />
             )
           ) : (
-            <ResultPanel mode={running ?? lastMode} verdict={verdict} running={running !== null} />
+            <ResultPanel
+              mode={running ?? lastMode}
+              verdict={verdict}
+              running={running !== null}
+              language={multiLanguage ? verdictLanguage : undefined}
+            />
           )}
         </div>
       </section>
 
-      <DraftSaver slug={question.slug} paths={[FILE]} />
+      <DraftSaver slug={question.slug} paths={Object.keys(starters)} />
     </div>
   );
 }
 
-/** LeetCode-style editor + Run/Submit console for JS and DSA questions. */
+/** LeetCode-style editor + Run/Submit console for JS and DSA questions (DSA: JavaScript or Python). */
 export default function CodeWorkspace({ question, assets, onAccepted }: Props) {
   const { resolved } = useTheme();
-  // Bumping this remounts the editor, which is how "Reset code" discards edits.
-  const [resetKey, setResetKey] = useState(0);
-  const initialCode = useMemo(
-    () => loadDraft(question.slug)?.files[FILE] ?? assets.starter,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [question.slug, assets.starter, resetKey],
-  );
+  const multiLanguage = question.type === 'dsa' && Boolean(assets.spec);
+  const [storedLanguage, setLanguage] = usePersistentState<LanguageId>('fp:dsaLanguage', 'javascript');
+  const language: LanguageId = multiLanguage && isLanguageId(storedLanguage) ? storedLanguage : 'javascript';
+
+  const starters = useMemo(() => starterFiles(assets, multiLanguage), [assets, multiLanguage]);
   // Stable references: Sandpack re-initialises its files whenever these props change identity,
   // which would wipe the editor on any parent re-render (e.g. after an Accepted submit).
-  const files = useMemo(() => ({ [FILE]: initialCode }), [initialCode]);
-  const options = useMemo(() => ({ activeFile: FILE, visibleFiles: [FILE] }), []);
+  const files = useMemo(() => {
+    const draft = loadDraft(question.slug);
+    return Object.fromEntries(Object.entries(starters).map(([path, code]) => [path, draft?.files[path] ?? code]));
+  }, [question.slug, starters]);
+  // Only the initial open file; switching languages opens files from inside (see Inner).
+  const [options] = useState(() => ({ activeFile: languageInfo(language).file, visibleFiles: [languageInfo(language).file] }));
 
   return (
-    <SandpackProvider
-      key={`${question.slug}:${resetKey}`}
-      files={files}
-      theme={sandpackThemes[resolved]}
-      options={options}
-    >
+    <SandpackProvider key={question.slug} files={files} theme={sandpackThemes[resolved]} options={options}>
       <Inner
         question={question}
         assets={assets}
         onAccepted={onAccepted}
-        onResetCode={() => {
-          if (!window.confirm('Discard your code and restore the starter?')) return;
-          clearDraft(question.slug);
-          setResetKey((k) => k + 1);
-        }}
+        language={language}
+        multiLanguage={multiLanguage}
+        onLanguageChange={setLanguage}
+        starters={starters}
       />
     </SandpackProvider>
   );

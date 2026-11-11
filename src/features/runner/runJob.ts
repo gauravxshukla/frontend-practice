@@ -1,5 +1,6 @@
 import type { DsaCase, DsaSpec } from '../../lib/content/catalog';
 import type { LogEntry } from '../console/types';
+import type { ExecOutput } from './languages/types';
 
 export interface CaseResult {
   index: number;
@@ -28,6 +29,16 @@ export type RunResponse =
 
 export type RunJob =
   | { type: 'dsa'; userCode: string; refCode?: string; checkerCode?: string; spec: DsaSpec; cases: DsaCase[] }
+  /** Judge outputs another language produced (see languages/types.ts). */
+  | {
+      type: 'dsa-judge';
+      spec: DsaSpec;
+      cases: DsaCase[];
+      outputs: ExecOutput[];
+      runtimeMs: number;
+      refCode?: string;
+      checkerCode?: string;
+    }
   | { type: 'jest'; userCode: string; testCode: string; env?: 'dom'; only?: string[] }
   | { type: 'jest-collect'; userCode: string; testCode: string; env?: 'dom' };
 
