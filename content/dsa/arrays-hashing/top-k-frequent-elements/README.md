@@ -34,10 +34,11 @@ Output: [7]
 
 ## Notes
 
-- Step 1 is always the same: count frequencies with a `Map`.
-- **Sort baseline:** sort the distinct values by count and take the first k. O(n log n).
-- **Heap:** keep a min-heap of size k keyed by count. Push each value and pop when the size exceeds k. O(n log k), which is best when k is small.
-- **Bucket sort (optimal):** a count can be at most `n`, so make `buckets[count] = [values…]`. Walk the buckets from high to low until you have collected k values. O(n) time and O(n) space.
-- Pitfall: using an object as the counter turns keys into strings, so you'd return `"1"` instead of `1`. Use a `Map`, or convert back with `Number`.
-- Pitfall: stop as soon as you have k values, even in the middle of a bucket.
-- Follow-up: for a stream of numbers, keep the counts and a size-k heap, or use a Count-Min sketch when memory is tight.
+- **Identify:** "k most frequent" → count, then rank values by frequency
+- **Brute force:** count, then sort the distinct values by frequency, O(n log n)
+- **Better:** keep a min-heap of size k over the counts, O(n log k)
+- **Insight:** a count is at most n, so bucket values by count instead of sorting
+- **Steps:** count each value; buckets[c] holds values seen c times; scan buckets from high to low until k are taken
+- **Complexity:** O(n log n) → O(n) time, O(n) space
+- **Pitfall:** size the buckets n + 1, since one value can appear all n times
+- **Related:** Kth Largest Element in an Array, K Closest Points to Origin, Group Anagrams

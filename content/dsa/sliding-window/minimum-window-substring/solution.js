@@ -5,35 +5,31 @@
  */
 export default function minWindow(s, t) {
   if (t.length > s.length) return '';
-
-  const need = new Map();
+  const need = new Map(); // char -> how many the window still needs
   for (const ch of t) need.set(ch, (need.get(ch) ?? 0) + 1);
-  let missing = t.length; // characters of t (with multiplicity) not yet covered
-
-  let left = 0;
+  let missing = t.length; // required characters not yet inside the window
   let bestStart = 0;
-  let bestLength = Infinity;
-
-  for (let right = 0; right < s.length; right++) {
-    const ch = s[right];
-    if (need.has(ch)) {
-      if (need.get(ch) > 0) missing--;
-      need.set(ch, need.get(ch) - 1); // may go negative: surplus copies
+  let bestLen = Infinity;
+  let l = 0;
+  for (let r = 0; r < s.length; r++) {
+    // taking a still-needed char brings the window closer to covering t
+    if (need.has(s[r])) {
+      if (need.get(s[r]) > 0) missing--;
+      need.set(s[r], need.get(s[r]) - 1);
     }
-
-    // Window is valid: shrink from the left as far as possible.
+    // covered: shrink from the left as long as it stays covered
     while (missing === 0) {
-      if (right - left + 1 < bestLength) {
-        bestStart = left;
-        bestLength = right - left + 1;
+      if (r - l + 1 < bestLen) {
+        bestStart = l;
+        bestLen = r - l + 1;
       }
-      const out = s[left];
-      if (need.has(out)) {
-        need.set(out, need.get(out) + 1);
-        if (need.get(out) > 0) missing++;
+      if (need.has(s[l])) {
+        need.set(s[l], need.get(s[l]) + 1);
+        // dropping a char we had no spare of breaks the cover
+        if (need.get(s[l]) > 0) missing++;
       }
-      left++;
+      l++;
     }
   }
-  return bestLength === Infinity ? '' : s.slice(bestStart, bestStart + bestLength);
+  return bestLen === Infinity ? '' : s.slice(bestStart, bestStart + bestLen);
 }

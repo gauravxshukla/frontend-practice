@@ -39,11 +39,10 @@ Output: ["we","say",":","yes"]
 
 ## Notes
 
-- **Key insight:** a delimiter alone always breaks, because the delimiter itself can appear in the data. Instead, *prefix each string with its length*.
-- **Encode:** for each string, append `length + '#' + string`. `["ab","#c"]` becomes `"2#ab2##c"`.
-- **Decode:** at position `i`, read digits up to the next `#` to get the length `L`, take the next `L` characters, and continue from there. The `#` inside a string is never examined as a separator because you skip over it by length.
-- O(total characters) time for both, with O(1) extra space beyond the output.
-- Pitfall: an empty list and a list with one empty string must encode differently (`""` vs `"0#"`).
-- Pitfall: `String.length` counts UTF-16 code units. That's fine as long as encode and decode both use `length` and `slice`.
-- Alternative: escape the delimiter (e.g. `/` becomes `//` and the separator is `/:`). It works but is easier to get wrong.
-- Follow-up: a fixed-width binary length header (4 bytes) avoids scanning for `#` and is how many network protocols frame messages.
+- **Identify:** list of strings ↔ one string, any character allowed → length-prefix encoding
+- **Brute force:** join with a delimiter; breaks as soon as a string contains that delimiter
+- **Insight:** instead of a delimiter, prefix each string with its length and `#`, then read exactly that many chars
+- **Steps:** encode each as `len#str`; decode by reading digits up to `#`, then slicing len characters
+- **Complexity:** O(n) → O(n) time and space, n = total characters; the fix is correctness, not speed
+- **Pitfall:** `[]` and `[""]` must differ: they encode to "" and "0#"
+- **Related:** Serialize and Deserialize Binary Tree, Group Anagrams

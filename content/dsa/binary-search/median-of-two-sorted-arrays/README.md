@@ -39,13 +39,11 @@ Explanation: combined = [1,2,3,4], (2 + 3) / 2 = 2.5.
 
 ## Notes
 
-- **Key insight:** the median splits the combined values into a left half and a right half of equal size (left gets the extra one when the total is odd). If you take `i` values from `nums1` for the left half, you must take `j = half − i` from `nums2`, so the only unknown is `i`.
-- Binary search `i` over `0 … m` on the **shorter** array. The partition is valid when `nums1[i−1] <= nums2[j]` and `nums2[j−1] <= nums1[i]`.
-- If `nums1[i−1] > nums2[j]`, you took too many from `nums1` (`hi = i − 1`); otherwise too few (`lo = i + 1`).
-- Use `−Infinity`/`+Infinity` for out-of-range neighbours so empty sides need no special case.
-- Odd total → `max(left1, left2)`. Even total → average of that and `min(right1, right2)`.
-- O(log(min(m, n))) time, O(1) space.
-- Brute force: merge both arrays (two pointers) and read the middle, O(m + n). Mention it first, then optimise.
-- Pitfall: searching over the longer array lets `j` go negative.
-- Edge cases: one empty array, all of `nums1` smaller than all of `nums2`, duplicates across arrays, negative values.
-- Follow-up: generalise to "k-th smallest of two sorted arrays", which this partition idea solves directly.
+- **Identify:** median of two sorted arrays in O(log(m + n)) → binary search a partition of the shorter array
+- **Key formula:** valid split when maxLeft1 ≤ minRight2 and maxLeft2 ≤ minRight1
+- **Brute force:** merge both arrays and take the middle, O(m + n)
+- **Insight:** instead of merging, choose how many items come from the short array; the long array's count follows
+- **Steps:** binary search i in the short array, j = half − i; fix the split by moving i; median from the four edge values
+- **Complexity:** O(m + n) → O(log min(m, n)) time, O(m + n) → O(1) space
+- **Pitfall:** search the shorter array, and treat out-of-range edges as −∞ / +∞
+- **Related:** Binary Search, Find Minimum in Rotated Sorted Array, Merge k Sorted Lists

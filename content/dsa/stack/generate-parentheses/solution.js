@@ -4,26 +4,17 @@
  */
 export default function generateParenthesis(n) {
   const result = [];
-  const path = [];
-
-  // open/close = how many of each we've placed so far.
-  function build(open, close) {
-    if (path.length === 2 * n) {
-      result.push(path.join(''));
+  const build = (current, open, close) => {
+    // every pair is placed, and the rules below kept it valid
+    if (current.length === 2 * n) {
+      result.push(current);
       return;
     }
-    if (open < n) {
-      path.push('(');
-      build(open + 1, close);
-      path.pop();
-    }
-    if (close < open) {
-      path.push(')');
-      build(open, close + 1);
-      path.pop();
-    }
-  }
-
-  build(0, 0);
+    // an opener is allowed while some are still unused
+    if (open < n) build(current + '(', open + 1, close);
+    // a closer is allowed only if it has an unmatched opener
+    if (close < open) build(current + ')', open, close + 1);
+  };
+  build('', 0, 0);
   return result;
 }

@@ -18,7 +18,12 @@ trap([4, 2, 0, 3, 2, 5]);                   // 9
 
 ## Notes
 
-- Water above bar `i` = `min(maxLeft[i], maxRight[i]) - height[i]`.
-- **Prefix/suffix max arrays:** O(n) time, O(n) space. Easy to explain, so start here.
-- **Two pointers:** O(1) space. Move the side with the **smaller** wall inward. That side's water is bounded by its own running max, because the other side is guaranteed to be at least as tall.
-- Also solvable with a monotonic stack (it fills water layer by layer).
+- **Identify:** "water trapped" between bars → each bar depends on the tallest bar to its left and right
+- **Key formula:** water at i = min(maxLeft, maxRight) − height[i]
+- **Brute force:** for each bar, scan both sides for the maxes, O(n²)
+- **Better:** precompute maxLeft[] and maxRight[] arrays, O(n) time, O(n) space
+- **Insight:** the smaller side's max sets the water level, so process that side with two pointers and no arrays
+- **Steps:** pointers at both ends; move the side with the lower bar; update its max, add max − height
+- **Complexity:** O(n²) → O(n) time, O(n) → O(1) space
+- **Pitfall:** update the max before adding water, so the result never goes negative
+- **Related:** Container With Most Water, Largest Rectangle in Histogram

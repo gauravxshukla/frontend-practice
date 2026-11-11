@@ -50,10 +50,10 @@ Output: [null,null,null,null,-3,null,0,-2]
 
 ## Notes
 
-- **Key insight:** the minimum only changes on push and pop, and a stack undoes changes in reverse order. So remember the minimum *at each height*.
-- **Pair stack (reference):** push `[val, min(val, currentMin)]`. `getMin` reads the top pair's second field, and popping automatically restores the previous minimum.
-- **Two stacks:** a main stack plus a min stack that you push to only when `val ≤ currentMin`, and pop from when the popped value equals its top. This saves space when the minimum rarely changes.
-- O(1) for every operation and O(n) space.
-- Pitfall (two-stack version): use `≤`, not `<`, when pushing to the min stack. Otherwise duplicates of the minimum are lost on the first pop.
-- Pitfall: scanning the whole stack in `getMin` is O(n) and breaks the requirement.
-- Follow-up: O(1) *extra* space using a single stack of differences from the current min (store `val − min` and decode on pop). Watch for overflow in fixed-width languages.
+- **Identify:** stack with O(1) getMin → store the running minimum alongside each element
+- **Brute force:** scan the whole stack on every getMin, O(n) per call
+- **Insight:** instead of recomputing the min, remember the min at each height; popping restores the old one
+- **Steps:** push (val, min(val, current min)); pop removes the pair; top and getMin read the top pair
+- **Complexity:** getMin O(n) → O(1); every operation O(1) time, O(n) space
+- **Pitfall:** the first push has no current min, so its min is the value itself
+- **Related:** Valid Parentheses, Evaluate Reverse Polish Notation, Daily Temperatures

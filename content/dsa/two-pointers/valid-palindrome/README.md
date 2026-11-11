@@ -37,10 +37,10 @@ Output: true
 
 ## Notes
 
-- **Two pointers (optimal):** `left` starts at 0 and `right` at the end. Skip non-alphanumeric characters on either side, then compare lowercase characters. On a mismatch return `false`, otherwise move both inward.
-- O(n) time and O(1) extra space.
-- **Baseline:** build the cleaned lowercase string and compare it with its reverse. It's O(n) time but O(n) extra space, and it's perfectly fine as a first answer.
-- Pitfall: digits count. `"0P"` is **not** a palindrome. A regex like `[a-z]` alone gets this wrong.
-- Pitfall: `_` is not alphanumeric, but `\w` in a regex matches it.
-- Pitfall: forgetting `left < right` in the skip loops can run past the other pointer or off the string.
-- Follow-up: "Valid Palindrome II", where you may delete at most one character. On the first mismatch, try skipping either side.
+- **Identify:** reads the same both ways, ignoring case and symbols → two pointers from the ends
+- **Brute force:** build a cleaned lowercase copy, reverse it and compare, O(n) time, O(n) space
+- **Insight:** instead of building a copy, skip non-alphanumerics in place and compare from both ends
+- **Steps:** l at start, r at end; skip non-alphanumerics; compare lowercase chars; move both inward
+- **Complexity:** O(n) → O(n) time, O(n) → O(1) space
+- **Pitfall:** digits count as characters ("0P" is false), and a string of only symbols is true
+- **Related:** Two Sum II, Palindromic Substrings, Longest Palindromic Substring

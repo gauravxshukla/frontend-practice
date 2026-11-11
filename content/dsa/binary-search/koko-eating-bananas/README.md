@@ -40,11 +40,11 @@ Output: 23
 
 ## Notes
 
-- **Key insight:** the hours needed, `Σ ceil(p / k)`, only goes down as `k` grows. That monotonic yes/no ("can I finish at speed k?") is what lets you binary search on the answer.
-- The search range is `1 … max(piles)`. Any speed above the largest pile still takes one hour per pile.
-- Find the first `k` where `hoursAt(k) <= h`: if it fits set `hi = mid`, otherwise `lo = mid + 1`, and stop when `lo === hi`.
-- O(n · log(max pile)) time, O(1) space. Brute force tries every `k` from 1 upward, which is O(n · max pile) and far too slow for piles near 10⁹.
-- Pitfall: integer division. Use `Math.ceil(p / k)` (or `Math.floor((p + k - 1) / k)`), not `p / k`.
-- Pitfall: starting `lo` at 0 divides by zero.
-- Edge cases: `h === piles.length` (answer is the max pile), one pile, huge `h` (answer is 1).
-- Follow-up: the same "binary search on the answer" pattern solves capacity-to-ship-packages and split-array-largest-sum.
+- **Identify:** "minimum speed that still finishes in h hours" → binary search on the answer
+- **Key formula:** hours at speed k = Σ ceil(pile / k)
+- **Brute force:** try every speed from 1 up to max(piles), O(max · n)
+- **Insight:** hours only fall as speed rises, so binary search the smallest speed that fits in h
+- **Steps:** l = 1, r = max pile; if hours(mid) ≤ h keep mid as a candidate and go left, else go right
+- **Complexity:** O(max · n) → O(n log max) time, O(1) space
+- **Pitfall:** total hours can exceed 32 bits with huge piles; use a long (Java) for the sum
+- **Related:** Binary Search, Find Minimum in Rotated Sorted Array, Search a 2D Matrix

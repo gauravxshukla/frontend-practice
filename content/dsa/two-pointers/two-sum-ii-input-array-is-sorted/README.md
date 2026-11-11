@@ -37,11 +37,11 @@ Explanation: 7 + 11 = 18.
 
 ## Notes
 
-- **Key insight:** because the array is sorted, the sum of the two ends tells you which pointer to move.
-- Start with `left = 0`, `right = n - 1`. If the sum is too small, `left++`. If it's too big, `right--`. If it matches, return `[left + 1, right + 1]`.
-- Why it's safe: when the sum is too small, `numbers[left]` can't pair with anything (everything else is ≤ `numbers[right]`), so discarding it loses nothing.
-- O(n) time and O(1) space.
-- **Alternatives:** a hash map as in Two Sum is O(n) time but O(n) space, which breaks the space rule. Binary-searching the complement for each element is O(n log n).
-- Pitfall: returning 0-based indices. The answer here is 1-based.
-- Pitfall: duplicates such as `[5,5]` with target 10. The pointers must be different positions, which `left < right` guarantees.
-- Follow-up: 3Sum reuses this exact loop as its inner step.
+- **Identify:** pair summing to target + sorted input + O(1) space → two pointers from both ends
+- **Brute force:** check all pairs, O(n²)
+- **Better:** binary search each number's partner, O(n log n)
+- **Insight:** sorted order tells you which way to move: too small → move left up, too big → move right down
+- **Steps:** l = 0, r = n − 1; compare the sum with target and move one pointer until they match
+- **Complexity:** O(n²) → O(n) time, O(1) space
+- **Pitfall:** the answer is 1-indexed: return [l + 1, r + 1]
+- **Related:** Two Sum, 3Sum, Container With Most Water

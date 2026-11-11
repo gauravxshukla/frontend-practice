@@ -1,24 +1,22 @@
-const OPS = {
-  '+': (a, b) => a + b,
-  '-': (a, b) => a - b,
-  '*': (a, b) => a * b,
-  '/': (a, b) => Math.trunc(a / b), // division truncates toward zero
-};
-
 /**
  * @param {string[]} tokens
  * @return {number}
  */
 export default function evalRPN(tokens) {
-  const stack = [];
+  const stack = []; // operands waiting for an operator
   for (const token of tokens) {
-    if (token in OPS) {
-      const b = stack.pop(); // right operand is on top
-      const a = stack.pop();
-      stack.push(OPS[token](a, b));
-    } else {
+    if (!['+', '-', '*', '/'].includes(token)) {
       stack.push(Number(token));
+      continue;
     }
+    // the right operand is on top, so pop it first
+    const b = stack.pop();
+    const a = stack.pop();
+    if (token === '+') stack.push(a + b);
+    else if (token === '-') stack.push(a - b);
+    else if (token === '*') stack.push(a * b);
+    // integer division truncates toward zero, not down
+    else stack.push(Math.trunc(a / b));
   }
   return stack.pop();
 }

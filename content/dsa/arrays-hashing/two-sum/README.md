@@ -18,7 +18,10 @@ twoSum([3, 2, 4], 6);      // [1, 2]
 
 ## Notes
 
-- One pass with a hash map from value to index: for each `n`, check whether `target - n` was seen, otherwise record `n`.
-- O(n) time, O(n) space. The brute-force double loop is O(n²).
-- Check for the complement **before** inserting the current number, which handles `[3, 3], 6` correctly.
-- Prefer `Map`/`Object.hasOwn` over `obj.hasOwnProperty` (which can be shadowed).
+- **Identify:** pair + sum to target + unsorted → hash map
+- **Brute force:** check all pairs, O(n²)
+- **Insight:** don't search for the partner; remember what you've seen
+- **Steps:** for each num, if `target − num` is in the map, return both indices; else store num → index
+- **Complexity:** O(n²) → O(n) time, O(1) → O(n) space
+- **Pitfall:** check before storing, so a number never pairs with itself ([3], target 6)
+- **Related:** Contains Duplicate, Two Sum II, 3Sum

@@ -1,18 +1,20 @@
 /**
- * @param {number[]} piles bananas in each pile
- * @param {number} h hours available
- * @return {number} the minimum integer eating speed
+ * @param {number[]} piles
+ * @param {number} h
+ * @return {number}
  */
 export default function minEatingSpeed(piles, h) {
-  // Hours needed at speed k. This shrinks as k grows, so we can binary search on k.
-  const hoursAt = (k) => piles.reduce((sum, p) => sum + Math.ceil(p / k), 0);
-
-  let lo = 1;
-  let hi = Math.max(...piles);
-  while (lo < hi) {
-    const mid = lo + ((hi - lo) >> 1);
-    if (hoursAt(mid) <= h) hi = mid; // fast enough, try slower
-    else lo = mid + 1; // too slow
+  // hours needed at speed k: each pile takes ceil(pile / k) hours
+  const hoursAt = (k) => piles.reduce((sum, pile) => sum + Math.ceil(pile / k), 0);
+  // the answer is between 1 and the biggest pile (one pile per hour)
+  let l = 1;
+  let r = Math.max(...piles);
+  while (l < r) {
+    const mid = l + Math.floor((r - l) / 2);
+    // fast enough: mid works, but a slower speed might too
+    if (hoursAt(mid) <= h) r = mid;
+    // too slow: every speed up to mid is too slow
+    else l = mid + 1;
   }
-  return lo;
+  return l;
 }

@@ -1,13 +1,14 @@
 /**
- * @param {number[]} numbers
+ * @param {number[]} nums
  * @return {boolean}
  */
-export default function containsDuplicate(numbers) {
-  const seen = new Set();
-
-  for (const n of numbers) {
-    if (seen.has(n)) return true;
-    seen.add(n);
+export default function containsDuplicate(nums) {
+  const seen = new Set(); // values visited so far
+  for (const num of nums) {
+    // a second sighting is the duplicate, so stop early
+    if (seen.has(num)) return true;
+    seen.add(num);
   }
+  // every value was new (also covers empty and single-element input)
   return false;
 }

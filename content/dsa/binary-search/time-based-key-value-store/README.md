@@ -51,11 +51,10 @@ Explanation: nothing for "love" existed at time 5, and "miss" was never set.
 
 ## Notes
 
-- **Key insight:** because `set` timestamps only increase, appending to a per-key array keeps each array sorted for free. No sorting or balanced tree needed.
-- Store `Map<key, [timestamp, value][]>`.
-- `get` binary searches that array for the **last** timestamp `<= t` (an "upper bound minus one" search). Record the candidate whenever `entries[mid][0] <= t` and keep searching right.
-- `set` is O(1), `get` is O(log k) where k is the number of versions of that key. Space is O(total sets).
-- Brute force: scan the key's versions from the newest back, which makes `get` O(k).
-- Pitfall: returning `undefined` or `null` instead of `""` for a missing key or a too-early timestamp.
-- Pitfall: an off-by-one that returns the first timestamp *greater* than `t`.
-- Follow-up: if timestamps could arrive out of order, use a sorted structure per key (or sort lazily before reads).
+- **Identify:** latest value at or before a timestamp, timestamps only increase → per-key list + binary search
+- **Brute force:** scan the key's whole history on every get, O(n) per get
+- **Insight:** set calls arrive in time order, so each key's list is already sorted for binary search
+- **Steps:** set appends (timestamp, value); get binary searches the rightmost timestamp ≤ t
+- **Complexity:** get O(n) → O(log n); set O(1); O(n) space
+- **Pitfall:** an unknown key, or a t before the first timestamp, returns ""
+- **Related:** Binary Search, Search a 2D Matrix, LRU Cache

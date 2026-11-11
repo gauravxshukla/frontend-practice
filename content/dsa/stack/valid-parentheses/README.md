@@ -20,7 +20,10 @@ isValid('');       // true
 
 ## Notes
 
-- Stack: push openers. On a closer, the top of the stack must be its matching opener, otherwise fail.
-- A `{ ')': '(', ']': '[', '}': '{' }` lookup replaces the if/else chain.
-- Return `false` early on a mismatch. At the end, the stack must be empty.
-- O(n) time, O(n) space.
+- **Identify:** brackets must close in reverse order of opening → stack
+- **Brute force:** repeatedly delete "()", "[]", "{}" until nothing changes, O(n²)
+- **Insight:** the most recent unclosed opener is the only one a closer may match, so keep openers on a stack
+- **Steps:** push openers; on a closer, the stack top must be its matching opener, else false; end with an empty stack
+- **Complexity:** O(n²) → O(n) time, O(n) space
+- **Pitfall:** a closer on an empty stack ("]") and leftover openers ("((") are both invalid
+- **Related:** Generate Parentheses, Valid Parenthesis String, Evaluate Reverse Polish Notation

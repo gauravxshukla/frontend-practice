@@ -18,6 +18,11 @@ containsDuplicate([1, 2, 3, 4]); // false
 
 ## Notes
 
-- Use a `Set` and return early on the first repeat. O(n) time and space.
-- One-liner: `new Set(nums).size !== nums.length`. It's clean, but always scans everything.
-- If O(1) extra space is required: sort and compare neighbours, O(n log n).
+- **Identify:** "does any value appear twice" → hash set membership
+- **Brute force:** compare every pair, O(n²)
+- **Better:** sort, then compare neighbours, O(n log n) time, O(1) extra space
+- **Insight:** instead of comparing pairs, remember each value in a set and check it on arrival
+- **Steps:** for each num, return true if it's already in the set; otherwise add it
+- **Complexity:** O(n²) → O(n) time, O(1) → O(n) space
+- **Pitfall:** empty or single-element input has no duplicate, so fall through to false
+- **Related:** Two Sum, Valid Anagram, Longest Consecutive Sequence

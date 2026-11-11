@@ -34,12 +34,11 @@ Output: [3,3,5,5,6,7]
 
 ## Notes
 
-- **Monotonic deque (optimal):** keep indices whose values are *decreasing* from front to back. The front is always the current window's max.
-- For each `i`: (1) pop the front if it has left the window (`index ≤ i − k`). (2) Pop from the back while `nums[back] ≤ nums[i]`, since those can never be a max again while `i` is in the window. (3) Push `i`. (4) Once `i ≥ k − 1`, output `nums[front]`.
-- O(n) time, because each index is pushed and popped at most once. O(k) space.
-- In JavaScript, `Array.prototype.shift` is O(n). Use a head pointer (as in the reference) or a ring buffer for a true O(1) front pop.
-- **Heap alternative:** a max-heap of `[value, index]`, lazily discarding the top while its index is out of the window. O(n log n).
-- **Baseline:** `Math.max` over each window is O(n · k), too slow when both are large.
-- Pitfall: store indices, not values, or you can't tell when the front expired.
-- Pitfall: `k = 1` returns the array itself, and `k = n` returns `[max]`.
-- Follow-up: sliding window *median* (two heaps with lazy deletion).
+- **Identify:** max of every window of size k → monotonic decreasing deque of indices
+- **Brute force:** scan each window for its max, O(n·k)
+- **Better:** a max-heap with lazy removal of out-of-window entries, O(n log n)
+- **Insight:** a smaller value to the left of a bigger one can never be a max again, so drop it
+- **Steps:** pop smaller values from the back; push i; pop the front if it left the window; front is the max
+- **Complexity:** O(n·k) → O(n) time, O(k) space
+- **Pitfall:** store indices, not values, so you can tell when the front has slid out of the window
+- **Related:** Daily Temperatures, Largest Rectangle in Histogram, Minimum Window Substring

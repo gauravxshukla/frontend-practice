@@ -41,10 +41,10 @@ Output: 22
 
 ## Notes
 
-- **Stack:** push numbers. On an operator, pop `b` (the right operand) and then `a` (the left operand), and push `a op b`. The single remaining value is the answer.
-- O(n) time and O(n) space.
-- Pitfall: operand order. For `-` and `/` you need `a - b`, not `b - a`. The first pop is the *right* operand.
-- Pitfall: `Math.floor` rounds negatives the wrong way (`Math.floor(-3.5)` is `-4`). Use `Math.trunc`, or `(a / b) | 0` for 32-bit values.
-- Pitfall: detecting operators with `isNaN` or a character check breaks on negative numbers like `"-11"`. Compare against the exact operator strings.
-- **Alternative:** recursion from the end of the array (the last token is the root operator). It's elegant but recurses as deep as the expression.
-- Follow-up: convert infix to postfix with the shunting-yard algorithm, or evaluate infix directly (Basic Calculator).
+- **Identify:** postfix expression, operators follow their operands → stack of numbers
+- **Brute force:** repeatedly find the first operator, evaluate it with the two tokens before it, splice, O(n²)
+- **Insight:** an operator always applies to the two most recent values, so a stack gives them in O(1)
+- **Steps:** push numbers; on an operator pop b then a, push a op b; the last value is the answer
+- **Complexity:** O(n²) → O(n) time, O(n) space
+- **Pitfall:** pop order matters for − and ÷, and division truncates toward zero (−7 / 2 = −3)
+- **Related:** Valid Parentheses, Min Stack, Daily Temperatures

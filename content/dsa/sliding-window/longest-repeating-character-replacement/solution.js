@@ -1,23 +1,22 @@
 /**
- * @param {string} s uppercase English letters
+ * @param {string} s uppercase letters
  * @param {number} k
  * @return {number}
  */
 export default function characterReplacement(s, k) {
-  const counts = new Array(26).fill(0);
-  let left = 0;
-  let maxFreq = 0; // highest count of one letter seen in any window so far
+  const counts = new Array(26).fill(0); // letter counts inside the window
+  let l = 0;
+  let maxFreq = 0; // highest single-letter count the window has reached
   let best = 0;
-
-  for (let right = 0; right < s.length; right++) {
-    maxFreq = Math.max(maxFreq, ++counts[s.charCodeAt(right) - 65]);
-
-    // Window needs (size - maxFreq) replacements; shrink while that exceeds k.
-    while (right - left + 1 - maxFreq > k) {
-      counts[s.charCodeAt(left) - 65]--;
-      left++;
+  for (let r = 0; r < s.length; r++) {
+    // the new letter may become the one we keep, so update the max
+    maxFreq = Math.max(maxFreq, ++counts[s.charCodeAt(r) - 65]);
+    // every other letter must be replaced; more than k means shrink
+    while (r - l + 1 - maxFreq > k) {
+      counts[s.charCodeAt(l) - 65]--;
+      l++;
     }
-    best = Math.max(best, right - left + 1);
+    best = Math.max(best, r - l + 1);
   }
   return best;
 }

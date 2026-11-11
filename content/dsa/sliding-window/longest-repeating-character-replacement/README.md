@@ -35,11 +35,11 @@ Explanation: change the B at index 3 to get "AAAAA".
 
 ## Notes
 
-- **Key insight:** a window is fixable when `windowLength − (count of its most common letter) ≤ k`. You keep the majority letter and replace the rest.
-- **Sliding window:** grow `right`, update that letter's count and `maxFreq`. While the window needs more than k replacements, shrink from the left. Track the best window length.
-- O(n) time (O(26n) if you recompute the max each step) and O(26) space.
-- **The "stale maxFreq" trick:** you never need to decrease `maxFreq` when shrinking. The answer only improves when a *larger* `maxFreq` appears, so a stale (too high) value just stops the window from growing, it never produces a wrong answer.
-- **Baseline:** check every substring with a running count. O(26 · n²).
-- Pitfall: using `if` vs `while` to shrink. With the stale-max trick, a single `if` also works because the window never needs to shrink by more than one. `while` is easier to reason about.
-- Pitfall: `k = 0` reduces to "longest run of one letter".
-- Follow-up: the binary version, "Max Consecutive Ones III" (flip up to k zeros), uses the same window.
+- **Identify:** longest substring made uniform with at most k changes → sliding window with counts
+- **Key formula:** window is valid while (window length − count of its most frequent char) ≤ k
+- **Brute force:** check every substring's replacements needed, O(n²·26)
+- **Insight:** keep the best max-frequency seen; the window only needs to grow when that max grows
+- **Steps:** add s[r] and update maxFreq; while length − maxFreq > k, drop s[l] and move l; update best
+- **Complexity:** O(n²) → O(n) time, O(26) space
+- **Pitfall:** maxFreq never needs decreasing; a stale max can't produce a longer wrong answer
+- **Related:** Longest Substring Without Repeating Characters, Permutation in String, Minimum Window Substring

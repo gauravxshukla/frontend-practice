@@ -38,12 +38,10 @@ Explanation: s has no "y".
 
 ## Notes
 
-- **Variable sliding window:** expand `right` until the window covers `t`, then shrink `left` as far as it stays valid, recording the smallest window seen. Repeat.
-- **Bookkeeping:** a `need` map from char to how many more are required, plus a single `missing` counter (initially `t.length`). Adding `ch` with `need[ch] > 0` decrements `missing`. Removing `ch` that pushes `need[ch]` above 0 increments it. The window is valid exactly when `missing === 0`.
-- Surplus copies make `need[ch]` negative, which is how you know they can be dropped for free.
-- O(|s| + |t|) time and O(alphabet) space.
-- **Baseline:** check every substring for coverage, O(|s|² · alphabet).
-- Pitfall: comparing two full count maps on every step works but costs O(52) per step and is easy to get wrong with duplicates.
-- Pitfall: storing the best *substring* on every improvement copies strings. Store `start` and `length` and slice once at the end.
-- Pitfall: `t` longer than `s` means there's no answer.
-- Follow-up: if `s` is huge and `t` small, pre-filter `s` to only the positions whose character is in `t` and slide over that list.
+- **Identify:** shortest substring of s containing every char of t (with counts) → variable window + counts
+- **Brute force:** check every substring of s against t's counts, O(n²·m)
+- **Insight:** grow right until the window covers t, then shrink left while it still covers t
+- **Steps:** count t; extend r, tracking how many required chars are satisfied; when all are, record and shrink l
+- **Complexity:** O(n²·m) → O(n + m) time, O(alphabet) space
+- **Pitfall:** count duplicates in t ("aa" needs two a's), and return "" when no window exists
+- **Related:** Permutation in String, Longest Substring Without Repeating Characters, Sliding Window Maximum

@@ -1,20 +1,23 @@
 class Codec {
-    // Length-prefix each string so any character (including '#') round-trips.
     public String encode(List<String> strs) {
-        StringBuilder sb = new StringBuilder();
-        for (String s : strs) sb.append(s.length()).append('#').append(s);
-        return sb.toString();
+        StringBuilder out = new StringBuilder();
+        // the length says where each string ends, so its content can contain anything
+        for (String s : strs) out.append(s.length()).append('#').append(s);
+        return out.toString();
     }
 
-    public List<String> decode(String s) {
-        List<String> out = new ArrayList<>();
+    public List<String> decode(String encoded) {
+        List<String> result = new ArrayList<>();
         int i = 0;
-        while (i < s.length()) {
-            int j = s.indexOf('#', i);
-            int length = Integer.parseInt(s.substring(i, j));
-            out.add(s.substring(j + 1, j + 1 + length));
+        while (i < encoded.length()) {
+            // the digits before '#' are the length of the next string
+            int j = i;
+            while (encoded.charAt(j) != '#') j++;
+            int length = Integer.parseInt(encoded.substring(i, j));
+            // take exactly that many characters, even if they include '#' or digits
+            result.add(encoded.substring(j + 1, j + 1 + length));
             i = j + 1 + length;
         }
-        return out;
+        return result;
     }
 }

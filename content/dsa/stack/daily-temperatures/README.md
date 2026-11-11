@@ -33,12 +33,10 @@ Output: [0,0,0]
 
 ## Notes
 
-- **Monotonic stack:** keep a stack of indices still waiting for a warmer day. Their temperatures are non-increasing from bottom to top.
-- For each day `i`, pop every index `j` whose temperature is lower than today's and set `answer[j] = i − j`. Then push `i`.
-- Indices left on the stack at the end never found a warmer day and stay 0.
-- O(n) time, because each index is pushed and popped once. O(n) space.
-- **Baseline:** for each day, scan forward for the first warmer day. O(n²) on a decreasing input.
-- Pitfall: use strict `<` when popping. Equal temperatures are *not* warmer.
-- Pitfall: store indices, not temperatures, since you need the distance.
-- **Alternative:** iterate right to left and jump using answers already computed (`j += answer[j]`). That's O(n) amortized with O(1) extra space.
-- Follow-up: "Next Greater Element I/II" (the circular array version iterates twice).
+- **Identify:** "next greater element" for every day → monotonic decreasing stack of indices
+- **Brute force:** for each day, scan forward for a warmer one, O(n²)
+- **Insight:** instead of scanning forward, keep unresolved days on a stack; a warmer day resolves them
+- **Steps:** for each day i, while it's warmer than the stack top, pop j and set answer[j] = i − j; push i
+- **Complexity:** O(n²) → O(n) time, O(n) space
+- **Pitfall:** equal temperatures aren't warmer: use a strict >, and days never resolved stay 0
+- **Related:** Car Fleet, Largest Rectangle in Histogram, Sliding Window Maximum
