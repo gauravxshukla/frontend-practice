@@ -22,10 +22,11 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
-import { getQuestion, questionsIn, questionTree, type QuestionGroup } from '../lib/content/catalog';
+import { questionsIn, questionTree, type QuestionGroup } from '../lib/content/catalog';
 import { noteSections, notes } from '../lib/content/notes';
 import { quizDecks } from '../lib/content/quiz';
 import { useProgress } from '../lib/progress';
+import { groupUrl, notesUrl, parseRoute, quizUrl } from '../lib/routes';
 import { ariaKeysFor, keysFor } from '../lib/shortcuts';
 import { useTheme, type ThemeMode } from '../lib/theme';
 import { useHoverIntent } from '../lib/useHoverIntent';
@@ -73,18 +74,22 @@ function locate(pathname: string): { activeLeaf?: string; open: string[] } {
     const parent = groupId.includes('/') ? [`questions/${groupId.split('/')[0]}`] : [];
     return { activeLeaf: `topic:${groupId}`, open: ['questions', ...parent] };
   };
-  if (pathname.startsWith('/q/')) {
-    const q = getQuestion(pathname.slice(3));
-    return q ? topicOpen(q.groupId) : { open: ['questions'] };
+  const route = parseRoute(pathname);
+  switch (route.kind) {
+    case 'question':
+      return topicOpen(route.question.groupId);
+    case 'group':
+      return topicOpen(route.group.id);
+    case 'quiz':
+      return route.deck ? { activeLeaf: `quiz:${route.deck}`, open: ['quiz'] } : { open: [] };
+    case 'notes': {
+      if (!route.slug) return { open: [] };
+      const sectionId = notes.find((n) => n.slug === route.slug)?.sectionId ?? route.slug;
+      return { activeLeaf: `notes:${sectionId}`, open: ['notes'] };
+    }
+    default:
+      return { open: [] };
   }
-  if (pathname.startsWith('/topics/')) return topicOpen(pathname.slice(8));
-  if (pathname.startsWith('/quiz/')) return { activeLeaf: `quiz:${pathname.slice(6)}`, open: ['quiz'] };
-  if (pathname.startsWith('/notes/')) {
-    const rest = pathname.slice(7);
-    const sectionId = notes.find((n) => n.slug === rest)?.sectionId ?? rest;
-    return { activeLeaf: `notes:${sectionId}`, open: ['notes'] };
-  }
-  return { open: [] };
 }
 
 interface GroupProps {
@@ -237,7 +242,7 @@ export default function Sidebar({
   const topicLink = (group: QuestionGroup) => (
     <TopicLink
       key={group.id}
-      to={`/topics/${group.id}`}
+      to={groupUrl(group.id)}
       label={group.label}
       active={location.activeLeaf === `topic:${group.id}`}
       icon={GROUP_ICONS[group.id]}
@@ -426,7 +431,7 @@ export default function Sidebar({
           {quizDecks.map((deck) => (
             <TopicLink
               key={deck.slug}
-              to={`/quiz/${deck.slug}`}
+              to={quizUrl(deck.slug)}
               label={deck.title}
               active={location.activeLeaf === `quiz:${deck.slug}`}
               meta={<span className="nav-count">{deck.cards.length}</span>}
@@ -446,7 +451,7 @@ export default function Sidebar({
           {noteSections.map((s) => (
             <TopicLink
               key={s.id}
-              to={`/notes/${s.id}`}
+              to={notesUrl(s.id)}
               label={s.label}
               active={location.activeLeaf === `notes:${s.id}`}
               meta={<span className="nav-count">{s.notes.length}</span>}

@@ -75,6 +75,14 @@
   font-size: 16px;
 }
 
+.empty-state-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
 /* ---------- Controls ---------- */
 .btn {
   display: inline-flex;
@@ -1066,20 +1074,58 @@ body.is-resizing iframe {
   min-width: 0;
 }
 
-.language-select {
-  height: 26px;
-  padding: 0 6px;
+/* ---------- Select (src/components/Select.tsx) ---------- */
+.select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.select select {
+  appearance: none;
+  width: 100%;
+  min-width: 0;
+  height: 28px;
+  /* The chevron sits in the right padding, never over the text. */
+  padding: 0 26px 0 8px;
+  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--bg);
   color: var(--text);
   font: inherit;
   font-size: 12px;
-  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
-.language-select:disabled {
+.select select:hover:not(:disabled) {
+  border-color: var(--border-strong);
+}
+
+.select select:disabled {
   opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.select-chevron {
+  position: absolute;
+  right: 7px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.select-icon {
+  display: none;
+}
+
+
+.language-select select {
+  height: 26px;
+  font-weight: 600;
 }
 
 .runtime-status {

@@ -6,6 +6,7 @@ import { noteSections } from '../lib/content/notes';
 import { quizDecks } from '../lib/content/quiz';
 import { placeFloating } from '../lib/floating';
 import { useProgress } from '../lib/progress';
+import { groupUrl, notesUrl, quizUrl } from '../lib/routes';
 
 export type SectionId = 'questions' | 'quiz' | 'notes';
 
@@ -130,7 +131,7 @@ export default function SidebarPeek({
           questionTree.map((track) => (
             <div key={track.id} className="peek-group">
               <PeekLink
-                to={`/topics/${track.id}`}
+                to={groupUrl(track.id)}
                 active={activeLeaf === `topic:${track.id}`}
                 icon={groupIcons[track.id]}
                 meta={solvedCount(track)}
@@ -140,7 +141,7 @@ export default function SidebarPeek({
               {track.children.map((topic) => (
                 <PeekLink
                   key={topic.id}
-                  to={`/topics/${topic.id}`}
+                  to={groupUrl(topic.id)}
                   depth={1}
                   active={activeLeaf === `topic:${topic.id}`}
                   icon={groupIcons[topic.id]}
@@ -153,13 +154,13 @@ export default function SidebarPeek({
           ))}
         {section === 'quiz' && (
           <>
-            <PeekLink to="/quiz" active={false}>
+            <PeekLink to={quizUrl()} active={false}>
               All decks
             </PeekLink>
             {quizDecks.map((deck) => (
               <PeekLink
                 key={deck.slug}
-                to={`/quiz/${deck.slug}`}
+                to={quizUrl(deck.slug)}
                 depth={1}
                 active={activeLeaf === `quiz:${deck.slug}`}
                 meta={<span className="nav-count">{deck.cards.length}</span>}
@@ -171,13 +172,13 @@ export default function SidebarPeek({
         )}
         {section === 'notes' && (
           <>
-            <PeekLink to="/notes" active={false}>
+            <PeekLink to={notesUrl()} active={false}>
               All notes
             </PeekLink>
             {noteSections.map((s) => (
               <PeekLink
                 key={s.id}
-                to={`/notes/${s.id}`}
+                to={notesUrl(s.id)}
                 depth={1}
                 active={activeLeaf === `notes:${s.id}`}
                 meta={<span className="nav-count">{s.notes.length}</span>}

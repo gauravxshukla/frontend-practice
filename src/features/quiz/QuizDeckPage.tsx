@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router';
 import { Eye, EyeOff, Shuffle } from 'lucide-react';
 import Markdown from '../../components/Markdown';
 import { getDeck, type QuizCard } from '../../lib/content/quiz';
+import { quizUrl } from '../../lib/routes';
 
 function shuffle<T>(items: T[]) {
   const copy = [...items];
@@ -50,7 +51,7 @@ export default function QuizDeckPage() {
       <div className="page">
         <div className="empty-state">
           <h2>Deck not found</h2>
-          <Link to="/quiz">Back to quiz</Link>
+          <Link to={quizUrl()}>Back to quiz</Link>
         </div>
       </div>
     );
@@ -71,7 +72,7 @@ export default function QuizDeckPage() {
     <div className="page">
       <header className="page-header">
         <p className="eyebrow">
-          <Link to="/quiz">Quiz</Link>
+          <Link to={quizUrl()}>Quiz</Link>
         </p>
         <h1>{deck.title}</h1>
       </header>

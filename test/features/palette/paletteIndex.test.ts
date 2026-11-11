@@ -1,16 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { findGroup, getQuestion, questions } from '../../../src/lib/content/catalog';
+import { questions } from '../../../src/lib/content/catalog';
 import { getNote, getNoteSection, notes, noteSections } from '../../../src/lib/content/notes';
 import { getDeck, quizDecks } from '../../../src/lib/content/quiz';
+import { parseRoute } from '../../../src/lib/routes';
 import { buildIndex, suggestions, type PaletteItem } from '../../../src/features/palette/paletteIndex';
 
 const resolves = (href: string) => {
-  const [, kind, ...rest] = href.split('/');
-  const path = rest.join('/');
-  if (kind === 'q') return Boolean(getQuestion(path));
-  if (kind === 'topics') return Boolean(findGroup(path));
-  if (kind === 'quiz') return Boolean(getDeck(path));
-  if (kind === 'notes') return Boolean(getNote(path) || getNoteSection(path));
+  const route = parseRoute(href);
+  if (route.kind === 'question' || route.kind === 'group') return true;
+  if (route.kind === 'quiz') return Boolean(route.deck && getDeck(route.deck));
+  if (route.kind === 'notes') return Boolean(route.slug && (getNote(route.slug) || getNoteSection(route.slug)));
   return false;
 };
 

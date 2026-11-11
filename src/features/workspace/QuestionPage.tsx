@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { SandpackCodeViewer, SandpackProvider } from '@codesandbox/sandpack-react';
 import { ArrowLeft, ArrowRight, CheckCircle2, ChevronRight, Clock, Eye, Lock, RotateCcw, Undo2 } from 'lucide-react';
 import { DifficultyBadge, Tag } from '../../components/Badges';
@@ -9,7 +9,6 @@ import { useToast } from '../../components/overlay/ToastProvider';
 import {
   breadcrumbOf,
   getNeighbours,
-  getQuestion,
   loadQuestionFiles,
   loadRunnerAssets,
   loadSolutionSources,
@@ -21,10 +20,12 @@ import { applyDraft, clearDraft, draftKey, loadDraft, saveDraft } from '../../li
 import { useProgress } from '../../lib/progress';
 import { useTheme } from '../../lib/theme';
 import { ariaKeysFor, keysFor } from '../../lib/shortcuts';
+import { groupUrl, parseRoute, questionUrl } from '../../lib/routes';
 import { useColumnResize } from '../../lib/useColumnResize';
 import { usePersistentState } from '../../lib/usePersistentState';
 import { LANGUAGES, languageInfo } from '../runner/languages/registry';
 import type { LanguageId } from '../runner/languages/types';
+import { useOpenSearch } from '../../app/openSearch';
 import CodeWorkspace from './CodeWorkspace';
 import LayoutToggles from './LayoutToggles';
 import PromptStrip from './PromptStrip';
@@ -135,19 +136,20 @@ function LockedPanel({ onReveal, what }: { onReveal: () => void; what: string })
   );
 }
 
+/** A question page: `/dsa/two-sum`, `/react/like-button/native` (see src/lib/routes.ts). */
 export default function QuestionPage() {
-  const slug = useParams()['*'] ?? '';
-  const question = getQuestion(slug);
+  const route = parseRoute(useLocation().pathname);
+  const question = route.kind === 'question' ? route.question : undefined;
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const openSearch = useOpenSearch();
   const progress = useProgress();
   const divider = useColumnResize('fp:promptWidth', 400, PROMPT_LIMITS);
   const confirm = useConfirm();
   const toast = useToast();
 
   const isCode = question?.type === 'js' || question?.type === 'dsa';
-  // React questions can be solved in React Native; `?platform=native` keeps it deep-linkable.
-  const platform: Platform = question?.type === 'react' && searchParams.get('platform') === 'native' ? 'native' : 'web';
+  // React questions can be solved in React Native, at `/react/<name>/native`.
+  const platform: Platform = route.kind === 'question' ? route.platform : 'web';
   const draftId = question ? draftKey(question.slug, platform) : '';
   const solved = question ? progress[question.slug] === 'solved' : false;
 
@@ -198,10 +200,7 @@ export default function QuestionPage() {
 
   const { prev, next } = question ? getNeighbours(question) : {};
   // Moving between React questions stays on the platform you're practising.
-  const hrefOf = useCallback(
-    (q: Question) => (q.type === 'react' && platform === 'native' ? `/q/${q.slug}?platform=native` : `/q/${q.slug}`),
-    [platform],
-  );
+  const hrefOf = useCallback((q: Question) => questionUrl(q, platform), [platform]);
 
   // Alt+←/→ moves between questions in the same topic.
   useEffect(() => {
@@ -221,9 +220,32 @@ export default function QuestionPage() {
       <div className="page">
         <div className="empty-state">
           <h2>Question not found</h2>
-          <p className="muted">
-            Nothing lives at <code>{slug}</code>. <Link to="/">Browse questions</Link>
-          </p>
+          {route.kind === 'unknown' && route.name ? (
+            <>
+              <p className="muted">
+                There's no question called <code>{route.name}</code>
+                {route.track ? (
+                  <>
+                    {' '}
+                    in <code>{route.track}</code>
+                  </>
+                ) : null}
+                .
+              </p>
+              <div className="empty-state-actions">
+                <button type="button" className="btn btn-primary" onClick={() => openSearch(route.name!.replace(/-/g, ' '))}>
+                  Search for “{route.name.replace(/-/g, ' ')}”
+                </button>
+                <Link to="/" className="btn">
+                  Browse questions
+                </Link>
+              </div>
+            </>
+          ) : (
+            <p className="muted">
+              <Link to="/">Browse questions</Link>
+            </p>
+          )}
         </div>
       </div>
     );
@@ -286,8 +308,7 @@ export default function QuestionPage() {
   };
 
   const hasUiSolution = platform === 'native' ? question.hasNativeSolution : question.hasSolution;
-  const changePlatform = (next: Platform) =>
-    setSearchParams(next === 'native' ? { platform: 'native' } : {}, { replace: true });
+  const changePlatform = (next: Platform) => navigate(questionUrl(question, next), { replace: true });
 
   const tabs: { id: LeftTab; label: string }[] = [
     { id: 'description', label: 'Description' },
@@ -300,10 +321,10 @@ export default function QuestionPage() {
       <header className="question-header">
         <div className="question-heading">
           <nav className="breadcrumb" aria-label="Breadcrumb">
-            {breadcrumbOf(question).map((g, i, all) => (
+            {breadcrumbOf(question).map((g, i) => (
               <span key={g.id} className="breadcrumb-item">
                 {i > 0 && <ChevronRight size={12} aria-hidden />}
-                {i === all.length - 1 ? <Link to={`/topics/${g.id}`}>{g.label}</Link> : g.label}
+                <Link to={groupUrl(g.id)}>{g.label}</Link>
               </span>
             ))}
           </nav>

@@ -5,6 +5,3 @@ export function isTyping(target: EventTarget | null) {
   const el = target as HTMLElement | null;
   return !!el && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName));
 }
-
-/** Question pages (`/q/...`) get the focused workspace layout. */
-export const isQuestionRoute = (pathname: string) => pathname.startsWith('/q/');

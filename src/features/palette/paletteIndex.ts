@@ -3,6 +3,7 @@ import { breadcrumbOf, questions, questionTree, type Question, type QuestionGrou
 import { notes, noteSections } from '../../lib/content/notes';
 import { quizDecks } from '../../lib/content/quiz';
 import type { Status } from '../../lib/progress';
+import { groupUrl, notesUrl, questionUrl, quizUrl } from '../../lib/routes';
 
 export type PaletteKind = 'question' | 'topic' | 'deck' | 'note' | 'action';
 
@@ -41,7 +42,7 @@ function topicItems(groups: QuestionGroup[], trail: string[] = []): PaletteItem[
       title: g.label,
       subtitle: trail.length ? trail.join(' › ') : 'Track',
       keywords: g.id.split('/'),
-      href: `/topics/${g.id}`,
+      href: groupUrl(g.id),
     },
     ...topicItems(g.children, [...trail, g.label]),
   ]);
@@ -61,7 +62,7 @@ export function buildIndex(): PaletteItem[] {
           .map((g) => g.label)
           .join(' › '),
         keywords: [...q.tags, q.difficulty, q.track, q.type],
-        href: `/q/${q.slug}`,
+        href: questionUrl(q),
         question: q,
       }),
     ),
@@ -73,7 +74,7 @@ export function buildIndex(): PaletteItem[] {
         title: d.title,
         subtitle: `Quiz · ${d.cards.length} cards`,
         keywords: ['quiz', 'flashcards'],
-        href: `/quiz/${d.slug}`,
+        href: quizUrl(d.slug),
       }),
     ),
     ...noteSections.map(
@@ -83,7 +84,7 @@ export function buildIndex(): PaletteItem[] {
         title: s.label,
         subtitle: `Notes · ${s.notes.length} ${s.notes.length === 1 ? 'note' : 'notes'}`,
         keywords: ['notes'],
-        href: `/notes/${s.id}`,
+        href: notesUrl(s.id),
       }),
     ),
     ...notes.map(
@@ -93,7 +94,7 @@ export function buildIndex(): PaletteItem[] {
         title: n.title,
         subtitle: `Notes › ${n.section}`,
         keywords: ['notes'],
-        href: `/notes/${n.slug}`,
+        href: notesUrl(n.slug),
       }),
     ),
   ];

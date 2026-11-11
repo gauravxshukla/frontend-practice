@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
 import { quizDecks } from '../../lib/content/quiz';
+import { quizUrl } from '../../lib/routes';
 
 export default function QuizIndex() {
   return (
@@ -14,7 +15,7 @@ export default function QuizIndex() {
           const isOutput = deck.cards.some((c) => c.front);
           return (
             <li key={deck.slug}>
-              <Link to={`/quiz/${deck.slug}`} className="question-row">
+              <Link to={quizUrl(deck.slug)} className="question-row">
                 <span className="question-row-title">{deck.title}</span>
                 <span className="tag">{isOutput ? 'Predict output' : 'Theory'}</span>
                 <span className="muted question-row-meta">{deck.cards.length} cards</span>
