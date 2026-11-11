@@ -13,6 +13,7 @@
     "verify": "npm run validate && npm run test:solutions"
   },
   "dependencies": {
+    "@codemirror/lang-java": "^6.0.2",
     "@codemirror/lang-python": "^6.2.1",
     "@codesandbox/sandpack-react": "^2.20.0",
     "linkedom": "^0.18.13",

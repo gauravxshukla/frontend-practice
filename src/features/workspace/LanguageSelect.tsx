@@ -20,6 +20,7 @@ export default function LanguageSelect({ value, onChange, disabled }: LanguageSe
       {LANGUAGES.map((l) => (
         <option key={l.id} value={l.id}>
           {l.label}
+          {l.beta ? ' (beta)' : ''}
         </option>
       ))}
     </select>

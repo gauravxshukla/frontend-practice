@@ -189,17 +189,20 @@ export interface RunnerAssets {
   checker?: string;
   /** DSA questions: hand-written Python starter overriding the generated one. */
   pyStarter?: string;
+  /** DSA questions: hand-written Java starter overriding the generated one. */
+  javaStarter?: string;
 }
 
 export async function loadRunnerAssets(q: Question): Promise<RunnerAssets> {
   const folder = folderOf(q.slug);
-  const [starter, solution, tests, cases, checker, pyStarter] = await Promise.all([
+  const [starter, solution, tests, cases, checker, pyStarter, javaStarter] = await Promise.all([
     loadFile(`${folder}/starter.js`),
     loadFile(`${folder}/solution.js`),
     loadFile(`${folder}/solution.test.js`),
     loadFile(`${folder}/cases.json`),
     loadFile(`${folder}/checker.js`),
     loadFile(`${folder}/starter.py`),
+    loadFile(`${folder}/starter.java`),
   ]);
   return {
     starter: starter ?? '',
@@ -208,14 +211,17 @@ export async function loadRunnerAssets(q: Question): Promise<RunnerAssets> {
     spec: cases ? (JSON.parse(cases) as DsaSpec) : undefined,
     checker,
     pyStarter,
+    javaStarter,
   };
 }
 
-/** Reference solutions for the read-only Solution tab: JS always, Python where one exists. */
-export async function loadSolutionSources(q: Question): Promise<{ javascript?: string; python?: string }> {
+/** Reference solutions for the read-only Solution tab: JS always, Python / Java where they exist. */
+export async function loadSolutionSources(q: Question): Promise<{ javascript?: string; python?: string; java?: string }> {
   const folder = folderOf(q.slug);
-  const [javascript, python] = await Promise.all([loadFile(`${folder}/solution.js`), loadFile(`${folder}/solution.py`)]);
-  return { javascript, python };
+  const [javascript, python, java] = await Promise.all(
+    ['js', 'py', 'java'].map((ext) => loadFile(`${folder}/solution.${ext}`)),
+  );
+  return { javascript, python, java };
 }
 
 export interface QuestionGroup {

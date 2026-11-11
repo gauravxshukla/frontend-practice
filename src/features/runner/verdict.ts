@@ -27,7 +27,7 @@ export function toVerdict(response: RunResponse): Verdict {
   switch (response.type) {
     case 'compile-error': {
       // Errors thrown while the module loads (outside a function) aren't syntax errors.
-      const kind = response.message.startsWith('SyntaxError') ? 'compile' : 'runtime';
+      const kind = response.kind ?? (response.message.startsWith('SyntaxError') ? 'compile' : 'runtime');
       return { kind, title: VERDICT_TITLES[kind], message: response.message, results: [] };
     }
     case 'timeout':

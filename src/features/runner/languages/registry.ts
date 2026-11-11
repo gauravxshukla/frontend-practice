@@ -1,3 +1,4 @@
+import { javaRuntime } from '../java/javaRuntime';
 import { pythonRuntime } from '../python/pythonRuntime';
 import { jsRuntime } from './jsRuntime';
 import type { LanguageId, LanguageRuntime } from './types';
@@ -11,17 +12,22 @@ export interface LanguageInfo {
   limitMs: number;
   /** Approximate one-time download, shown while the runtime loads. */
   download?: string;
+  /** Shown as "(beta)" in the language menu. */
+  beta?: boolean;
 }
 
 /** Languages offered for DSA questions, in menu order. */
 export const LANGUAGES: LanguageInfo[] = [
   { id: 'javascript', label: 'JavaScript', file: '/solution.js', limitMs: 3000 },
   { id: 'python', label: 'Python', file: '/solution.py', limitMs: 8000, download: '~6 MB' },
+  // The run limit starts after compiling (see javaRuntime's compileLimitMs).
+  { id: 'java', label: 'Java', file: '/Solution.java', limitMs: 6000, beta: true },
 ];
 
 const RUNTIMES: Record<LanguageId, LanguageRuntime> = {
   javascript: jsRuntime,
   python: pythonRuntime,
+  java: javaRuntime,
 };
 
 export const languageInfo = (id: LanguageId) => LANGUAGES.find((l) => l.id === id) ?? LANGUAGES[0];
