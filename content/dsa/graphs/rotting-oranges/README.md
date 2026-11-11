@@ -38,13 +38,10 @@ Output: 0
 
 ## Notes
 
-- **Key insight:** the rot spreads like a BFS wave from **every** rotten orange simultaneously, and each BFS level is one minute.
-- Count the fresh oranges and collect all rotten ones as the starting frontier.
-- While the frontier is non-empty **and** fresh oranges remain: minute++, rot every fresh neighbour, decrement the fresh count, collect them as the next frontier.
-- At the end, return the minutes if `fresh === 0`, otherwise `-1`.
-- O(rows · cols) time and space.
-- Brute-force baseline: simulate minute by minute, scanning the whole grid each time to find oranges next to rot. O((rows · cols)²) in the worst case.
-- Pitfall: counting one extra minute after the last orange rots (stop when `fresh` hits 0, or subtract one at the end).
-- Pitfall: rotting oranges during the same scan you are reading from, which lets rot travel several cells in one minute. Use a separate next frontier.
-- Edge cases: no oranges at all (`0`), no rotten orange but some fresh ones (`-1`), all already rotten (`0`).
-- Follow-up: return the time each individual orange rots, or let some cells be "immune" for k minutes.
+- **Identify:** rot spreads one step per minute from every rotten orange → multi-source BFS by levels
+- **Brute force:** simulate minute by minute, rescanning the whole grid each time, O((m·n)²)
+- **Insight:** BFS from all rotten oranges at once; each BFS level is one minute
+- **Steps:** count fresh, queue rotten; each round rot fresh neighbours and add a minute; at the end fresh must be 0
+- **Complexity:** O((m·n)²) → O(m·n) time, O(m·n) space
+- **Pitfall:** no fresh oranges at the start means 0 minutes; any fresh left unreachable means −1
+- **Related:** Walls and Gates, Number of Islands, Binary Tree Level Order Traversal

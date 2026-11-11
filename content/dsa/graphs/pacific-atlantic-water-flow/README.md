@@ -43,12 +43,10 @@ Explanation: a single cell borders all four edges, so it reaches both oceans.
 
 ## Notes
 
-- **Key insight:** reverse the flow. Instead of asking where water from each cell can go, start at each ocean's border and walk **uphill** (to neighbours with height ≥ current). Every cell you reach can drain into that ocean.
-- Run one DFS/BFS seeded with all Pacific border cells (top row, left column) and one seeded with all Atlantic border cells (bottom row, right column), each with its own visited matrix.
-- The answer is every cell marked in both matrices.
-- O(rows · cols) time and space: each search visits each cell at most once.
-- Brute-force baseline: from every cell, search downhill and check whether you touch both a Pacific and an Atlantic edge. O((rows · cols)²).
-- Pitfall: the comparison is `>=` when climbing (equal heights let water flow both ways). Using `>` misses plateaus.
-- Pitfall: corner cells belong to both oceans; a 1-row or 1-column grid puts every cell on both borders.
-- Recursive DFS on a 200x200 grid can get deep; an explicit stack is safer.
-- Follow-up: return the cells sorted, or count cells that reach exactly one ocean.
+- **Identify:** cells whose water can reach both oceans → reverse flow: DFS uphill from each ocean's border
+- **Brute force:** from every cell, DFS downhill to see which oceans it reaches, O((m·n)²)
+- **Insight:** instead of flowing down from each cell, climb up from the oceans; two DFS passes cover everything
+- **Steps:** DFS from Pacific borders and Atlantic borders, moving to neighbours ≥ current height; return cells in both sets
+- **Complexity:** O((m·n)²) → O(m·n) time, O(m·n) space
+- **Pitfall:** climbing allows equal heights (≥), because water flows across flat cells
+- **Related:** Surrounded Regions, Number of Islands, Walls and Gates

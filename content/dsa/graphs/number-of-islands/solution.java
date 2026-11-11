@@ -1,23 +1,28 @@
 class Solution {
+    private char[][] grid;
+
     public int numIslands(char[][] grid) {
-        int count = 0;
+        this.grid = grid;
+        int islands = 0;
         for (int r = 0; r < grid.length; r++) {
             for (int c = 0; c < grid[0].length; c++) {
+                // land the scan hasn't sunk yet starts a new island
                 if (grid[r][c] == '1') {
-                    count++;
-                    sink(grid, r, c);
+                    islands++;
+                    sink(r, c);
                 }
             }
         }
-        return count;
+        return islands;
     }
 
-    private void sink(char[][] grid, int r, int c) {
-        if (r < 0 || c < 0 || r >= grid.length || c >= grid[0].length || grid[r][c] != '1') return;
+    // sink every land cell connected to (r, c) so it isn't counted again
+    private void sink(int r, int c) {
+        if (r < 0 || r >= grid.length || c < 0 || c >= grid[0].length || grid[r][c] != '1') return;
         grid[r][c] = '0';
-        sink(grid, r + 1, c);
-        sink(grid, r - 1, c);
-        sink(grid, r, c + 1);
-        sink(grid, r, c - 1);
+        sink(r + 1, c);
+        sink(r - 1, c);
+        sink(r, c + 1);
+        sink(r, c - 1);
     }
 }

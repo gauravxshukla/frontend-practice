@@ -1,25 +1,25 @@
 /**
- * @param {number} n  nodes are labelled 0..n-1
- * @param {number[][]} edges  undirected edges
+ * @param {number} n
+ * @param {number[][]} edges
  * @return {boolean}
  */
 export default function validTree(n, edges) {
-  // A tree on n nodes has exactly n - 1 edges and no cycle (which then forces connectivity).
+  // a tree on n nodes has exactly n - 1 edges; with that count, no cycle means connected
   if (edges.length !== n - 1) return false;
-
   const parent = Array.from({ length: n }, (_, i) => i);
+  // root of x's set, pointing nodes closer to the root as we go (path halving)
   const find = (x) => {
     while (parent[x] !== x) {
-      parent[x] = parent[parent[x]]; // path halving
+      parent[x] = parent[parent[x]];
       x = parent[x];
     }
     return x;
   };
-
   for (const [a, b] of edges) {
     const ra = find(a);
     const rb = find(b);
-    if (ra === rb) return false; // edge closes a cycle
+    // already connected: this edge closes a cycle
+    if (ra === rb) return false;
     parent[ra] = rb;
   }
   return true;

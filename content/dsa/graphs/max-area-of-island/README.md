@@ -40,11 +40,10 @@ Output: 0
 
 ## Notes
 
-- **Key insight:** same as counting islands, but each flood fill also returns how many cells it sank; keep the running maximum.
-- Scan the grid; on an unvisited `1`, flood-fill with a stack (or recursion), zeroing cells as you push them and counting each one popped.
-- O(rows · cols) time and O(rows · cols) worst-case space for the stack.
-- Brute-force baseline: for each land cell, run a fresh BFS with its own visited set. Correct but O((rows · cols)²).
-- Pitfall: returning `-Infinity` or `undefined` for an all-water grid; the answer must be `0`.
-- Pitfall: diagonal cells are **not** connected, so a checkerboard of land has max area 1.
-- If you must not mutate the input, use a separate `visited` matrix.
-- Follow-up: "Making a Large Island": flip at most one `0` to `1` and maximize the area (label islands with ids and sizes, then try each water cell).
+- **Identify:** size of the largest connected land group → DFS that returns the area it sinks
+- **Brute force:** BFS from every land cell with a fresh visited set, O((m·n)²)
+- **Insight:** one DFS per island counts its cells while sinking them, so each cell is visited once
+- **Steps:** scan cells; on land, area = DFS returning 1 + the four neighbours' areas; keep the max
+- **Complexity:** O((m·n)²) → O(m·n) time, O(m·n) recursion depth worst case
+- **Pitfall:** mark a cell before recursing, or neighbours count it twice
+- **Related:** Number of Islands, Surrounded Regions, Pacific Atlantic Water Flow

@@ -1,58 +1,34 @@
 /**
  * @param {number[][]} heights
- * @return {number[][]} cells [r, c] that can drain into both oceans (any order)
+ * @return {number[][]}
  */
 export default function pacificAtlantic(heights) {
   const rows = heights.length;
-  const cols = rows ? heights[0].length : 0;
-  if (!rows || !cols) return [];
-
-  // Walk "uphill" from each ocean's border: a cell is reachable if water could flow
-  // from it down to the ocean.
-  const climb = (starts) => {
-    const seen = Array.from({ length: rows }, () => new Array(cols).fill(false));
-    const stack = [];
-    for (const [r, c] of starts) {
-      if (!seen[r][c]) {
-        seen[r][c] = true;
-        stack.push([r, c]);
-      }
+  const cols = heights[0].length;
+  const pacific = Array.from({ length: rows }, () => new Array(cols).fill(false));
+  const atlantic = Array.from({ length: rows }, () => new Array(cols).fill(false));
+  // climb from the ocean: a neighbour at least as high can drain into this cell
+  const climb = (r, c, seen) => {
+    seen[r][c] = true;
+    for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nr = r + dr;
+      const nc = c + dc;
+      if (nr < 0 || nr >= rows || nc < 0 || nc >= cols || seen[nr][nc]) continue;
+      if (heights[nr][nc] >= heights[r][c]) climb(nr, nc, seen);
     }
-    while (stack.length) {
-      const [r, c] = stack.pop();
-      for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-        const nr = r + dr;
-        const nc = c + dc;
-        if (
-          nr >= 0 && nc >= 0 && nr < rows && nc < cols &&
-          !seen[nr][nc] && heights[nr][nc] >= heights[r][c]
-        ) {
-          seen[nr][nc] = true;
-          stack.push([nr, nc]);
-        }
-      }
-    }
-    return seen;
   };
-
-  const pacificStarts = [];
-  const atlanticStarts = [];
+  // top/left edges touch the Pacific, bottom/right edges the Atlantic
   for (let r = 0; r < rows; r++) {
-    pacificStarts.push([r, 0]);
-    atlanticStarts.push([r, cols - 1]);
+    climb(r, 0, pacific);
+    climb(r, cols - 1, atlantic);
   }
   for (let c = 0; c < cols; c++) {
-    pacificStarts.push([0, c]);
-    atlanticStarts.push([rows - 1, c]);
+    climb(0, c, pacific);
+    climb(rows - 1, c, atlantic);
   }
-
-  const pacific = climb(pacificStarts);
-  const atlantic = climb(atlanticStarts);
   const result = [];
   for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      if (pacific[r][c] && atlantic[r][c]) result.push([r, c]);
-    }
+    for (let c = 0; c < cols; c++) if (pacific[r][c] && atlantic[r][c]) result.push([r, c]);
   }
   return result;
 }

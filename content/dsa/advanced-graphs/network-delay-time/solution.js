@@ -1,5 +1,7 @@
-class MinHeap {
-  constructor() {
+// binary heap: before(a, b) is true when a should come out first
+class Heap {
+  constructor(before) {
+    this.before = before;
     this.items = [];
   }
 
@@ -7,16 +9,16 @@ class MinHeap {
     return this.items.length;
   }
 
-  // Items are arrays; they are ordered by item[0].
-  push(item) {
+  push(value) {
     const a = this.items;
-    a.push(item);
+    a.push(value);
+    // sift up: swap with the parent while the new item should come out sooner
     let i = a.length - 1;
     while (i > 0) {
-      const p = (i - 1) >> 1;
-      if (a[p][0] <= a[i][0]) break;
-      [a[p], a[i]] = [a[i], a[p]];
-      i = p;
+      const parent = (i - 1) >> 1;
+      if (!this.before(a[i], a[parent])) break;
+      [a[i], a[parent]] = [a[parent], a[i]];
+      i = parent;
     }
   }
 
@@ -26,16 +28,17 @@ class MinHeap {
     const last = a.pop();
     if (a.length) {
       a[0] = last;
+      // sift down: swap with whichever child should come out first
       let i = 0;
-      for (;;) {
+      while (true) {
         const l = 2 * i + 1;
         const r = l + 1;
-        let m = i;
-        if (l < a.length && a[l][0] < a[m][0]) m = l;
-        if (r < a.length && a[r][0] < a[m][0]) m = r;
-        if (m === i) break;
-        [a[m], a[i]] = [a[i], a[m]];
-        i = m;
+        let first = i;
+        if (l < a.length && this.before(a[l], a[first])) first = l;
+        if (r < a.length && this.before(a[r], a[first])) first = r;
+        if (first === i) break;
+        [a[i], a[first]] = [a[first], a[i]];
+        i = first;
       }
     }
     return top;
@@ -43,33 +46,28 @@ class MinHeap {
 }
 
 /**
- * @param {number[][]} times  directed edges [from, to, travelTime], nodes 1..n
- * @param {number} n
- * @param {number} k  the source node
- * @return {number} time for the signal to reach every node, or -1
+ * @param {number[][]} times [from, to, time] directed edges
+ * @param {number} n nodes labelled 1..n
+ * @param {number} k start node
+ * @return {number}
  */
 export default function networkDelayTime(times, n, k) {
   const adj = Array.from({ length: n + 1 }, () => []);
   for (const [u, v, w] of times) adj[u].push([v, w]);
-
-  // Dijkstra: pop the closest unsettled node, settle it, relax its edges.
-  const dist = new Array(n + 1).fill(Infinity);
-  const heap = new MinHeap();
-  dist[k] = 0;
+  const settled = new Map(); // node -> final shortest time
+  // min-heap of [time, node]: the closest unsettled node comes out first
+  const heap = new Heap((a, b) => a[0] < b[0]);
   heap.push([0, k]);
-  let settled = 0;
-  let latest = 0;
   while (heap.size) {
-    const [d, u] = heap.pop();
-    if (d > dist[u]) continue; // stale entry
-    settled++;
-    latest = d; // nodes settle in non-decreasing distance order
-    for (const [v, w] of adj[u]) {
-      if (d + w < dist[v]) {
-        dist[v] = d + w;
-        heap.push([dist[v], v]);
-      }
+    const [time, node] = heap.pop();
+    // an older, longer entry for a node that's already settled
+    if (settled.has(node)) continue;
+    settled.set(node, time);
+    for (const [next, w] of adj[node]) {
+      if (!settled.has(next)) heap.push([time + w, next]);
     }
   }
-  return settled === n ? latest : -1;
+  // the signal needs as long as the farthest node takes; unreachable nodes make it impossible
+  if (settled.size < n) return -1;
+  return Math.max(...settled.values());
 }

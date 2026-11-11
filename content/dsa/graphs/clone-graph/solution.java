@@ -1,20 +1,18 @@
 class Solution {
+    private final Map<Node, Node> copies = new HashMap<>(); // original node -> its clone
+
     public Node cloneGraph(Node node) {
-        if (node == null) return null;
-        Map<Node, Node> copies = new HashMap<>();
-        copies.put(node, new Node(node.val));
-        Deque<Node> queue = new ArrayDeque<>();
-        queue.add(node);
-        while (!queue.isEmpty()) {
-            Node cur = queue.poll();
-            for (Node nb : cur.neighbors) {
-                if (!copies.containsKey(nb)) {
-                    copies.put(nb, new Node(nb.val));
-                    queue.add(nb);
-                }
-                copies.get(cur).neighbors.add(copies.get(nb));
-            }
-        }
-        return copies.get(node);
+        copies.clear();
+        return node == null ? null : clone(node);
+    }
+
+    private Node clone(Node original) {
+        // already cloned (we came back around a cycle): reuse it
+        if (copies.containsKey(original)) return copies.get(original);
+        Node copy = new Node(original.val);
+        // register before visiting neighbours so cycles find this clone
+        copies.put(original, copy);
+        for (Node nb : original.neighbors) copy.neighbors.add(clone(nb));
+        return copy;
     }
 }

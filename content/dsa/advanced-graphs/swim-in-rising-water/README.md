@@ -44,12 +44,10 @@ Explanation: follow the outer spiral; the highest cell on the best route is 16.
 
 ## Notes
 
-- **Key insight:** the time needed for a path is the **highest** elevation on it. You want the path whose maximum is smallest, a "minimax" path.
-- Modified Dijkstra: a min-heap keyed by "max elevation so far". Start with `[grid[0][0], 0, 0]`; pop the smallest, and push each unvisited neighbour with `max(current, neighbour)`. The first time you pop the target, that key is the answer.
-- O(n² log n) time, O(n²) space.
-- Binary search alternative: for a candidate `t`, BFS/DFS over cells with elevation ≤ `t` and check whether the target is reachable. Binary search `t` in `[0, n² - 1]`. O(n² log n) as well.
-- Union-find alternative: add cells in increasing elevation order and stop once the two corners share a root.
-- Pitfall: the start cell's own elevation counts; with `grid[0][0] = 3` you cannot leave before `t = 3`.
-- Pitfall: summing elevations along the path, as in a normal shortest path, solves a different problem.
-- Edge case: `n = 1`, where the answer is `grid[0][0]`.
-- Follow-up: "Path With Minimum Effort", where the cost is the maximum height *difference* between steps (same minimax Dijkstra).
+- **Identify:** minimise the highest cell on a path from corner to corner → Dijkstra on the path's max elevation
+- **Brute force:** binary search the time t and BFS cells ≤ t, O(n² log n²) (a valid alternative)
+- **Insight:** always extend the path through the lowest reachable cell; the first time you pop the target, its max is optimal
+- **Steps:** min-heap of (max so far, r, c) from (0, 0); pop; at the target return; push unvisited neighbours with max(t, height)
+- **Complexity:** O(n² log n) time, O(n²) space
+- **Pitfall:** the start cell's own height counts: begin with grid[0][0], not 0
+- **Related:** Network Delay Time, Min Cost to Connect All Points, Cheapest Flights Within K Stops

@@ -1,27 +1,28 @@
 /**
  * @param {number} numCourses
- * @param {number[][]} prerequisites  [course, prereq] pairs: take prereq before course
+ * @param {number[][]} prerequisites [course, prerequisite] pairs
  * @return {boolean}
  */
 export default function canFinish(numCourses, prerequisites) {
-  // Kahn's algorithm: repeatedly take a course with no remaining prerequisites.
-  const indegree = new Array(numCourses).fill(0);
+  // prerequisite -> courses it unlocks, and how many prerequisites each course still needs
   const unlocks = Array.from({ length: numCourses }, () => []);
-  for (const [course, prereq] of prerequisites) {
-    unlocks[prereq].push(course);
-    indegree[course]++;
+  const needs = new Array(numCourses).fill(0);
+  for (const [course, pre] of prerequisites) {
+    unlocks[pre].push(course);
+    needs[course]++;
   }
-
-  const queue = [];
-  for (let i = 0; i < numCourses; i++) if (indegree[i] === 0) queue.push(i);
-
+  // courses with nothing left to wait for can be taken now
+  const ready = [];
+  for (let c = 0; c < numCourses; c++) if (needs[c] === 0) ready.push(c);
   let taken = 0;
-  for (let head = 0; head < queue.length; head++) {
+  while (ready.length) {
+    const course = ready.pop();
     taken++;
-    for (const next of unlocks[queue[head]]) {
-      if (--indegree[next] === 0) queue.push(next);
+    // taking it removes one requirement from each course it unlocks
+    for (const next of unlocks[course]) {
+      if (--needs[next] === 0) ready.push(next);
     }
   }
-  // Anything left over sits on (or behind) a cycle.
+  // courses on a cycle never reach zero requirements
   return taken === numCourses;
 }

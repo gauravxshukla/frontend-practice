@@ -4,21 +4,15 @@
  * @return {GraphNode | null}
  */
 export default function cloneGraph(node) {
-  if (!node) return null;
   const copies = new Map(); // original node -> its clone
-
-  copies.set(node, { val: node.val, neighbors: [] });
-  const queue = [node];
-  while (queue.length) {
-    const current = queue.shift();
-    for (const neighbor of current.neighbors) {
-      if (!copies.has(neighbor)) {
-        // First time we see it: create the clone and schedule its edges.
-        copies.set(neighbor, { val: neighbor.val, neighbors: [] });
-        queue.push(neighbor);
-      }
-      copies.get(current).neighbors.push(copies.get(neighbor));
-    }
-  }
-  return copies.get(node);
+  const clone = (original) => {
+    // already cloned (we came back around a cycle): reuse it
+    if (copies.has(original)) return copies.get(original);
+    const copy = { val: original.val, neighbors: [] };
+    // register before visiting neighbours so cycles find this clone
+    copies.set(original, copy);
+    for (const nb of original.neighbors) copy.neighbors.push(clone(nb));
+    return copy;
+  };
+  return node ? clone(node) : null;
 }
