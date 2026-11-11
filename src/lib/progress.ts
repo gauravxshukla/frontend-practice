@@ -35,6 +35,11 @@ export function markSolved(slug: string) {
   if (state[slug] !== 'solved') write({ ...state, [slug]: 'solved' });
 }
 
+/** Undo a manual "Mark complete" (machine coding): back to attempted. */
+export function markUnsolved(slug: string) {
+  if (state[slug] === 'solved') write({ ...state, [slug]: 'attempted' });
+}
+
 function subscribe(listener: () => void) {
   listeners.add(listener);
   return () => listeners.delete(listener);

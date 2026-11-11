@@ -3,6 +3,7 @@ import { SandpackCodeEditor, SandpackProvider, useSandpack } from '@codesandbox/
 import { CloudUpload, Play, RotateCcw } from 'lucide-react';
 import type { FileMap, Question, RunnerAssets } from '../../lib/content/catalog';
 import { loadDraft } from '../../lib/drafts';
+import { recordActivity } from '../../lib/activity';
 import { markAttempted, markSolved } from '../../lib/progress';
 import { useTheme } from '../../lib/theme';
 import { usePersistentState } from '../../lib/usePersistentState';
@@ -139,6 +140,7 @@ function Inner({ question, assets, onAccepted, language, multiLanguage, onLangua
       setVerdict(next);
       setRunning(null);
 
+      recordActivity(question.slug);
       if (mode === 'submit' && next.kind === 'accepted') {
         markSolved(question.slug);
         onAccepted();

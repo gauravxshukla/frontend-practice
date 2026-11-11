@@ -31,7 +31,7 @@
   margin-right: auto;
   color: var(--text);
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 .brand:hover {
@@ -39,17 +39,8 @@
 }
 
 .brand-mark {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
+  display: block;
   flex-shrink: 0;
-  border-radius: 7px;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 600;
 }
 
 .brand-name {
@@ -573,9 +564,25 @@
   height: 36px;
 }
 
+.rail-btn {
+  position: relative;
+}
+
 .rail-btn.active {
   background: var(--accent-soft);
   color: var(--accent-text);
+}
+
+/* Where you are: a bar on the rail's left edge (the button sits 10px in). */
+.rail-btn.active::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: -10px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent);
 }
 
 .rail-btn.peeking {

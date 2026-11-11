@@ -7,6 +7,7 @@ import { useColumnResize } from '../../lib/useColumnResize';
 import ConsoleDrawer from '../console/ConsoleDrawer';
 import { useSandpackLogs } from '../console/useSandpackLogs';
 import DraftSaver from './DraftSaver';
+import EditTracker from './EditTracker';
 import FileExplorer from './explorer/FileExplorer';
 import { nativeSetup, type Platform } from './native/nativeSetup';
 import PreviewPane from './PreviewPane';
@@ -44,6 +45,8 @@ interface WorkspaceProps {
   onFilesOpenChange: (open: boolean) => void;
   previewOpen: boolean;
   onConsoleErrors?: (errors: number) => void;
+  /** The user changed the code for the first time since opening it. */
+  onFirstEdit?: () => void;
 }
 
 function SandpackConsoleDrawer({ onErrorCount }: { onErrorCount?: (errors: number) => void }) {
@@ -64,6 +67,7 @@ export default function Workspace({
   onFilesOpenChange,
   previewOpen,
   onConsoleErrors,
+  onFirstEdit,
 }: WorkspaceProps) {
   const { resolved } = useTheme();
   const kind: Kind = question.type === 'react' ? 'react' : 'vanilla';
@@ -109,6 +113,7 @@ export default function Workspace({
       options={options}
     >
       {draftSlug && !readOnly && <DraftSaver slug={draftSlug} hidden={hidden} />}
+      {onFirstEdit && !readOnly && <EditTracker onFirstEdit={onFirstEdit} />}
       {/* SandpackLayout (not a plain div): it anchors Sandpack's lazy start, without which the
           preview's loading overlay never clears. */}
       <SandpackLayout className={`mc-workspace${maximized && previewOpen ? ' is-maximized' : ''}`}>

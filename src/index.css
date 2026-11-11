@@ -15,6 +15,16 @@
   --duration: 180ms;
 }
 
+/* Activity heatmap: one hue (the accent), light to dark, mixed into the
+   surface so the steps follow the theme. */
+:root {
+  --heat-0: var(--surface-3);
+  --heat-1: color-mix(in srgb, var(--accent) 30%, var(--surface-2));
+  --heat-2: color-mix(in srgb, var(--accent) 55%, var(--surface-2));
+  --heat-3: color-mix(in srgb, var(--accent) 80%, var(--surface-2));
+  --heat-4: var(--accent);
+}
+
 :root,
 :root[data-theme='light'] {
   color-scheme: light;
@@ -55,6 +65,10 @@
   /* The phone frame around a React Native preview looks the same in both themes. */
   --device-bezel: #18181b;
   --device-screen: #ffffff;
+  /* The logo tile: indigo into violet, with a white glyph. */
+  --brand-from: #5b5bd6;
+  --brand-to: #9b4fd6;
+  --brand-ink: #ffffff;
 }
 
 :root[data-theme='dark'] {
@@ -94,10 +108,18 @@
   --syntax-symbol: #f472b6;
   --device-bezel: #18181b;
   --device-screen: #ffffff;
+  --brand-from: #6c6ce8;
+  --brand-to: #a35ee6;
+  --brand-ink: #ffffff;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Lucide icons: one slightly lighter stroke everywhere, for a crisper look. */
+.lucide {
+  stroke-width: 1.75;
 }
 
 html,
