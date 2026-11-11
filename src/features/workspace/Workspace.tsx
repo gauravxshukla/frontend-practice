@@ -8,6 +8,7 @@ import ConsoleDrawer from '../console/ConsoleDrawer';
 import { useSandpackLogs } from '../console/useSandpackLogs';
 import DraftSaver from './DraftSaver';
 import FileExplorer from './explorer/FileExplorer';
+import { nativeSetup, type Platform } from './native/nativeSetup';
 import PreviewPane from './PreviewPane';
 import { sandpackThemes } from './sandpackThemes';
 
@@ -20,6 +21,9 @@ const TEMPLATE_INTERNALS: Record<Kind, string[]> = {
   react: ['/index.js', '/public/index.html', '/package.json'],
   vanilla: ['/package.json'],
 };
+
+// React Native replaces the template's entry with its own (see nativeSetup) and has no CSS files.
+const NATIVE_TEMPLATE_INTERNALS = ['/public/index.html', '/package.json', '/styles.css'];
 
 /** Entry points the app can't run without; the first one is the default open file. */
 const PROTECTED: Record<Kind, string[]> = {
@@ -34,8 +38,10 @@ interface WorkspaceProps {
   question: Question;
   files: FileMap;
   readOnly?: boolean;
-  /** When set, edits are saved as a draft under this question slug. */
+  /** When set, edits are saved as a draft under this key. */
   draftSlug?: string;
+  /** React questions: `native` runs the files through react-native-web. */
+  platform?: Platform;
 }
 
 function SandpackConsoleDrawer() {
@@ -44,7 +50,7 @@ function SandpackConsoleDrawer() {
 }
 
 /** Live-preview sandbox for machine-coding (React / vanilla) questions: files · editor · preview + console. */
-export default function Workspace({ question, files, readOnly = false, draftSlug }: WorkspaceProps) {
+export default function Workspace({ question, files, readOnly = false, draftSlug, platform = 'web' }: WorkspaceProps) {
   const { resolved } = useTheme();
   const kind: Kind = question.type === 'react' ? 'react' : 'vanilla';
   const [explorerOpen, setExplorerOpen] = usePersistentState(
@@ -53,14 +59,34 @@ export default function Workspace({ question, files, readOnly = false, draftSlug
   );
   const [maximized, setMaximized] = useState(false);
 
+  const isNative = kind === 'react' && platform === 'native';
+
   // Stable references: Sandpack re-initialises whenever these props change identity.
-  const sandpackFiles = useMemo(
-    () => Object.fromEntries(Object.entries(files).map(([path, code]) => [path, { code, readOnly }])),
-    [files, readOnly],
-  );
-  const customSetup = useMemo(() => ({ dependencies: question.dependencies }), [question]);
+  const setup = useMemo(() => {
+    if (!isNative) {
+      return {
+        files,
+        dependencies: question.dependencies,
+        hidden: TEMPLATE_INTERNALS[kind].filter((p) => !(p in files)),
+      };
+    }
+    const native = nativeSetup(files, question.dependencies);
+    return { ...native, hidden: [...NATIVE_TEMPLATE_INTERNALS.filter((p) => !(p in files)), ...native.hidden] };
+  }, [isNative, files, question.dependencies, kind]);
+  const sandpackFiles = useMemo(() => {
+    // `hidden` keeps plumbing (React Native's entry and shim) out of the editor's tabs.
+    const plumbing = new Set(setup.hidden);
+    return Object.fromEntries(
+      Object.entries(setup.files).map(([path, code]) => [path, { code, readOnly, hidden: plumbing.has(path) }]),
+    );
+  }, [setup, readOnly]);
+  const customSetup = useMemo(() => ({ dependencies: setup.dependencies }), [setup]);
   const options = useMemo(() => ({ activeFile: PROTECTED[kind][0], recompileDelay: 400 }), [kind]);
-  const hidden = useMemo(() => TEMPLATE_INTERNALS[kind].filter((p) => !(p in files)), [kind, files]);
+  const hidden = setup.hidden;
+  const isUserFile = useMemo(() => {
+    const skip = new Set(hidden);
+    return (path: string) => !skip.has(path);
+  }, [hidden]);
 
   return (
     <SandpackProvider
@@ -107,7 +133,14 @@ export default function Workspace({ question, files, readOnly = false, draftSlug
           />
         </div>
         <div className="mc-output">
-          <PreviewPane maximized={maximized} onToggleMaximize={() => setMaximized((m) => !m)} />
+          <PreviewPane
+            maximized={maximized}
+            onToggleMaximize={() => setMaximized((m) => !m)}
+            platform={isNative ? 'native' : 'web'}
+            isUserFile={isUserFile}
+            title={question.title}
+            dependencies={question.dependencies}
+          />
           <SandpackConsoleDrawer />
         </div>
       </SandpackLayout>

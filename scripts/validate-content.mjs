@@ -91,6 +91,12 @@ for (const readme of readmes) {
   }
   if (data.type === 'react' && !existsSync(join(folder, 'starter/App.js'))) fail('missing starter/App.js');
   if (data.type === 'vanilla' && !existsSync(join(folder, 'starter/index.js'))) fail('missing starter/index.js');
+  // Optional React Native variants (react-native-web in the sandbox).
+  for (const variant of ['starter-native', 'solution-native']) {
+    if (!existsSync(join(folder, variant))) continue;
+    if (data.type !== 'react') fail(`${variant}/ is only for React questions`);
+    else if (!existsSync(join(folder, variant, 'App.js'))) fail(`missing ${variant}/App.js`);
+  }
 }
 
 if (errors.length) {

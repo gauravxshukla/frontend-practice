@@ -1,4 +1,6 @@
 import { parseFrontmatter } from './frontmatter.js';
+import { defaultNativeStarter } from '../../features/workspace/native/defaultStarter';
+import { isWebOnlyFile, type Platform } from '../../features/workspace/native/nativeSetup';
 import dsaTopics from '../../../content/dsa/topics.json';
 import jsTopics from '../../../content/js/topics.json';
 
@@ -21,6 +23,10 @@ export interface Question {
   /** The README's `## Notes` section, shown only after revealing the solution. */
   notes: string;
   hasSolution: boolean;
+  /** React questions: a hand-written React Native starter (starter-native/) exists. */
+  hasNativeStarter: boolean;
+  /** React questions: a React Native reference solution (solution-native/) exists. */
+  hasNativeSolution: boolean;
   /** Sidebar/topic group this question lives in: `js/polyfills`, `dsa/trees`, `machine-coding/react`. */
   groupId: string;
   /** Position inside its topic (its index in the track's topics.json). */
@@ -96,6 +102,8 @@ function buildQuestion(readmePath: string, raw: string): Question {
     ),
     prompt,
     notes,
+    hasNativeStarter: type === 'react' && filePaths.some((p) => p.startsWith(`${folder}/starter-native/`)),
+    hasNativeSolution: type === 'react' && filePaths.some((p) => p.startsWith(`${folder}/solution-native/`)),
     hasSolution: isUI
       ? filePaths.some((p) => p.startsWith(`${folder}/solution/`))
       : filePaths.includes(`${folder}/solution.js`),
@@ -133,8 +141,20 @@ async function loadFile(path: string): Promise<string | undefined> {
 }
 
 /** Starter or solution files for a machine-coding (React / vanilla) sandbox. */
-export async function loadQuestionFiles(q: Question, variant: 'starter' | 'solution'): Promise<FileMap> {
-  return loadDir(`${folderOf(q.slug)}/${variant}/`);
+export async function loadQuestionFiles(
+  q: Question,
+  variant: 'starter' | 'solution',
+  platform: Platform = 'web',
+): Promise<FileMap> {
+  const folder = folderOf(q.slug);
+  const web = await loadDir(`${folder}/${variant}/`);
+  if (platform === 'web') return web;
+  // React Native reuses the web variant's data files (users.js…), minus CSS,
+  // under its own App.js: from <variant>-native/, or a default starter screen.
+  const shared = Object.fromEntries(Object.entries(web).filter(([path]) => !isWebOnlyFile(path)));
+  const native = await loadDir(`${folder}/${variant}-native/`);
+  if (variant === 'starter' && !native['/App.js']) native['/App.js'] = defaultNativeStarter(q.title);
+  return { ...shared, ...native };
 }
 
 export interface DsaCase {
