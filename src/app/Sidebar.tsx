@@ -176,6 +176,12 @@ export default function Sidebar({
   const railButtons = useRef(new Map<SectionId, HTMLButtonElement>());
   const peek = collapsed ? hover.current : null;
 
+  // The mobile drawer takes focus when it opens: the page behind it is inert.
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (mobileOpen) closeButtonRef.current?.focus();
+  }, [mobileOpen]);
+
   const closePeek = (focusAnchor = false) => {
     const anchor = peek ? railButtons.current.get(peek) : undefined;
     hover.set(null);
@@ -282,7 +288,7 @@ export default function Sidebar({
         >
           <PanelLeftClose size={16} />
         </button>
-        <button type="button" className="icon-btn sidebar-close" onClick={onCloseMobile} aria-label="Close menu">
+        <button ref={closeButtonRef} type="button" className="icon-btn sidebar-close" onClick={onCloseMobile} aria-label="Close menu">
           <X size={16} />
         </button>
       </div>

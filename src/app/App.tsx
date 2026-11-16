@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createBrowserRouter, Link, Navigate, Outlet, RouterProvider, useLocation } from 'react-router';
 import { Keyboard, Menu, Moon, PanelLeft, Search, Sun, SunMoon } from 'lucide-react';
 import CatalogPage from '../features/catalog/CatalogPage';
@@ -19,6 +19,7 @@ import { recordVisit } from '../lib/recent';
 import { legacyRedirect, notesUrl, parseRoute, quizUrl } from '../lib/routes';
 import { keysFor, type ShortcutContext } from '../lib/shortcuts';
 import { setThemeMode } from '../lib/theme';
+import { MOBILE_QUERY, useMediaQuery } from '../lib/useMediaQuery';
 import { usePersistentState } from '../lib/usePersistentState';
 import { OpenSearchContext } from './openSearch';
 import Sidebar from './Sidebar';
@@ -26,8 +27,6 @@ import './layout.css';
 
 // Sandpack is heavy; only load it when a question is opened.
 const QuestionPage = lazy(() => import('../features/workspace/QuestionPage'));
-
-const isMobile = () => window.matchMedia('(max-width: 860px)').matches;
 
 /** Before you type: the three tracks, then Quiz and Notes. */
 function jumpToItems(actions: PaletteAction[]): PaletteItem[] {
@@ -68,25 +67,47 @@ function Layout() {
   const collapsed = inWorkspace ? workspaceCollapsed : browseCollapsed;
   const setCollapsed = inWorkspace ? setWorkspaceCollapsed : setBrowseCollapsed;
   const [mobileOpen, setMobileOpen] = useState(false);
+  const mobile = useMediaQuery(MOBILE_QUERY);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  // Whether the next close of the drawer hands focus back to the menu button. Set by
+  // closeDrawer and read after the re-render, once the page behind is no longer inert.
+  const restoreFocus = useRef(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   // Text to start a search with (e.g. the name of a question that wasn't found).
   const [paletteSeed, setPaletteSeed] = useState<{ query: string } | null>(null);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
 
-  // Close the drawer whenever the route changes.
-  useEffect(() => setMobileOpen(false), [pathname]);
+  const closeDrawer = useCallback((returnFocus: boolean) => {
+    restoreFocus.current = returnFocus;
+    setMobileOpen(false);
+  }, []);
+
+  useEffect(() => {
+    if (mobileOpen || !restoreFocus.current) return;
+    restoreFocus.current = false;
+    menuButtonRef.current?.focus();
+  }, [mobileOpen]);
+
+  // Close the drawer whenever the route changes, and when the window grows past the
+  // drawer breakpoint (else the page would stay inert on desktop).
+  useEffect(() => closeDrawer(false), [pathname, closeDrawer]);
+  useEffect(() => {
+    if (!mobile) closeDrawer(false);
+  }, [mobile, closeDrawer]);
   useEffect(() => recordVisit(pathname), [pathname]);
 
   const toggleSidebar = useCallback(() => {
-    if (isMobile()) setMobileOpen((open) => !open);
-    else setCollapsed((c) => !c);
-  }, [setCollapsed]);
+    if (mobile) {
+      restoreFocus.current = true;
+      setMobileOpen((open) => !open);
+    } else setCollapsed((c) => !c);
+  }, [mobile, setCollapsed]);
 
   const openPalette = useCallback((query?: string) => {
-    setMobileOpen(false);
+    closeDrawer(false);
     if (query !== undefined) setPaletteSeed({ query });
     setPaletteOpen(true);
-  }, []);
+  }, [closeDrawer]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -98,7 +119,7 @@ function Layout() {
         e.preventDefault();
         e.stopPropagation();
         if (otherDialog) return;
-        setMobileOpen(false);
+        closeDrawer(false);
         setPaletteOpen((open) => !open);
       } else if (mod && e.key.toLowerCase() === 'b') {
         e.preventDefault();
@@ -109,15 +130,15 @@ function Layout() {
       } else if (e.key === '?' && !mod && !isTyping(e.target) && !document.querySelector('dialog[open]:not(.shortcuts)')) {
         // Toggles: `?` again closes the sheet.
         e.preventDefault();
-        setMobileOpen(false);
+        closeDrawer(false);
         setShortcutsOpen((open) => !open);
       } else if (e.key === 'Escape') {
-        setMobileOpen(false);
+        closeDrawer(true);
       }
     };
     window.addEventListener('keydown', onKey, true);
     return () => window.removeEventListener('keydown', onKey, true);
-  }, [toggleSidebar, openPalette]);
+  }, [toggleSidebar, openPalette, closeDrawer]);
 
   const actions = useMemo(
     (): PaletteAction[] => [
@@ -158,18 +179,19 @@ function Layout() {
             collapsed={collapsed}
             onToggleCollapsed={() => setCollapsed((c) => !c)}
             mobileOpen={mobileOpen}
-            onCloseMobile={() => setMobileOpen(false)}
+            onCloseMobile={() => closeDrawer(true)}
             onOpenSearch={() => openPalette()}
             onOpenShortcuts={() => {
-              setMobileOpen(false);
+              closeDrawer(false);
               setShortcutsOpen(true);
             }}
           />
-          {mobileOpen && <div className="sidebar-backdrop" onClick={() => setMobileOpen(false)} aria-hidden />}
+          {mobileOpen && <div className="sidebar-backdrop" onClick={() => closeDrawer(true)} aria-hidden />}
 
-          <div className="main">
+          {/* While the drawer is open, the page behind it can't be focused or read. */}
+          <div className="main" inert={mobileOpen}>
             <header className="mobile-topbar">
-              <button type="button" className="icon-btn" onClick={() => setMobileOpen(true)} aria-label="Open menu">
+              <button ref={menuButtonRef} type="button" className="icon-btn" onClick={() => setMobileOpen(true)} aria-label="Open menu">
                 <Menu size={18} />
               </button>
               <Link to="/" className="brand">

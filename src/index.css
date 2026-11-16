@@ -184,6 +184,15 @@ kbd {
   background: var(--accent-soft);
 }
 
+/* iOS zooms the page in when a field under 16px is focused, and doesn't zoom back out.
+   On touch screens every form field is 16px (the code editor: sandpackThemes.ts).
+   The :not()s lift specificity above component rules like `.select select`. */
+@media (pointer: coarse) {
+  :is(input, textarea, select):not([type='checkbox']):not([type='radio']) {
+    font-size: 16px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

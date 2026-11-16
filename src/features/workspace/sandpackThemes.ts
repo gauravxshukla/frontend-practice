@@ -1,13 +1,22 @@
 import type { SandpackTheme } from '@codesandbox/sandpack-react';
 import type { ResolvedTheme } from '../../lib/theme';
+import { COARSE_POINTER_QUERY } from '../../lib/useMediaQuery';
 
-// Mirrors the app tokens in src/index.css so the editor feels like part of the app.
-const font: SandpackTheme['font'] = {
-  body: "'Inter', system-ui, sans-serif",
-  mono: "'JetBrains Mono', ui-monospace, Menlo, monospace",
-  size: '13px',
-  lineHeight: '20px',
-};
+/**
+ * Mirrors the app tokens in src/index.css so the editor feels like part of the app.
+ * Touch screens get 16px: iOS zooms into a focused editor with smaller text.
+ */
+export function editorFont(coarse: boolean): SandpackTheme['font'] {
+  return {
+    body: "'Inter', system-ui, sans-serif",
+    mono: "'JetBrains Mono', ui-monospace, Menlo, monospace",
+    size: coarse ? '16px' : '13px',
+    lineHeight: coarse ? '24px' : '20px',
+  };
+}
+
+// Read once: the kind of pointer doesn't change during a visit.
+const font = editorFont(typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia(COARSE_POINTER_QUERY).matches);
 
 const light: SandpackTheme = {
   colors: {
