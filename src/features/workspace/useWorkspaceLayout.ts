@@ -1,10 +1,11 @@
 import { useCallback, useEffect } from 'react';
+import { useMediaQuery } from '../../lib/useMediaQuery';
 import { usePersistentState } from '../../lib/usePersistentState';
 
 export type PanelId = 'description' | 'files' | 'preview';
 
-/** Below this width the file tree starts hidden so the editor keeps room. */
-const FILES_MIN_VIEWPORT = 1100;
+/** Narrower than this, the file tree starts hidden so the editor keeps room. */
+export const FILES_WIDE_QUERY = '(min-width: 1100px)';
 const MAX_TABS_WITHOUT_TREE = 3;
 
 /**
@@ -13,6 +14,11 @@ const MAX_TABS_WITHOUT_TREE = 3;
  */
 export function filesOpenByDefault(paths: string[]): boolean {
   return paths.length > MAX_TABS_WITHOUT_TREE || paths.some((p) => p.split('/').filter(Boolean).length > 1);
+}
+
+/** The user's stored choice wins; otherwise open only on a wide window and when the tree helps. */
+export function resolveFilesOpen(choice: boolean | null, wide: boolean, paths: string[]): boolean {
+  return choice ?? (wide && filesOpenByDefault(paths));
 }
 
 const SHORTCUT_PANELS: Record<string, PanelId> = { Digit1: 'description', Digit2: 'files', Digit3: 'preview' };
@@ -27,8 +33,9 @@ export function useWorkspaceLayout({ panels, paths }: { panels: PanelId[]; paths
   const [filesChoice, setFilesChoice] = usePersistentState<boolean | null>('fp:explorerOpen', null);
   const [preview, setPreview] = usePersistentState('fp:layout:preview', true);
 
-  const wide = typeof window === 'undefined' || window.innerWidth >= FILES_MIN_VIEWPORT;
-  const files = filesChoice ?? (wide && filesOpenByDefault(paths));
+  // Live: resizing the window across the breakpoint updates the default.
+  const wide = useMediaQuery(FILES_WIDE_QUERY);
+  const files = resolveFilesOpen(filesChoice, wide, paths);
   const state: Record<PanelId, boolean> = { description, files, preview };
 
   const toggle = useCallback(

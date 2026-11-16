@@ -183,3 +183,12 @@
     display: none;
   }
 }
+
+/* Touch screens at any width (e.g. a tablet): no keyboard hints. */
+@media (hover: none) {
+  .palette-footer,
+  .palette-esc,
+  .palette-row-meta .kbd {
+    display: none;
+  }
+}

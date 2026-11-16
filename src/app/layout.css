@@ -772,6 +772,79 @@ body.is-resizing iframe {
   display: none;
 }
 
+/* ---------- Phone question page: view switcher (QuestionPage renders it at ≤860px only) ---------- */
+.phone-panes {
+  display: flex;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.phone-panes button {
+  position: relative;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.phone-panes button[aria-selected='true'] {
+  color: var(--text);
+}
+
+.phone-panes button[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.phone-pane-alert {
+  color: var(--hard);
+}
+
+/* "More" in the phone header: the machine-coding actions, in a small floating panel. */
+.header-menu-root {
+  position: relative;
+}
+
+.header-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 210px;
+  padding: 8px;
+  border: 1px solid var(--overlay-border);
+  border-radius: var(--radius-lg);
+  background: var(--overlay-bg);
+  box-shadow: var(--overlay-shadow);
+  animation: rise var(--duration) var(--ease);
+}
+
+.header-menu .btn {
+  justify-content: flex-start;
+}
+
+.header-menu .segmented button {
+  flex: 1;
+}
+
 /* ---------- Panel toggles (question header) ---------- */
 .layout-toggles {
   display: flex;
@@ -1904,22 +1977,43 @@ body.is-resizing-rows iframe {
     padding: 20px 16px 48px;
   }
 
+  /* The question page fills the screen under the top bar (48px) and shows one view at a
+     time: QuestionPage sets .question-body[data-pane]. Hidden views use display: none and
+     stay mounted, so the editor keeps its state and the preview keeps running. */
   .question-page {
-    height: auto;
+    height: calc(100vh - 48px);
+    height: calc(100dvh - 48px);
   }
 
   .question-header {
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 12px;
+  }
+
+  .question-heading {
+    flex: 1;
+  }
+
+  /* Wrap between crumbs, never inside one ("DSA · NeetCode" / "150"). */
+  .breadcrumb {
     flex-wrap: wrap;
+  }
+
+  .breadcrumb-item {
+    white-space: nowrap;
+  }
+
+  .question-title-row {
+    gap: 4px 8px;
+  }
+
+  .question-title-row .meta {
+    display: none;
   }
 
   .question-actions {
-    margin-left: 0;
-    flex-wrap: wrap;
-  }
-
-  .question-body,
-  .workspace-panel {
-    flex: none;
+    flex-shrink: 0;
   }
 
   .question-body {
@@ -1927,10 +2021,8 @@ body.is-resizing-rows iframe {
   }
 
   .prompt-panel {
+    flex: 1;
     width: 100%;
-    max-height: 60vh;
-    max-height: 60dvh;
-    border-bottom: 1px solid var(--border);
   }
 
   .panel-scroll {
@@ -1945,49 +2037,56 @@ body.is-resizing-rows iframe {
     display: none;
   }
 
-  .workspace-panel {
-    height: 85vh;
-    height: 85dvh;
+  .question-body[data-pane='problem'] > .workspace-panel,
+  .question-body[data-pane]:not([data-pane='problem']) > .prompt-panel {
+    display: none;
   }
 
-  /* Stack files, editor and output; the console drawer and tree keep their toggles. */
+  /* Code questions. Code: the editor, with Run / Submit in a bar beneath it. Tests: the console. */
+  .question-body[data-pane='code'] :is(.row-resize, .console-tabs, .console-body),
+  .question-body[data-pane='tests'] :is(.editor-bar, .editor-area, .row-resize) {
+    display: none;
+  }
+
+  .question-body[data-pane='code'] .console {
+    min-height: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .question-body[data-pane='code'] .console-header {
+    justify-content: flex-end;
+    padding: 6px 8px;
+    border-bottom: 0;
+  }
+
+  .question-body[data-pane='tests'] .console {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* Machine coding. Code: files and editor, stacked. Preview: the preview over its console. */
   .mc-workspace,
-  .mc-workspace.sp-layout {
-    flex-direction: column;
-  }
-
+  .mc-workspace.sp-layout,
   .mc-split {
     flex-direction: column;
   }
 
   .mc-editor,
-  .mc-split > .mc-editor {
+  .mc-split > .mc-editor,
+  .mc-output {
     flex: 1 1 0;
-    min-height: 220px;
+    min-height: 0;
     border-right: 0;
-    border-bottom: 1px solid var(--border);
   }
 
-  /* No panel toggles on phones, so nothing stays hidden. */
-  .layout-toggles {
-    display: none;
-  }
-
+  /* The preview toggle is desktop-only; on phones the Preview view always has it. */
   .mc-output[hidden] {
     display: flex;
   }
 
-  .prompt-strip {
-    flex: 0 0 auto;
-    flex-direction: row;
-    padding: 4px 8px;
-    border-right: 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .mc-output {
-    flex: 1 1 0;
-    min-height: 260px;
+  .question-body[data-pane='code'] .mc-output,
+  .question-body[data-pane='preview'] :is(.mc-editor, .explorer, .explorer-rail) {
+    display: none;
   }
 
   .explorer {
@@ -2011,5 +2110,95 @@ body.is-resizing-rows iframe {
 
   .input-with-icon {
     max-width: none;
+  }
+}
+
+/* ---------- Touch screens ---------- */
+/* No hover usually means no keyboard either, so shortcut hints are noise. */
+@media (hover: none) {
+  .console-actions .kbd {
+    display: none;
+  }
+}
+
+/* Fingers need bigger targets than a mouse pointer: 36px here (the responsive audit fails
+   anything under 32px). `:root` lifts these above each component's own size rule, whatever
+   order the stylesheets load in. */
+@media (pointer: coarse) {
+  :root :is(.icon-btn, .layout-toggle, .chip-add, .console-search-toggle, .console-filter-level select) {
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  :root
+    :is(
+      .btn,
+      .btn-sm,
+      .segmented button,
+      .select select,
+      .case-chip > button:first-child,
+      .console-drawer-toggle,
+      .console-filter-text,
+      .nav-item,
+      .nav-group-header
+    ) {
+    min-height: 36px;
+  }
+
+  :root .chip-remove {
+    width: 32px;
+    height: 32px;
+  }
+
+  :root .brand {
+    min-height: 32px;
+  }
+
+  /* Resize handles: a finger-wide (~21px) grab area and a visible grip. A tap leaves
+     :hover stuck on, so the hover/drag narrowing of the hit area is undone here and the
+     drag shows on the line itself instead. */
+  .resize-handle::after,
+  .resize-handle:hover::after,
+  .resize-handle:focus-visible::after,
+  body.is-resizing .resize-handle::after {
+    inset: 0 -10px;
+    background: none;
+  }
+
+  .row-resize::after,
+  .row-resize:hover::after,
+  .row-resize:focus-visible::after,
+  body.is-resizing-rows .row-resize::after {
+    inset: -10px 0;
+    background: none;
+  }
+
+  .resize-handle::before,
+  .row-resize::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    border-radius: 2px;
+    background: var(--border-strong);
+    transform: translate(-50%, -50%);
+  }
+
+  .resize-handle::before {
+    width: 4px;
+    height: 28px;
+  }
+
+  .row-resize::before {
+    width: 28px;
+    height: 4px;
+  }
+
+  body.is-resizing .resize-handle,
+  body.is-resizing-rows .row-resize,
+  body.is-resizing .resize-handle::before,
+  body.is-resizing-rows .row-resize::before {
+    background: var(--accent);
   }
 }

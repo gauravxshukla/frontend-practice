@@ -23,12 +23,16 @@ import { useTheme } from '../../lib/theme';
 import { ariaKeysFor, keysFor } from '../../lib/shortcuts';
 import { groupUrl, parseRoute, questionUrl } from '../../lib/routes';
 import { useColumnResize } from '../../lib/useColumnResize';
+import { MOBILE_QUERY, useMediaQuery } from '../../lib/useMediaQuery';
 import { LANGUAGES, languageInfo } from '../runner/languages/registry';
 import type { LanguageId } from '../runner/languages/types';
 import { useOpenSearch } from '../../app/openSearch';
 import CodeWorkspace from './CodeWorkspace';
+import HeaderMenu from './HeaderMenu';
 import LayoutToggles from './LayoutToggles';
 import MarkComplete from './MarkComplete';
+import PhonePaneTabs from './PhonePaneTabs';
+import { phonePanes, type PhonePane } from './phonePanes';
 import PromptStrip from './PromptStrip';
 import { useWorkspaceLayout, type PanelId } from './useWorkspaceLayout';
 import type { Platform } from './native/nativeSetup';
@@ -157,6 +161,10 @@ export default function QuestionPage() {
   const [solutionFiles, setSolutionFiles] = useState<FileMap | null>(null);
   const [resetKey, setResetKey] = useState(0);
   const [consoleErrors, setConsoleErrors] = useState(0);
+  // Phones show one view at a time (problem, code, tests or preview) instead of side-by-side panels.
+  const phone = useMediaQuery(MOBILE_QUERY);
+  const [pane, setPane] = useState<PhonePane>('problem');
+  const showTests = useCallback(() => setPane('tests'), []);
 
   // Panels: code questions only have the description to hide; machine coding also files and preview.
   const panels = useMemo<PanelId[]>(() => (isCode ? ['description'] : ['description', 'files', 'preview']), [isCode]);
@@ -166,6 +174,7 @@ export default function QuestionPage() {
   useEffect(() => {
     setLeftTab('description');
     setRevealed(false);
+    setPane('problem');
   }, [question]);
 
   useEffect(() => {
@@ -317,6 +326,35 @@ export default function QuestionPage() {
     ...(isCode && question.hasSolution ? [{ id: 'solution' as const, label: 'Solution' }] : []),
   ];
 
+  // Machine-coding actions: in the header on wide screens, behind "More" on phones.
+  const platformToggle = question.type === 'react' ? <PlatformToggle value={platform} onChange={changePlatform} /> : null;
+  const uiActions = isCode ? null : (
+    <>
+      {uiView === 'attempt' ? (
+        <>
+          <button type="button" className="btn" onClick={resetUi}>
+            <RotateCcw size={14} aria-hidden /> Reset
+          </button>
+          <MarkComplete slug={question.slug} />
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={revealUiSolution}
+            disabled={!hasUiSolution}
+            data-tooltip={hasUiSolution ? undefined : `No ${platform === 'native' ? 'React Native ' : ''}reference solution has been written yet`}
+          >
+            <Eye size={14} aria-hidden /> {hasUiSolution ? 'Reveal solution' : 'No solution yet'}
+          </button>
+        </>
+      ) : (
+        <button type="button" className="btn btn-primary" onClick={backToAttempt}>
+          <Undo2 size={14} aria-hidden /> Back to my code
+        </button>
+      )}
+    </>
+  );
+  const showPrompt = layout.state.description || phone;
+
   return (
     <div className="question-page">
       <header className="question-header">
@@ -346,8 +384,10 @@ export default function QuestionPage() {
         </div>
 
         <div className="question-actions">
-          <LayoutToggles panels={panels} state={layout.state} onToggle={layout.toggle} previewAlert={consoleErrors > 0} />
-          {question.type === 'react' && <PlatformToggle value={platform} onChange={changePlatform} />}
+          {!phone && (
+            <LayoutToggles panels={panels} state={layout.state} onToggle={layout.toggle} previewAlert={consoleErrors > 0} />
+          )}
+          {!phone && platformToggle}
           <div className="btn-group" role="group" aria-label="Question navigation">
             <button
               type="button"
@@ -374,33 +414,33 @@ export default function QuestionPage() {
               <ArrowRight size={15} />
             </button>
           </div>
-          {!isCode &&
-            (uiView === 'attempt' ? (
-              <>
-                <button type="button" className="btn" onClick={resetUi}>
-                  <RotateCcw size={14} aria-hidden /> Reset
-                </button>
-                <MarkComplete slug={question.slug} />
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={revealUiSolution}
-                  disabled={!hasUiSolution}
-                  data-tooltip={hasUiSolution ? undefined : `No ${platform === 'native' ? 'React Native ' : ''}reference solution has been written yet`}
-                >
-                  <Eye size={14} aria-hidden /> {hasUiSolution ? 'Reveal solution' : 'No solution yet'}
-                </button>
-              </>
+          {uiActions &&
+            (phone ? (
+              <HeaderMenu label="More actions">
+                {platformToggle}
+                {uiActions}
+              </HeaderMenu>
             ) : (
-              <button type="button" className="btn btn-primary" onClick={backToAttempt}>
-                <Undo2 size={14} aria-hidden /> Back to my code
-              </button>
+              uiActions
             ))}
         </div>
       </header>
 
-      <div className="question-body" style={{ '--prompt-width': `${divider.value}px` } as CSSProperties}>
-        {!layout.state.description && (
+      {phone && (
+        <PhonePaneTabs
+          panes={phonePanes(isCode)}
+          value={pane}
+          onChange={setPane}
+          alerts={{ preview: consoleErrors > 0 }}
+        />
+      )}
+
+      <div
+        className="question-body"
+        data-pane={phone ? pane : undefined}
+        style={{ '--prompt-width': `${divider.value}px` } as CSSProperties}
+      >
+        {!showPrompt && (
           <PromptStrip
             tabs={tabs}
             onOpen={(tab) => {
@@ -409,7 +449,7 @@ export default function QuestionPage() {
             }}
           />
         )}
-        {layout.state.description && (
+        {showPrompt && (
           <>
             <section className="prompt-panel" aria-label="Problem">
               <div className="panel-tabs" role="tablist">
@@ -463,7 +503,7 @@ export default function QuestionPage() {
         <section className="workspace-panel" aria-label="Workspace">
           {isCode ? (
             assets ? (
-              <CodeWorkspace question={question} assets={assets} onAccepted={onAccepted} />
+              <CodeWorkspace question={question} assets={assets} onAccepted={onAccepted} onConsoleNeeded={showTests} />
             ) : (
               <WorkspaceSkeleton />
             )

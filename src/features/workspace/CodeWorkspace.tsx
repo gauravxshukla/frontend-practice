@@ -6,6 +6,7 @@ import { loadDraft } from '../../lib/drafts';
 import { recordActivity } from '../../lib/activity';
 import { markAttempted, markSolved } from '../../lib/progress';
 import { useTheme } from '../../lib/theme';
+import { MOBILE_QUERY, useMediaQuery } from '../../lib/useMediaQuery';
 import { usePersistentState } from '../../lib/usePersistentState';
 import { useRowResize } from '../../lib/useRowResize';
 import { Kbd } from '../../components/Kbd';
@@ -32,6 +33,8 @@ interface Props {
   question: Question;
   assets: RunnerAssets;
   onAccepted: () => void;
+  /** A run started or a testcase needs fixing: on phones, the page switches to the console. */
+  onConsoleNeeded?: () => void;
 }
 
 /** Starter per language file. DSA questions get Python and Java too: a committed starter, else one generated from cases.json. */
@@ -58,7 +61,7 @@ interface InnerProps extends Props {
   starters: FileMap;
 }
 
-function Inner({ question, assets, onAccepted, language, multiLanguage, onLanguageChange, starters }: InnerProps) {
+function Inner({ question, assets, onAccepted, onConsoleNeeded, language, multiLanguage, onLanguageChange, starters }: InnerProps) {
   const { sandpack } = useSandpack();
   const toast = useToast();
   const info = languageInfo(language);
@@ -91,6 +94,8 @@ function Inner({ question, assets, onAccepted, language, multiLanguage, onLangua
   /** Language the shown verdict was produced in (the user may switch since). */
   const [verdictLanguage, setVerdictLanguage] = useState(info.label);
   const consoleResize = useRowResize('fp:consoleHeight', 280);
+  // On phones the console is either a bar under the editor or the whole view: CSS sizes it.
+  const phone = useMediaQuery(MOBILE_QUERY);
 
   // JS questions: learn the suite's test names (registering tests doesn't run them).
   useEffect(() => {
@@ -114,6 +119,7 @@ function Inner({ question, assets, onAccepted, language, multiLanguage, onLangua
         } catch (e) {
           setCaseError((e as Error).message);
           setTab('testcase');
+          onConsoleNeeded?.();
           return;
         }
         const input = { code: codeRef.current, spec, cases: runnable, refCode: assets.solution, checkerCode: assets.checker };
@@ -135,6 +141,7 @@ function Inner({ question, assets, onAccepted, language, multiLanguage, onLangua
       setLastMode(mode);
       setVerdictLanguage(info.label);
       setTab('result');
+      onConsoleNeeded?.();
       const response = await start();
       const next = toVerdict(response);
       setVerdict(next);
@@ -148,7 +155,7 @@ function Inner({ question, assets, onAccepted, language, multiLanguage, onLangua
         markAttempted(question.slug);
       }
     },
-    [running, status, spec, cases, assets, testNames, question.slug, question.env, onAccepted, runtime, info],
+    [running, status, spec, cases, assets, testNames, question.slug, question.env, onAccepted, onConsoleNeeded, runtime, info],
   );
 
   // ⌘' / Ctrl+' runs, ⌘↵ / Ctrl+↵ submits. Capture phase so the editor doesn't eat them.
@@ -235,7 +242,7 @@ function Inner({ question, assets, onAccepted, language, multiLanguage, onLangua
         onKeyDown={consoleResize.onKeyDown}
       />
 
-      <section className="console" style={{ height: consoleResize.height }} aria-label="Console">
+      <section className="console" style={phone ? undefined : { height: consoleResize.height }} aria-label="Console">
         <div className="console-header">
           <div className="console-tabs" role="tablist">
             <button type="button" role="tab" aria-selected={tab === 'testcase'} onClick={() => setTab('testcase')}>
@@ -308,7 +315,7 @@ function Inner({ question, assets, onAccepted, language, multiLanguage, onLangua
 }
 
 /** LeetCode-style editor + Run/Submit console for JS and DSA questions (DSA: JavaScript or Python). */
-export default function CodeWorkspace({ question, assets, onAccepted }: Props) {
+export default function CodeWorkspace({ question, assets, onAccepted, onConsoleNeeded }: Props) {
   const { resolved } = useTheme();
   const multiLanguage = question.type === 'dsa' && Boolean(assets.spec);
   const [storedLanguage, setLanguage] = usePersistentState<LanguageId>('fp:dsaLanguage', 'javascript');
@@ -330,6 +337,7 @@ export default function CodeWorkspace({ question, assets, onAccepted }: Props) {
         question={question}
         assets={assets}
         onAccepted={onAccepted}
+        onConsoleNeeded={onConsoleNeeded}
         language={language}
         multiLanguage={multiLanguage}
         onLanguageChange={setLanguage}

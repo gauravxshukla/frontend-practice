@@ -701,3 +701,12 @@
 .nav-item.active .nav-count {
   color: inherit;
 }
+
+/* Touch screens: no keyboard hint on the search box, and no hover-only edge strip (the
+   header's collapse button does the same job). */
+@media (hover: none) {
+  .sidebar-search-trigger .kbd,
+  .sidebar-edge {
+    display: none;
+  }
+}

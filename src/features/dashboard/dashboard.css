@@ -471,3 +471,10 @@
     display: none;
   }
 }
+
+/* Touch screens: no keyboard hint on the search box. */
+@media (hover: none) {
+  .dashboard-search .kbd {
+    display: none;
+  }
+}

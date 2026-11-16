@@ -12,7 +12,7 @@ interviews: JS questions graded by Jest-style suites, DSA in JS / Python (Pyodid
 | `npm run build` | Type-check (`tsc`, including `test/`) and build. This is the typecheck gate. |
 | `npm run verify` | Validate content, then run every test (Vitest) |
 | `npx vitest run test/lib/drafts.test.ts` | Run one test file |
-| `npm run audit:responsive` | Check the app in Chrome at phone/tablet/desktop sizes (overflow, iOS zoom, drawer, touch); screenshots in `.audit/responsive/` |
+| `npm run audit:responsive` | Check the app in Chrome at phone/tablet/desktop sizes (overflow, iOS zoom, drawer, phone question views, tap targets, keyboard hints, resize handles); screenshots in `.audit/responsive/` |
 
 There is no lint script.
 
